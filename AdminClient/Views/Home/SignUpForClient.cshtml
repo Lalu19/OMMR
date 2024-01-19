@@ -1,0 +1,414 @@
+﻿@using Microsoft.Extensions.Configuration;
+@using Microsoft.AspNetCore.Http
+@inject IConfiguration Configuration;
+
+@{
+    Layout = null;
+    ViewBag.Title = "User";
+    string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
+}
+
+
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- ===============================================-->
+    <!--    Document Title-->
+    <!-- ===============================================-->
+    <title>Signup</title>
+
+    <!-- ===============================================-->
+    <!--    Favicons-->
+    <!-- ===============================================-->
+    @* <link rel="apple-touch-icon" sizes="180x180" href="~/assets/img/icons/logo-colorNewEbook.png"> *@
+    @* <link rel="icon" type="image/png" sizes="32x32" href="~/assets/img/icons/logo-colorNewEbook.png"> *@
+    @* <link rel="icon" type="image/png" sizes="16x16" href="~/assets/img/icons/logo-colorNewEbook.png"> *@
+    @* <link rel="shortcut icon" type="image/x-icon" href="~/assets/img/icons/logo-colorNewEbook.png"> *@
+    @* <link rel="manifest" href="~/assets/img/favicons/manifest.json"> *@
+    @* <meta name="msapplication-TileImage" content="~/assets/img/icons/logo-colorNewEbook.png"> *@
+    <meta name="theme-color" content="#ffffff">
+    <script src="~/assets//js/vendors/imagesloaded/imagesloaded.pkgd.min.js"></script>
+    <script src="~/assets/js/vendors/simplebar/simplebar.min.js"></script>
+    <script src="~/assets/js/config.js"></script>
+
+    <!-- ===============================================-->
+    <!--    Stylesheets-->
+    <!-- ===============================================-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="../../../../../css2?family=Nunito+Sans:wght@300;400;600;700;800;900&amp;display=swap" rel="stylesheet">
+    <link href="~/assets/js/vendors/simplebar/simplebar.min.js" rel="stylesheet">
+    <link rel="stylesheet" href="~/assets/js/vendors/release/v4.0.0/css/line.css">
+    <link href="~/assets/css/theme-rtl.min.css" type="text/css" rel="stylesheet" id="style-rtl">
+    <link href="~/assets/css/theme.min.css" type="text/css" rel="stylesheet" id="style-default">
+    <link href="~/assets/css/user-rtl.min.css" type="text/css" rel="stylesheet" id="user-style-rtl">
+    <link href="~/assets/css/user.min.css" type="text/css" rel="stylesheet" id="user-style-default">
+
+    <link rel="icon" href="~/images/brand/Fv.png" type="image/x-icon" />
+
+    <!-- SELECT2 CSS -->
+    <link href="~/plugins/select2/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/plugins/multipleselect/multiple-select.css">
+
+    <style>
+        .side-menu__item {
+            color: black !important;
+        }
+
+        .header-brand-img {
+            height: 6.5rem;
+            line-height: 2rem;
+            vertical-align: middle;
+            margin-right: 0.5rem;
+            width: auto;
+        }
+
+        #clientlogo{
+            margin-top:-15px;
+            margin-bottom: -15px;
+        }
+
+
+        .select2-container--default .select2-selection--single {
+             background-color: none; 
+             border: none; 
+        }
+
+        .select2-container .select2-selection--single {
+             box-sizing:unset; 
+             cursor: none; 
+             display:none; 
+            height: none;
+             user-select: none; 
+             -webkit-user-select: none; 
+        }
+
+
+    </style>
+
+
+</head>
+
+<body>
+    <!-- ===============================================-->
+    <!--    Main Content-->
+    <!-- ===============================================-->
+    <main class="main" id="top">
+        <div class="container-fluid px-0" data-layout="container">
+            <div class="container-fluid">
+                <div class="bg-holder bg-auth-card-overlay" style="background-image:url(../../../assets/img/bg/37.png);"></div>
+                <!--/.bg-holder-->
+                <div class="row flex-center position-relative min-vh-100 g-0 py-5">
+                    <div class="col-11 col-sm-6 col-xl-4">
+                        <div class="card border border-300 auth-card">
+                            <div class="card-body pe-md-0">
+                                <div class="row align-items-center gx-0 gy-7">
+                                    <form action="#" role="form" class="validate" id="formPost" enctype="multipart/form-data">
+                                        <div class="col mx-auto">
+                                            <div class="auth-form-box">
+                                                <div class="text-center mb-1">
+                                                    <a class="d-flex flex-center text-decoration-none mb-2" @*href="../../../index.html"*@>
+                                                        <div class="d-flex align-items-center fw-bolder fs-3 d-inline-block">  <img src="~/images/brand/OMMR_LOGO_Final__1_-removebg-preview.png" class="header-brand-img" id="clientlogo" alt="">@* <img class="mainlogo" src="~/assets/img/icons/EBooklogodesign-removebg-preview.png" alt="phoenix" width="58"> *@</div>
+                                                    </a>
+                                                    <span class="login100-form-title">
+                                                        Client Signup
+                                                    </span>
+                                                </div>
+                                                <div class="mb-1 text-start">
+                                                    @*<label class="form-label" for="name">Name</label>*@
+                                                    <div class="form-icon-container"><input class="form-control form-icon-input" name="name" type="text" id="name" autocomplete="off" placeholder="Name" required><span class="fas fa-user text-900 fs--1 form-icon"></span></div>
+                                                </div>
+                                                <div class="mb-1 text-start">
+                                                    @*<label class="form-label" for="mobile">Mobile</label>*@
+                                                    <div class="form-icon-container"><input class="form-control form-icon-input" name="mobile" type="number" id="mobile" autocomplete="off" placeholder="Mobile Number" required><span class="fas fa-mobile text-900 fs--1 form-icon"></span></div>
+                                                </div>
+                                                <div class="mb-1 text-start">
+                                                    @*<label class="form-label" for="email">Email</label>*@
+                                                    <div class="form-icon-container"><input class="form-control form-icon-input" name="email" type="email" id="email" autocomplete="off" placeholder="Email" required><span class="fas fa-envelope text-900 fs--1 form-icon"></span></div>
+                                                </div>
+                                                <div class="mb-1 text-start">
+                                                    @* <label class="form-label" for="Address">Address</label>*@
+                                                    <div class="form-icon-container"><input class="form-control form-icon-input" name="Address" type="text" id="Address" autocomplete="off" placeholder="Address" required><span class="fas fa-address-card text-900 fs--1 form-icon"></span></div>
+                                                </div>
+                                                <div class="mb-1 text-start">
+                                                    @*<label class="form-label" for="username">User Name</label>*@
+                                                    <div class="form-icon-container"><input class="form-control form-icon-input" name="username" type="text" id="username" autocomplete="off" placeholder="User Name" required><span class="fas fa-user text-900 fs--1 form-icon"></span></div>
+                                                </div>
+                                                <div class="mb-1 text-start">
+                                                    @* <label class="form-label" for="password">Password</label>*@
+                                                    <div class="form-icon-container"><input class="form-control form-icon-input" name="password" type="password" id="password" autocomplete="off" placeholder="Password" required><span class="fas fa-key text-900 fs--1 form-icon"></span></div>
+                                                </div>
+
+                                                <div class="row flex-between-center mb-1">
+                                                    <div class="col-auto">
+                                                        <div class="form-check mb-0"><input class="form-check-input" id="basic-checkbox" type="checkbox" onclick="Toggle()"><label class="form-check-label mb-0" for="basic-checkbox">Show passward</label></div>
+                                                    </div>
+                                                </div>
+
+                                                @* <div class="mb-1 text-start">
+                                                <label class="form-label" for="Advertise">Advertise Name</label>
+                                                <div class="form-control form-icon-container">
+                                                <select class=" form-icon-input" id="adver" name="selectedArea" required>
+                                                <option value="advertise1">Advertise 1</option>
+                                                <option value="advertise2">Advertise 2</option>
+                                                <option value="advertise3">Advertise 3</option>
+                                                </select>
+                                                <span class="fas fa-film text-900 fs--1 form-icon"></span>
+                                                </div>
+                                                </div>*@
+
+                                                @*<div class="mb-1 text-start">
+                                                <label class="form-label" for="Advertise">Advertise Name</label>
+                                                <div class="form-control form-icon-container">
+                                                <div style="height:100px; overflow:auto;">
+                                                <select multiple class="form-icon-input" id="adver" name="selectedArea[]" required size="5">
+
+                                                </select>
+                                                </div>
+                                                <span class="fas fa-film text-900 fs--1 form-icon"></span>
+                                                </div>
+                                                </div>*@
+
+                                                <div class="mb-1 text-start">
+                                                    <div class="form-icon-container">
+                                                        <div class="form-group overflow-hidden">
+                                                            <select multiple="multiple" class="form-control select2 w-100" id="adver" name="selectedArea[]" data-placeholder="Select Advertise" required> </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="mt-1 text-start">
+                                                    <button type="button" id="btnSave" class="btn btn-success w-100 mb-3">Sign Up</button>
+                                                </div>
+
+                                                <span class="backto-link font-default content-color text-decoration-none">Already have an Client account? <a class="text-decoration-underline theme-color" href="/Home/Login"> Signin for Client </a> </span>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- ===============================================-->
+    <!--    JavaScripts-->
+    <script src="~/assets/js/vendors/popper/popper.min.js"></script>
+    <script src="~/assets/js/vendors/popper/popper.min.js"></script>
+    <script src="~/assets/js/vendors/anchorjs/anchor.min.js"></script>
+    <script src="~/assets/js/vendors/is/is.min.js"></script>
+    <script src="~/assets/js/vendors/fontawesome/all.min.js"></script>
+    <script src="~/assets/js/vendors/lodash/lodash.min.js"></script>
+    <script src="~/assets/js/vendors/v3/polyfill.min.js"></script>
+    <script src="~/assets/js/vendors/list.js/list.min.js"></script>
+    <script src="~/assets/js/vendors/feather-icons/feather.min.js"></script>
+    <script src="~/assets/js/vendors/dayjs/dayjs.min.js"></script>
+    <script src="~/assets/js/phoenix.js"></script>
+
+    <!-- JQUERY SCRIPTS JS-->
+
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+
+    <script src="~/js/site.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+
+    @*<script src="~/Custom/plugins/sweetalert/sweet-alert.min.js"></script>*@
+    <script src="~/Custom/plugins/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+    <script src="~/Custom/plugins/loading/loading.js"></script>
+
+    <!-- BOOTSTRAP SCRIPTS JS-->
+    <script src="~/js/vendors/bootstrap.bundle.min.js"></script>
+
+    <!-- SPARKLINE JS-->
+    <script src="~/js/vendors/jquery.sparkline.min.js"></script>
+
+    <!-- CHART-CIRCLE JS-->
+    <script src="~/js/vendors/circle-progress.min.js"></script>
+
+    <!-- RATING STAR JS-->
+    <script src="~/plugins/rating/rating-stars.js"></script>
+
+    <!-- INPUT MASK JS-->
+    <script src="~/plugins/input-mask/input-mask.min.js"></script>
+
+    <!-- P-SCROLL JS -->
+    <script src="~/plugins/p-scroll/p-scroll.js"></script>
+    <script src="~/plugins/p-scroll/p-scroll-1.js"></script>
+
+    <!--SIDEMENU JS-->
+    <script src="~/plugins/sidemenu/icon-sidemenu.js"></script>
+
+    <!-- SIDEMENU-RESPONSIVE-TABS JS-->
+    <script src="~/plugins/sidemenu-responsive-tabs/js/sidemenu-responsive-tabs.js"></script>
+
+    <!--LEFT-MENU JS-->
+    <script src="~/js/left-menu.js"></script>
+
+    <!-- SIDEBAR JS -->
+    <script src="~/plugins/right-sidebar/right-sidebar.js"></script>
+
+    <!-- SELECT JS -->
+    <script src="~/plugins/multipleselect/multiple-select.js"></script>
+    <script src="~/plugins/multipleselect/multi-select.js"></script>
+    <script src="~/plugins/select2/select2.full.min.js"></script>
+    <script src="~/js/select2.js"></script>
+    <!-- C3 CHART JS -->
+    <script src="~/plugins/charts-c3/d3.v5.min.js"></script>
+    <script src="~/plugins/charts-c3/c3-chart.js"></script>
+    <script src="~/chart/Chart.min.js"></script>
+    <!-- CUSTOM JS-->
+    <script src="~/js/custom.js"></script>
+
+
+
+    <script>
+        function Toggle() {
+            var temp = document.getElementById("password");
+            if (temp.type === "password") {
+                temp.type = "text";
+            }
+            else {
+                temp.type = "password";
+            }
+        }
+    </script>
+
+    <script>
+
+        $("#btnSave").click(function (e) {
+
+            if (!document.getElementById("formPost").checkValidity()) {
+                e.preventDefault();
+            } else {
+
+                var selectedAreas = $("#adver").val();
+                var selectedAreasString = selectedAreas.join(', ');
+
+                var model = {
+                    userRoleId: 4,
+                    fullName: $.trim($("#name").val()),
+                    mobile: $.trim($("#mobile").val()),
+                    email: $.trim($("#email").val()),
+                    address: $.trim($("#Address").val()),
+                    userName: $.trim($("#username").val()),
+                    password: $.trim($("#password").val()),
+
+                    advertiseName: selectedAreasString,
+
+                    addedBy: 1,
+                }
+                console.log(model);
+                $.ajax({
+                    type: "POST",
+                    url: "@apiUrl/api/Users/CreateUser",
+                    data: JSON.stringify(model),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data, statusText, xhr) {
+                        if (xhr.status === 200) {
+                            sweetAlert({
+                                html: true,
+                                title: "Client",
+                                text: "Successfully created!",
+                                type: "success"
+                            }).then(function () {
+                                window.location = "/Home/Login";
+                            });
+
+                        } else if (data.status === "duplicate") {
+                            sweetAlert("Validation Alert!", data.responseMsg, "warning");
+                        } else if (data.status === "error") {
+                            sweetAlert("Validation Alert!", data.responseMsg, "warning");
+                        } else {
+                            sweetAlert("Validation Alert!", "Something unexpected!", "warning");
+                        }
+                    },
+                    error: function (data) {
+                        if (data.status == 401) {
+                            window.location.replace('/Message/TokenExpire');
+                        } else if (data.status == 403) {
+                            window.location.replace('/Message/Unauthorize');
+                        } else if (data.status == 400) {
+                            sweetAlert("Validation Alert!", "Please check input data!", "warning");
+                        }
+                    }
+                });
+            }
+        });
+
+
+        GetAdvertise()
+        function GetAdvertise() {
+            var opt = '';
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/AdScreen/GetAdvertiseList",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (res) {
+                    console.log(res)
+                    var options = [];
+                    //options.push('<option value="">Please Select </option>');
+                    for (var i = 0; i < res.data.length; i++) {
+                        //if (Id == res.data[i].stateId) {
+                        //    opt = 'selected'
+                        //} else {
+                        //    opt = '';
+                        //}
+                        options.push('<option value="' + res.data[i].adsName + '" ' + opt + '>' + res.data[i].adsName + '</option>');
+                    }
+                    $("#adver").html(options.join(''));
+                    $('#adver').multipleSelect({
+                        width: '100%'
+                    });
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
+
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#mobile").change(function () {
+                var inputvalues = $(this).val();
+                var gstinformat = new RegExp('^[0-9]{10}$');
+                if (gstinformat.test(inputvalues)) {
+                    return true;
+                } else {
+                    alert('Please Enter Valid Mobile No');
+                    $("#mobile").val;
+                    $("#mobile").focus();
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
+
+
+
+

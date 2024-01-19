@@ -1,0 +1,553 @@
+﻿@using Microsoft.Extensions.Configuration;
+@using Microsoft.AspNetCore.Http
+@inject IConfiguration Configuration;
+
+@{
+    ViewBag.Title = "Dashboard";
+    string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
+}
+
+<div class="page-header">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#"><i class="fe fe-home mr-1"></i> Admin Console</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+    </ol>
+    
+</div>
+
+<div id="superadmincontainer">
+   <div class="row">
+    <div class="col-xl-3 col-lg-6 col-md-12">
+        <div class="card" id="tu">
+            <div class="card-body d-flex">
+                <div class="card-order">
+                    <h6 class="mb-2">Total Users</h6>
+                    <h2 class="mb-1"><span class="number-font counter" id="totalUser"></span></h2>
+                    <p class="text-muted fs-12 mb-0"></p>
+                </div>
+                <div class="ml-auto">
+                        <span class="bg-primary-transparent icon-service text-primary"><i class="mdi mdi-account-multiple  fs-2"></i> </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-12">
+        <div class="card" id="activee">
+            <div class="card-body d-flex">
+                <div class="card-order">
+                    <h6 class="mb-2">Active</h6>
+                    <h2 class="mb-1"><span class="number-font counter" id="activeUser"></span></h2>
+                    <p class="text-muted fs-12 mb-0"></p>
+                </div>
+                <div class="ml-auto">
+                    <span class="bg-primary-transparent icon-service text-primary"><i class="mdi mdi-account-multiple  fs-2"></i> </span>
+                </div>
+            </div>
+        </div>
+    </div>
+     <div class="col-xl-3 col-lg-6 col-md-12">
+        <div class="card" id="inactivee">
+            <div class="card-body d-flex">
+                <div class="card-order">
+                    <h6 class="mb-2">In-Active </h6>
+                    <h2 class="mb-1"><span class="number-font counter" id="inActiveUser"></span></h2>
+                    <p class="text-muted fs-12 mb-0"></p>
+                </div>
+                <div class="ml-auto">
+                    <span class="bg-primary-transparent icon-service text-primary"><i class="mdi mdi-account-multiple  fs-2"></i> </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-12">
+        <div class="card" id="sr">
+            <div class="card-body d-flex">
+                <div class="card-order">
+                    <h6 class="mb-2">SuperAdmin</h6>
+                    <h2 class="mb-1"><span class="number-font counter" id="superadminUser"></span></h2>
+                    <p class="text-muted fs-12 mb-0"></p>
+                </div>
+                <div class="ml-auto">
+                        <span class="bg-primary-transparent icon-service text-primary"><i class="mdi mdi-account-multiple  fs-2"></i> </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-12">
+        <div class="card" id="auu">
+            <div class="card-body d-flex">
+                <div class="card-order">
+                    <h6 class="mb-2">Admin </h6>
+                    <h2 class="mb-1"><span class="number-font counter" id="adminUser"></span></h2>
+                    <p class="text-muted fs-12 mb-0"></p>
+                </div>
+                <div class="ml-auto">
+                   @*<a href="~/Report/AdminListView">*@
+                        <span class="bg-primary-transparent icon-service text-primary"><i class="mdi mdi-account-multiple  fs-2"></i> </span>
+                </div>
+            </div>
+        </div>
+    </div>
+      <div class="col-xl-3 col-lg-6 col-md-12">
+        <div class="card" id="qwerr">
+            <div class="card-body d-flex">
+                <div class="card-order">
+                    <h6 class="mb-2">State User </h6>
+                    <h2 class="mb-1"><span class="number-font counter" id="stateUser"></span></h2>
+                    <p class="text-muted fs-12 mb-0"></p>
+                </div>
+                <div class="ml-auto">
+                    <a href="~/Report/StateAdminListView">
+                        <span class="bg-primary-transparent icon-service text-primary"><i class="mdi mdi-account-multiple  fs-2"></i> </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-12">
+        <div class="card" id="qwee">
+            <div class="card-body d-flex">
+                <div class="card-order">
+                    <h6 class="mb-2">Client User </h6>
+                    <h2 class="mb-1"><span class="number-font counter" id="clientUser"></span></h2>
+                    <p class="text-muted fs-12 mb-0"></p>
+                </div>
+                <div class="ml-auto">
+                    <a href="~/Report/ClientListView">
+                        <span class="bg-primary-transparent icon-service text-primary"><i class="mdi mdi-account-multiple  fs-2"></i> </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+        <div class="col-xl-3 col-lg-6 col-md-12">
+            <div class="card" id="asdd">
+                <div class="card-body d-flex">
+                    <div class="card-order">
+                        <h6 class="mb-2">Agent</h6>
+                        <h2 class="mb-1"><span class="number-font counter" id="agentUser"></span></h2>
+                        <p class="text-muted fs-12 mb-0"></p>
+                    </div>
+                    <div class="ml-auto">
+                        <a href="~/Agent/AgentListByAdmin">
+                            <span class="bg-primary-transparent icon-service text-primary"><i class="mdi mdi-account-multiple  fs-2"></i> </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+   </div>
+</div>
+
+<div id="stateusercontainer">
+    <div class="row">
+        <div class="col-xl-6 col-lg-6 col-md-12">
+            <div class="card">
+                <div class="card-body d-flex">
+                    <div class="card-order">
+                        <h6 class="mb-2">Total Agent</h6>
+                        <h2 class="mb-1"><span class="number-font counter" id="totalagent"></span></h2>
+                        <p class="text-muted fs-12 mb-0"></p>
+                    </div>
+                    <div class="ml-auto">
+                        <a href="~/Agent/AgentList">
+                            <span class="bg-primary-transparent icon-service text-primary"><i class="mdi mdi-account-multiple  fs-2"></i> </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-12">
+            <div class="card">
+                <div class="card-body d-flex">
+                    <div class="card-order">
+                        <h6 class="mb-2">Total Theatre</h6>
+                        <h2 class="mb-1"><span class="number-font counter" id="theatreUser"></span></h2>
+                        <p class="text-muted fs-12 mb-0"></p>
+                    </div>
+                    <div class="ml-auto">
+                        <a href="~/adscreen/TheaterList">
+                            <span class="bg-primary-transparent icon-service text-primary"><i class="mdi mdi-account-multiple  fs-2"></i> </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section id ="superadminsection">
+    <div class="row">
+
+        <div class="col-sm-12 col-md-12 col-lg-7 col-xl-8">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Date Wise Login</div>
+                    <div class="card-options">
+                        <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
+                     
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="dateChart" width="400" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-12 col-md-12 col-lg-5 col-xl-4">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">User Statistics</div>
+                    <div class="card-options">
+                        <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
+                     
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="pieChart" width="400" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+      
+    </div>
+    <div class="row">
+
+        <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Month Wise Login</div>
+                    <div class="card-options">
+                        <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
+                     
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="monthChart" width="400" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Year Wise Login</div>
+                    <div class="card-options">
+                        <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
+                     
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="yearChart" width="400" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+
+@section scripts{
+
+    <script>
+        var dateChartData = null, pieChartData = null, monthChartData = null, yearChartData=null;
+        $(function () {
+            if ('@Context.Session.GetString("RoleName")'== 'Super Admin') {
+                $('#userStatus').show();
+                loadUserStatus();
+            }
+            loadDateChart();
+            loadPieChart();
+            loadMonthChart();
+            loadYearChart();
+
+            new Chart($('#dateChart'), {
+                type: 'line',
+                data: {
+                    labels: dateChartData.map(x => x.date),
+                    datasets: [
+                        {
+                            label: 'Date wise Login',
+                            backgroundColor: '#cd1313',
+                            data: dateChartData.map(x => x.count)
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            //const colors = ['#90EE90', '#47366a', '#ff0000'];
+            const colors = ['#c729ef', '#00f9f8', '#90EE90', '#f5ea06'];
+            new Chart($('#pieChart'), {
+                type: 'pie',
+                data: {
+                    labels: pieChartData.map(x => x.roleName),
+                    datasets: [
+                        {
+                            backgroundColor: colors,
+                            data: pieChartData.map(x => x.count)
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            new Chart($('#monthChart'), {
+                type: 'bar',
+                data: {
+                    labels: monthChartData.map(x => x.month),
+                    datasets: [
+                        {
+                            label: 'Month wise Login',
+                            backgroundColor: '#cd1313',
+                            data: monthChartData.map(x => x.count)
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            });
+
+            new Chart($('#yearChart'), {
+                type: 'bar',
+                data: {
+                    labels: yearChartData.map(x => x.year),
+                    datasets: [
+                        {
+                            label: 'Year wise Login',
+                            backgroundColor: '#cd1313',
+                            data: yearChartData.map(x => x.count)
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            });
+        });
+
+        totalagentforadmin()
+        function totalagentforadmin() {
+            $.ajax({
+                "url": '@apiUrl/api/Agent/GetAgentList',
+                type: "GET",
+                success: function (data) {
+                    //console.log(data);
+                    var x = '';
+                    var recordsTotal = data.recordsTotal;
+                    x = x + '<h2>' + recordsTotal + '</h2>';
+                    $('#agentUser').html(x);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+        }
+
+        function loadDateChart() {
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/Users/GetLogInSummaryByDate/@Context.Session.GetInt32("UserId")",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                       "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                async:false,
+                success: function (data) {
+                    //console.log(data)
+                    dateChartData = data;
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
+        function loadPieChart() {
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/Users/GetRoleWiseUser",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                       "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                async:false,
+                success: function (data) {
+                    //console.log(data)
+                    pieChartData = data;
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
+        function loadMonthChart() {
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/Users/GetLogInSummaryByMonth/@Context.Session.GetInt32("UserId")",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                       "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                async:false,
+                success: function (data) {
+                    //console.log(data)
+                    monthChartData = data;
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
+        function loadYearChart() {
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/Users/GetLogInSummaryByYear/@Context.Session.GetInt32("UserId")",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                       "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                async:false,
+                success: function (data) {
+                    //console.log(data)
+                    yearChartData = data;
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
+
+        function loadUserStatus() {
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/Users/UserStatus",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                       "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (data) {
+                    if (data) {
+                        $('#totalUser').text(data.totalUser);
+                        $('#activeUser').text(data.activeUser);
+                        $('#inActiveUser').text(data.inActiveUser);
+                        $('#adminUser').text(data.adminUser);
+                        $('#superadminUser').text(data.superAdminUser);
+                        $('#stateUser').text(data.stateUser);
+                        $('#clientUser').text(data.clientUser);
+                    } else {
+                        sweetAlert("Validation Alert!", "Something unexpected!", "warning");
+                    }
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
+
+        $(function () {
+            var roleName = '@Context.Session.GetString("RoleName")';
+
+            if (roleName === 'Super Admin') {
+                $('#stateusercontainer').hide();
+                //$('#tu,#sr,#qwee,#qwerr,#auu,#admincontainer').hide();
+                loadUserStatus();
+            } else if (roleName === 'State User') {
+                $('#superadmincontainer,#superadminsection').hide();
+                loadUserStatus();
+            } else if (roleName === 'Admin') {
+                $('#tu,#sr,#activee,#inactivee,#stateusercontainer').hide();
+                loadUserStatus();
+            } else if (roleName === 'Client User') {
+                $('#superadmincontainer, #superadminsection, #stateusercontainer').hide();
+                loadUserStatus();
+            //} else if (roleName === 'Certificate Client') {
+            //    $('#usercontainer, #usersection, #admincontainer, #adminsection, #superadmincontainer, #superadmincertificatecontainer,#othercontainer,#othercertificatecontainer,#usercertificatecontainer').hide();
+            //    loadUserStatus();
+          
+            }
+        });
+    </script>
+
+   @*StateUser*@
+    <script>
+
+        totalagent()
+        function totalagent() {
+            $.ajax({
+                "url": '@apiUrl/api/Agent/GetAgentListbyuserid/' + @Context.Session.GetInt32("UserId"),
+                type: "GET",
+                success: function (data) {
+                    //console.log(data);
+                    var x = '';
+                    var recordsTotal = data.recordsTotal;
+                    x = x + '<h2>' + recordsTotal + '</h2>';
+                    $('#totalagent').html(x);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+        }
+
+        totaltheatre()
+        function totaltheatre() {
+            $.ajax({
+                "url": '@apiUrl/api/ScreenList/GetAllListbystateid/' + @Context.Session.GetInt32("UserId"),
+                type: "GET",
+                success: function (data) {
+                    //console.log(data);
+                    var x = '';
+                    var recordsTotal = data.recordsTotal;
+                    x = x + '<h2>' + recordsTotal + '</h2>';
+                    $('#theatreUser').html(x);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+        }
+        
+    </script>
+}

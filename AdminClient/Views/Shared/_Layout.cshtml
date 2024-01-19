@@ -1,0 +1,276 @@
+﻿@using Microsoft.AspNetCore.Http
+
+
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+
+    <!-- Meta data -->
+    <meta charset="UTF-8">
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=0'>
+    <meta content="Admin Console – Business Administartion Tool By Appman Technologies" name="description">
+    <meta content="Appman Technologies Private Limited" name="author">
+    <meta name="keywords" content="Admin Console – Business Administartion Tool By Appman Technologies" />
+
+    <!--favicon -->
+    <link rel="icon" href="~/images/brand/Fv.png" type="image/x-icon" />
+
+    <!-- TITLE -->
+    <title>@ViewBag.Title</title>
+    <!-- DASHBOARD CSS -->
+    <link href="~/css/style.css" rel="stylesheet" />
+    <link href="~/css/color-skins/color1.css" rel="stylesheet" />
+    <link href="~/css/skins-modes.css" rel="stylesheet" />
+
+
+    <link href="~/Custom/plugins/sweetalert/sweet-alert.css" rel="stylesheet" />
+    <link href="~/Custom/plugins/bootstrap-datepicker/bootstrap-datepicker3.standalone.min.css" rel="stylesheet" media="screen">
+    <!--SIDEMENU CSS-->
+    <link rel="stylesheet" href="~/plugins/sidemenu/icon-sidemenu.css">
+
+    <!--C3 CHARTS CSS -->
+    <link href="~/plugins/charts-c3/c3-chart.css" rel="stylesheet" />
+
+    <!-- P-SCROll CSS -->
+    <link href="~/plugins/p-scroll/p-scroll.css" rel="stylesheet" type="text/css">
+
+    <!--- FONT-ICONS CSS -->
+    <link href="~/css/icons.css" rel="stylesheet" />
+
+    <!-- SIDEBAR CSS -->
+    <link href="~/plugins/right-sidebar/right-sidebar.css" rel="stylesheet">
+
+    <!-- Data table css -->
+    <link href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css" type="text/css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/buttons/1.7.0/css/buttons.dataTables.min.css" type="text/css" rel="stylesheet" />
+
+    <!-- SELECT2 CSS -->
+    <link href="~/plugins/select2/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/plugins/multipleselect/multiple-select.css">
+    <style>
+        .ommr{
+            color: #13cd19;
+        }
+
+        .header-desktop {
+            display: block;
+            position: absolute;
+            width: 150px;
+            height: 65px;
+            background-repeat: no-repeat;
+            margin-top: -17px;
+            margin-left: 34px;
+        }
+
+        .appm:hover{
+            color: #13cd19;
+        }
+    </style>
+</head>
+
+<body class="app sidebar-mini dark-mode">
+
+    <!-- GLOBAL-LOADER -->
+    <div id="global-loader">
+        <img src="~/images/svgs/loader.svg" class="loader-img" alt="Loader">
+    </div>
+
+    <div class="page">
+        <div class="page-main">
+            <!-- HEADER -->
+            <div class="header app-header">
+                <div class="container-fluid">
+                    <div class="d-flex header-nav">
+                        <div class="color-headerlogo">
+                            <a class="header-desktop" href="~/DashBoard/Index"></a>
+                            <a class="header-mobile" href="~/DashBoard/Index"></a>
+                        </div>
+                        <!-- Color LOGO -->
+                        <a href="#" data-toggle="sidebar" class="nav-link icon toggle"><i class="fe fe-align-justify"></i></a>
+                        <div class="">
+                            <form class="form-inline">
+                                <div class="search-element">
+                                    <input type="search" class="form-control header-search" placeholder="Search…" aria-label="Search" tabindex="1">
+                                    <button class="btn btn-primary-color" type="submit"><i class="fe fe-search"></i></button>
+                                </div>
+                            </form>
+                        </div><!-- SEARCH -->
+                        <div class="d-flex order-lg-2 ml-auto header-right-icons header-search-icon">
+                            <div class="dropdown  search-icon">
+                                <a href="#" data-toggle="search" class="nav-link nav-link-lg d-md-none navsearch">
+                                    <i class="fe fe-search"></i>
+                                </a>
+                            </div>
+                            <div class="dropdown  header-fullscreen">
+                                <a class="nav-link icon full-screen-link nav-link-bg" id="fullscreen-button">
+                                    <i class="fe fe-minimize"></i>
+                                </a>
+                            </div><!-- FULL-SCREEN -->
+                            
+                            
+                            <div class="dropdown header-user">
+                                <a href="#" class="nav-link icon" data-toggle="dropdown">
+                                    <span>
+                                        <img src="@Context.Session.GetString("ImagePath")" alt="profile-user" class="avatar brround cover-image mb-0 ml-0">
+                                    </span>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                    <div class=" dropdown-header noti-title text-center border-bottom p-3">
+                                        <div class="header-usertext">
+                                            <h5 class="mb-1">@Context.Session.GetString("FullName")</h5>
+
+                                           @* <p class="mb-0">Care Hospital</p>*@
+                                        </div>
+                                    </div>
+                                    <a class="dropdown-item" href="~/User/UserProfile">
+                                        <i class="mdi mdi-account-outline mr-2"></i> <span>My profile</span>
+                                    </a>
+                                    <a class="dropdown-item" href="~/User/ChangePassword">
+                                        <i class="mdi mdi-settings mr-2"></i> <span>Change Password</span>
+                                    </a>
+                                    <a href="#" class="dropdown-item" data-toggle="modal" data-target="#sign-out">
+                                        <i class="mdi  mdi-logout-variant mr-2"></i> <span>Logout</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- HEADER END -->
+            <!-- APP SIDEBAR -->
+            <aside class="app-sidebar">
+                <div class="app-sidebar__user">
+                    <div class="dropdown user-pro-body text-center">
+                        <div class="user-pic">
+
+                            <img src="@Context.Session.GetString("ImagePath")" class="avatar-xl rounded-circle mb-1">
+                        </div>
+                        <div class="user-info">
+                            <h5 class=" mb-0 font-weight-semibold">@Context.Session.GetString("FullName")</h5>
+                            @*<p>@Context.Session.GetString("StateName")</p>*@
+                            @*<p>StateName: @(Context.Session.Keys.Contains("stateName") ? Context.Session.GetString("stateName") : "Not Set")</p>*@
+                        </div>
+                    </div>
+                </div>
+                @Html.Raw(Context.Session.GetString("AppMenu"))
+            </aside>
+            <!-- APP SIDEBAR CLOSED -->
+            <div class="app-content">
+                <div class="section">
+                    <!-- PAGE-HEADER -->
+                    @RenderBody()
+                    <!-- PAGE-HEADER END -->
+                </div>
+            </div>
+        </div>
+        <!-- FOOTER -->
+        <footer class="footer left-footer">
+            <div class="container">
+                <div class="row align-items-center flex-row-reverse">
+                    <div class="col-md-12 col-sm-12 text-center">
+                        Copyright © 2023<a href="#" class="ommr"> Outdoor Media Measurement & Research</a> || Designed & Developed by <a class="appm" href="https://appman.in/">Appman Technologies Pvt.Ltd</a>,All rights reserved.
+
+                     @*   <div class="col-md-12 col-sm-12 text-center">
+                        Copyright © 2023<a href="#" class="ommr"> Outdoor Media Measurement & Research</a> || <a class="ommr" href="~/assets/OMMR TC & PP.pdf">Privacy Policy & Terms and Condition</a> || Designed by <a href="https://appman.in/">Appman Technologies Pvt.Ltd</a>,All rights reserved. </div>*@
+
+
+                       
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- FOOTER CLOSED -->
+    </div>
+
+
+    <div class="modal fade" id="sign-out">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Want to leave?</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    Press logout to leave
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal">Stay Here</button>
+                    <a role="button" class="btn btn-danger" href="/home/logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- BACK-TO-TOP -->
+    <a href="#top" id="back-to-top"><i class="fa fa-angle-double-up"></i></a>
+
+    <!-- JQUERY SCRIPTS JS-->
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+
+    <script src="~/js/site.js"></script>
+
+    <!-- DATA TABLE JS-->
+    <script src="https://cdn.datatables.net/buttons/1.7.0/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.print.min.js"></script>
+
+
+    <script src="~/Custom/plugins/sweetalert/sweet-alert.min.js"></script>
+    <script src="~/Custom/plugins/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+    <script src="~/Custom/plugins/loading/loading.js"></script>
+
+    <!-- BOOTSTRAP SCRIPTS JS-->
+    <script src="~/js/vendors/bootstrap.bundle.min.js"></script>
+
+    <!-- SPARKLINE JS-->
+    <script src="~/js/vendors/jquery.sparkline.min.js"></script>
+
+    <!-- CHART-CIRCLE JS-->
+    <script src="~/js/vendors/circle-progress.min.js"></script>
+
+    <!-- RATING STAR JS-->
+    <script src="~/plugins/rating/rating-stars.js"></script>
+
+    <!-- INPUT MASK JS-->
+    <script src="~/plugins/input-mask/input-mask.min.js"></script>
+
+    <!-- P-SCROLL JS -->
+    <script src="~/plugins/p-scroll/p-scroll.js"></script>
+    <script src="~/plugins/p-scroll/p-scroll-1.js"></script>
+
+    <!--SIDEMENU JS-->
+    <script src="~/plugins/sidemenu/icon-sidemenu.js"></script>
+
+    <!-- SIDEMENU-RESPONSIVE-TABS JS-->
+    <script src="~/plugins/sidemenu-responsive-tabs/js/sidemenu-responsive-tabs.js"></script>
+
+    <!--LEFT-MENU JS-->
+    <script src="~/js/left-menu.js"></script>
+
+    <!-- SIDEBAR JS -->
+    <script src="~/plugins/right-sidebar/right-sidebar.js"></script>
+
+    <!-- SELECT JS -->
+    <script src="~/plugins/multipleselect/multiple-select.js"></script>
+    <script src="~/plugins/multipleselect/multi-select.js"></script>
+    <script src="~/plugins/select2/select2.full.min.js"></script>
+    <script src="~/js/select2.js"></script>
+    <!-- C3 CHART JS -->
+    <script src="~/plugins/charts-c3/d3.v5.min.js"></script>
+    <script src="~/plugins/charts-c3/c3-chart.js"></script>
+    <script src="~/chart/Chart.min.js"></script>
+    <!-- CUSTOM JS-->
+    <script src="~/js/custom.js"></script>
+
+    @RenderSection("scripts", false);
+</body>
+</html>

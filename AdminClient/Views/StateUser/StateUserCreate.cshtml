@@ -1,0 +1,370 @@
+﻿@using Microsoft.Extensions.Configuration;
+@using Microsoft.AspNetCore.Http
+@inject IConfiguration Configuration;
+
+@{
+    ViewBag.Title = "State User";
+    string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
+}
+<style>
+    #preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #fff;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+</style>
+<!-- PAGE-HEADER -->
+<div class="page-header">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#"><i class="fe fe-file-text mr-1"></i>Admin Console</a></li>
+        <li class="breadcrumb-item active" aria-current="page">State User Create</li>
+    </ol>
+    <div class="ml-auto">
+        <a href="~/StateUser/StateUserList" class="btn btn-primary btn-icon btn-sm text-white mr-2">
+            <span>
+                <i class="fe fe-plus"></i>
+            </span> View
+        </a>
+    </div>
+</div>
+<!-- PAGE-HEADER END -->
+
+
+<div id="preloader" class="d-none">
+    <div class="spinner"></div>
+</div>
+
+<div class="row">
+    <div class="col-md">
+        <div class="card overflow-hidden">
+            <div class="card-header">
+                <h3 class="card-title">State User Create</h3>
+            </div>
+            <div class="card-body">
+                <form action="#" name="myForm" role="form" class="validate" id="formPost">
+                    <div class="row">
+                     
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">User Name</label>
+                                <div class="input-box">
+                                    <select class="form-control" id="selectUser">
+                                    </select>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">State Name</label>
+                                <div class="input-box">
+                                    <select class="form-control" id="selectState">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button type="button" id="Add_State" class="btn btn-radius btn-info">Add State</button>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="table-responsive">
+                        <table id="Statee" class="table table-bordered table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>UserName</th>
+                                    <th>State Name</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="State_tb">
+                            </tbody>
+                        </table>
+                    </div>
+                    <br />
+                    <br />
+                    <br />
+                    <div class="row">
+                        <div class="col-md-6">
+                           
+                            <button type="button" id="btnSave" class="btn btn-radius btn-success">Save</button>
+                          
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@section scripts{
+    <script>
+        $(function () {
+            $("#btnSave").click(function (e) {
+                if (!document.getElementById("formPost").checkValidity()) {
+                    e.preventDefault();
+                }
+                else {
+                    var itemDetails = [];
+                    //$.each($("#BEd tbody tr"), function () {
+                    //    var $irow = $(this),
+                    //        rowObj = {};
+                    //    var k = 0
+                    //    var UserName;
+                    //    var StateName;
+                     
+                    //    $.each($("td", $irow), function () {
+                    //        var $col = $(this);
+                         
+                    //        if (k == 0) {
+                    //            UserName = parseInt($col.html())
+                    //            //UserName = $col.html()
+                    //        }
+                    //        if (k == 1) {
+                    //            StateName = parseInt($col.html())
+                    //            //StateName = $col.html()
+                    //        }
+                          
+                    //        k = k + 1
+                    //    });
+                       
+                    //    var a = {
+                    //        "userId": UserName,
+                    //        "stateId": StateName,
+
+                    //        //"userId": parseInt($("#selectUser").val()),
+                    //        //"stateId": parseInt($("#selectState").val()),
+                    //    }
+                    //    itemDetails.push(a)
+                    //});
+
+                    $.each($("#Statee tbody tr"), function () {
+                        var $irow = $(this),
+                            rowObj = {};
+
+                        // Retrieve the data-value attributes
+                        var UserName = parseInt($irow.find("td:eq(0)").data("value"));
+                        var StateName = parseInt($irow.find("td:eq(1)").data("value"));
+
+                        var a = {
+                            "userId": UserName,
+                            "stateId": StateName
+                        }
+                        itemDetails.push(a);
+                    });
+                    console.log("itemDetails:", itemDetails);
+
+                    // Show preloader
+                    var preloader = $("#preloader");
+                    preloader.removeClass("d-none");
+                    var model = {
+                        "userId": parseInt($("#selectUser").val()),
+                        "stateId": parseInt($("#selectState").val()),
+                        stateUserDTOs: itemDetails,
+                        createdBy: @Context.Session.GetInt32("UserId"),
+                    }
+                    console.log(model)
+                    $.ajax({
+                        type: "POST",
+                        url: "@apiUrl/api/StateUser/StateUserCreate",
+                        data: JSON.stringify(model),
+                        contentType: "application/json; charset=utf-8",
+                        headers: {
+                            "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                        },
+                        dataType: "json",
+                        //success: function (data, statusText, xhr) {
+                        //    if (xhr.status === 200) {
+
+                        //        sweetAlert({
+                        //            html: true,
+                        //            icon: "success",
+                        //            title: "State User",
+                        //            text: "Successfully created!",
+                        //            type: "success"
+                        //        });
+                        //    } else if (data.status === "duplicate") {
+                        //        sweetAlert("Validation Alert!", data.responseMsg, "warning");
+                        //    } else if (data.status === "error") {
+                        //        sweetAlert("Validation Alert!", data.responseMsg, "warning");
+                        //    } else {
+                        //        sweetAlert("Validation Alert!", "Something unexpected!", "warning");
+                        //    }
+                        //},
+
+                        success: function (data, statusText, xhr) {
+                            if (xhr.status === 200) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "State User",
+                                    text: "Successfully created!",
+                                }).then(function () {
+                                    location.reload(); // Refresh the page
+                                });
+
+                                //preloader.addClass("d-none");
+                            } else if (data.status === "Duplicate") {
+                                Swal.fire({
+                                    icon: "warning",
+                                    title: "Validation Alert!",
+                                    text: data.responseMsg,
+                                }).then(function () {
+                                    location.reload(); // Refresh the page
+                                });
+                            } else if (data.status === "error") {
+                                Swal.fire({
+                                    icon: "warning",
+                                    title: "Validation Alert!",
+                                    text: data.responseMsg,
+                                }).then(function () {
+                                    location.reload(); // Refresh the page
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: "warning",
+                                    title: "Validation Alert!",
+                                    text: "Something unexpected!",
+                                }).then(function () {
+                                    location.reload(); // Refresh the page
+                                });
+                            }
+                            preloader.addClass("d-none");
+                        },
+                        error: function (data) {
+                            if (data.status == 401) {
+                                window.location.replace('/Message/TokenExpire');
+                            } else if (data.status == 403) {
+                                window.location.replace('/Message/Unauthorize');
+                            } else if (data.status == 400) {
+                                sweetAlert("Validation Alert!", "Please check input data!", "warning");
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        GetUser()
+        function GetUser(Id) {
+            var opt = '';
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/AdScreen/GetStateUserList",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (res) {
+                    console.log(res)
+                    var options = [];
+                    options.push('<option value="">Please Select </option>');
+                    for (var i = 0; i < res.data.length; i++) {
+                        if (Id == res.data[i].userId) {
+                            opt = 'selected'
+                        } else {
+                            opt = '';
+                        }
+                        options.push('<option value="' + res.data[i].userId + '" ' + opt + '>' + res.data[i].fullName + '</option>');
+                    }
+                    $("#selectUser").html(options.join(''));
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
+
+        GetState()
+        function GetState(Id) {
+            var opt = '';
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/State/GetStateList",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (res) {
+                    console.log(res)
+                    var options = [];
+                    options.push('<option value="">Please Select </option>');
+                    for (var i = 0; i < res.data.length; i++) {
+                        if (Id == res.data[i].stateId) {
+                            opt = 'selected'
+                        } else {
+                            opt = '';
+                        }
+                        options.push('<option value="' + res.data[i].stateId + '" ' + opt + '>' + res.data[i].stateName + '</option>');
+                    }
+                    $("#selectState").html(options.join(''));
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
+
+        $(function () {
+
+            $("#Add_State").click(function (e) {
+                var UserValue = $('#selectUser').val();
+                var UserText = $('#selectUser option:selected').text();
+                var StateValue = $('#selectState').val();
+                var StateText = $('#selectState option:selected').text();
+
+                var row = "<tr><td data-value='" + UserValue + "'>" + UserText + "</td><td data-value='" + StateValue + "'>" + StateText + "</td><td><button class='delRowBtn'><i class='ion-trash-b' style='color: red;'></i></button></td></tr>";
+
+                $('#State_tb').append(row);
+            });
+
+
+            $(document).on("click", ".delRowBtn", function () {
+                $(this).closest("tr").remove();
+            });
+        });
+     
+    </script>
+}
+
+
+

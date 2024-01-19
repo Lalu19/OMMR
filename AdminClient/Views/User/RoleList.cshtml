@@ -1,0 +1,392 @@
+﻿@using Microsoft.Extensions.Configuration;
+@using Microsoft.AspNetCore.Http
+@inject IConfiguration Configuration;
+
+@{
+    ViewBag.Title = "Role";
+    string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
+}
+
+
+<div class="page-header">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#"><i class="fe fe-pie-chart mr-1"></i> Admin Console</a></li>
+        <li class="breadcrumb-item active" aria-current="page">User Roles</li>
+    </ol>
+    <div class="ml-auto">
+        <a href="#" onclick="showAddBtn()" data-toggle="modal" data-target="#roleModal" class="btn btn-primary btn-icon btn-sm text-white mr-2">
+            <span>
+                <i class="fe fe-plus"></i>
+            </span> Create User Role
+        </a>
+    </div>
+</div>
+
+<div class="col-md-12 col-lg-12">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Roles</div>
+        </div>
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table id="roleTable"  class="table table-striped table-bordered nowrap dataTable no-footer dtr-inline" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Menu Group</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+         
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div id="roleModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+
+            </div>
+            <div class="modal-body">
+                <form action="#" role="form" class="validate" id="formPost">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Role&nbsp;<span style="color: red;"><b>*</b></span></label>
+                                        <input type="text" class="form-control" autocomplete="off" id="role" placeholder="Role" required />
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Description&nbsp;<span style="color: red;"><b>*</b></span></label>
+                                        <input type="text" class="form-control" autocomplete="off" placeholder="Description" id="description" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Menu Group&nbsp;<span style="color: red;"><b>*</b></span></label>
+                                        <select id="menuGrp" class="custom-select" required></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <button type="button" id="btnSave" class="btn btn-primary" style="display:none">Save</button>
+                                    <button type="button" id="btnUpdate" class="btn btn-primary" style="display:none">Update</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        var roleIdForUpdate;
+
+        $(function () {
+            loadRoles();
+
+            $('#roleTable tbody').on('click', 'button[data-target="#roleModal"]', function () {
+                var id = $(this).data('id');
+                loadSingleRole(id);
+                $('#btnUpdate').show();
+                $('#btnSave').hide();
+                roleIdForUpdate = id;
+            });
+
+            $('#roleTable tbody').on('click', 'button[data-target="#delete"]', function () {
+                var id = $(this).data('id');
+
+                swal({
+                    html: true,
+                    title: "Are you sure?",
+                    text: "You will not be able to recover this data!",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, confirm it!",
+                    closeOnConfirm: false
+                }, function () {
+                    $.ajax({
+                        type: "GET",
+                        url: "@apiUrl/api/Users/DeleteSingleRole/" + id,
+                        contentType: "application/json; charset=utf-8",
+                        headers: {
+                            "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                        },
+                        dataType: "json",
+                        success: function (data, statusText, xhr) {
+                            if (xhr.status == 200) {
+                                $('#roleTable').DataTable().ajax.reload(null, false);
+                                sweetAlert({
+                                    html: true,
+                                    title: "Role",
+                                    text: "Successfully deleted!",
+                                    type: "success"
+                                });
+                            }else if (xhr.status == 202) {
+                                sweetAlert("Validation Alert!", data.responseMsg, "warning");
+                            } else {
+                                sweetAlert("Validation Alert!", "Something unexpected!", "warning");
+                            }
+                        },
+                        error: function (data) {
+                            if (data.status == 401) {
+                                window.location.replace('/Message/TokenExpire');
+                            } else if (data.status == 403) {
+                                window.location.replace('/Message/Unauthorize');
+                            }
+                        }
+                    });
+                });
+            });
+
+            $("#btnSave").click(function (e) {
+                if (!document.getElementById("formPost").checkValidity()) {
+                    e.preventDefault();
+                } else {
+                        var model = {
+                            roleName: $.trim($("#role").val()),
+                            roleDesc: $.trim($("#description").val()),
+                            menuGroupId: parseInt($("#menuGrp").val()),
+                            isActive: true,
+                            addedBy:@Context.Session.GetInt32("UserId"),
+                        }
+                    //console.log(model);
+
+                $.ajax({
+                    type: "POST",
+                    url: "@apiUrl/api/Users/CreateUserRole",
+                    data: JSON.stringify(model),
+                    contentType: "application/json; charset=utf-8",
+                    headers: {
+                            "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                    },
+                    dataType: "json",
+                    success: function (data, statusText, xhr) {
+                        if (xhr.status === 200) {
+                            $('#roleTable').DataTable().ajax.reload(null, false);
+                            sweetAlert({
+                                html: true,
+                                title: "Role",
+                                text: "Successfully created!",
+                                type: "success"
+                                });
+                        } else if (data.status === "duplicate") {
+                            sweetAlert("Validation Alert!", data.responseMsg, "warning");
+                        } else if (data.status === "error") {
+                            sweetAlert("Validation Alert!", data.responseMsg, "warning");
+                        }else {
+                                sweetAlert("Validation Alert!", "Something unexpected!", "warning");
+                            }
+                    },
+                    error: function (data) {
+                        if (data.status == 401) {
+                            window.location.replace('/Message/TokenExpire');
+                        } else if (data.status == 403) {
+                            window.location.replace('/Message/Unauthorize');
+                        } else if (data.status == 400) {
+                            sweetAlert("Validation Alert!", "Please check input data!", "warning");
+                        }
+                    }
+                    });
+                }
+            });
+
+            $("#btnUpdate").click(function (e) {
+                if (!document.getElementById("formPost").checkValidity()) {
+                    e.preventDefault();
+                } else {
+                        var model = {
+                        userRoleId: roleIdForUpdate,
+                        roleName: $.trim($("#role").val()),
+                        roleDesc: $.trim($("#description").val()),
+                        lastUpdatedBy:@Context.Session.GetInt32("UserId"),
+                        menuGroupId: parseInt($("#menuGrp").val())
+                    }
+                    $.ajax({
+                        type: "POST",
+                        url: "@apiUrl/api/Users/UpdateUserRole",
+                        data: JSON.stringify(model),
+                        contentType: "application/json; charset=utf-8",
+                        headers: {
+                            "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                        },
+                        dataType: "json",
+                        success: function (data, statusText, xhr) {
+                            //console.log(xhr.status);
+                            //console.log(statusText);
+                            if (xhr.status==200) {
+                                $('#roleTable').DataTable().ajax.reload(null, false);
+                                    sweetAlert({
+                                        html: true,
+                                        title: "Role",
+                                        text: "Successfully updated!",
+                                        type: "success"
+                                    });
+                            } else if (xhr.status == 202) {
+                                sweetAlert("Validation Alert!", data.responseMsg, "warning");
+                            } else {
+                                sweetAlert("Validation Alert!", "Something unexpected!", "warning");
+                            }
+                        },
+                        error: function (data) {
+                            if (data.status == 401) {
+                                window.location.replace('/Message/TokenExpire');
+                            } else if (data.status == 403) {
+                                window.location.replace('/Message/Unauthorize');
+                            } else if (data.status == 400) {
+                                sweetAlert("Validation Alert!", "Please check input data!", "warning");
+                            }
+                        }
+                    });
+                }
+            });
+
+        });
+
+        function loadSingleRole(id) {
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/Users/GetSingleRole/" + id,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                success: function (data, statusText, xhr) {
+                    console.log(xhr.status);
+                    if (xhr.status == 200) {
+                        $('#role').val(data.roleName);
+                        $('#description').val(data.roleDesc);
+                        menuGroupList(data.menuGroupId);
+                    }
+                    else {
+                        sweetAlert("Validation Alert!", "Something unexpected!", "warning");
+                    }
+                },
+                error: function (data) {
+                    console.log(data.status);
+                    if (data.status == 401) {
+                        console.log('un-authorized/token expired');
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        console.log('forbidden/no permission');
+                        window.location.replace('/Message/Unauthorize');
+                    }
+
+                }
+            });
+        }
+
+        function loadRoles() {
+            var table = $('#roleTable').DataTable();
+            table.destroy();
+
+            table = $('#roleTable').dataTable({
+                "paginationType": "full_numbers",
+                "dom": 'Bfrtip',
+                "buttons": ['copy', 'csv', 'excel', 'pdf', 'print'],
+                "searching": false,
+                "paging": true,
+                "sort": true,
+                "info": true,
+                "ajax": {
+                    "url": '@apiUrl/api/Users/GetUserRoleList',
+                    "type": "GET",
+                    "dataType": "json",
+                    "headers": {
+                        "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                    },
+                    "error": function (data) {
+                        if (data.status == 401) {
+                            window.location.replace('/Message/TokenExpire');
+                        } else if (data.status == 403) {
+                            window.location.replace('/Message/Unauthorize');
+                        }
+                    }
+                },
+                "order": [],
+                "columns": [
+                    { "data": "roleName", "orderable": true },
+                    { "data": "roleDesc", "orderable": true },
+                    { "data": "menuGroupName", "orderable": true },
+                    {
+                        "orderable": false,
+                        "class": "action_button",
+                        "render": function (data, type, row) {
+                            var id = row.userRoleId;
+                            var actionButtonsHtml = "";
+                            actionButtonsHtml += generateActionButtonForList(id, 'roleModal');
+                            return actionButtonsHtml;
+                        }
+                    }
+                ]
+            });
+        }
+
+        function menuGroupList(id) {
+            var opt = '';
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/Menu/GetMenuGroupList",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                   "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (res) {
+
+                    var options = [];
+                    options.push('<option value="">Select MenuGroup</option>');
+                    for (var i = 0; i < res.data.length; i++) {
+                        if (id == res.data[i].menuGroupID) {
+                            opt = 'selected'
+                        } else {
+                            opt = '';
+                        }
+                        options.push('<option value="' + res.data[i].menuGroupID + '" ' + opt + '>' + res.data[i].menuGroupName+ '</option>');
+                    }
+                    $("#menuGrp").html(options.join(''));
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
+
+        function showAddBtn() {
+            menuGroupList('');
+            $('#btnSave').show();
+            $('#btnUpdate').hide();
+            resetInput('#roleModal');
+        }
+    </script>
+}

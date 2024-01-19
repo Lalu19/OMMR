@@ -1,0 +1,234 @@
+﻿@using Microsoft.Extensions.Configuration;
+@using Microsoft.AspNetCore.Http
+@inject IConfiguration Configuration;
+
+@{
+    ViewBag.Title = "Upcoming Movie Poster List";
+    string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
+}
+<!-- PAGE-HEADER -->
+<div class="page-header">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#"><i class="fe fe-file-text mr-1"></i>Admin Console</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Upcoming Movie Poster List</li>
+    </ol>
+    <div class="ml-auto">
+        <a href="~/UpcomingMovie/UpcomingMovieCreate" class="btn btn-primary btn-icon btn-sm text-white mr-2">
+            <span>
+                <i class="fe fe-plus"></i>
+            </span>Create
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Upcoming Movie List</div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="Poster_Tb" class="table table-striped table-bordered nowrap dataTable no-footer dtr-inline" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Movie Poster</th>
+                                <th>Teaser Link</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+
+    <script>
+
+        //List
+        loadPoster()
+        async function loadPoster() {
+            var table = $('#Poster_Tb').DataTable();
+            table.destroy();
+            table = $('#Poster_Tb').dataTable({
+                "paginationType": "full_numbers",
+                "dom": 'Bfrtip',
+                "buttons": ['excel'],
+                "searching": true,
+                "paging": true,
+                "sort": true,
+                "info": true,
+                "ajax": {
+                    "url": '@apiUrl/api/UpcomingMovie/GetUpcomingMovieList',
+                    "type": "GET",
+                    "dataType": "json",
+                    "headers": {
+                        "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                    },
+                    "error": function (data) {
+                        if (data.status == 401) {
+                            window.location.replace('/Message/TokenExpire');
+                        } else if (data.status == 403) {
+                            window.location.replace('/Message/Unauthorize');
+                        }
+                    }
+                },
+                "order": [],
+                "columns": [
+                    {
+                        "render": function (data, type, row) {
+                            if (row.moviePoster === '') {
+                                return '';
+                            } else {
+                                var imageUrl = row.moviePoster;
+                                var isPdf = imageUrl.toLowerCase().endsWith('.pdf');
+
+                                if (isPdf) {
+                                    // Display a larger PDF icon with left margin
+                                    return '<a href="#" data-toggle="modal" data-target="#hallPassImgModal" data-image="' + imageUrl + '"><i class="fa fa-file-pdf-o" style="font-size: 32px; margin-left: 36px;"></i></a>';
+                                } else {
+                                    // Display an image
+                                    return '<a href="#" data-toggle="modal" data-target="#hallPassImgModal" data-image="' + imageUrl + '"><img style="margin-left: 28px;" class="avatar avatar-md rounded-circle" src="' + imageUrl + '"/></a>';
+                                }
+                            }
+                        }
+                    },
+
+                    { "data": "teaserLink", "orderable": true, "visible": true },
+
+                    {
+                        "render": function (data, type, row) {
+                            return '<a class="btn btn-sm btn-primary" href="../UpcomingMovie/UpcomingMovieEdit?upcomingMovieId=' + row.upcomingMovieId + '"><i class="fa fa-edit"></i></a>' + '&nbsp&nbsp<button class="btn btn-sm btn-danger" data-target="#delete" data-id=' + row.upcomingMovieId + ' data-title="Delete"><i class="fa fa-trash"></i></button>';
+
+                        }
+                    }
+                ]
+            });
+        }
+
+        //Delete
+        $('#Poster_Tb tbody').on('click', 'button[data-target="#delete"]', function () {
+            var id = $(this).data('id');
+            swal({
+                html: true,
+                title: "Are you sure?",
+                text: "You will not be able to recover this data!",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, confirm it!",
+                closeOnConfirm: false
+            }, function () {
+                $.ajax({
+                    type: "GET",
+                    url: "@apiUrl/api/UpcomingMovie/DeleteMovie/" + id + "/" + @Context.Session.GetInt32("UserId"),
+                    contentType: "application/json; charset=utf-8",
+                    headers: {
+                        "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                    },
+                    dataType: "json",
+                    success: function (data, statusText, xhr) {
+                        if (xhr.status == 200) {
+                            $('#Poster_Tb').DataTable().ajax.reload(null, false);
+                            sweetAlert({
+                                html: true,
+                                title: "Movie Poster",
+                                text: "Successfully deleted!",
+                                type: "success"
+                            });
+                        } else if (xhr.status == 202) {
+                            sweetAlert("Validation Alert!", data.responseMsg, "warning");
+                        } else {
+                            sweetAlert("Validation Alert!", "Something unexpected!", "warning");
+                        }
+                    },
+                    error: function (data) {
+                        if (data.status == 401) {
+                            window.location.replace('/Message/TokenExpire');
+                        } else if (data.status == 403) {
+                            window.location.replace('/Message/Unauthorize');
+                        }
+                    }
+                });
+            });
+        });
+
+        //$(document).on('click', 'a[data-toggle="modal"]', function () {
+        //    var imageUrl = $(this).data('image');
+        //    $('#hallPassImgImage').attr('src', imageUrl);
+        //});
+
+        $(document).on('click', 'a[data-toggle="modal"]', function () {
+            var imageUrl = $(this).data('image');
+            var isPdf = imageUrl.toLowerCase().endsWith('.pdf');
+
+            // Clear modal content
+            $('#modalContent').empty();
+
+            if (isPdf) {
+                // It's a PDF, so use PDF.js to display the PDF in the modal.
+                pdfjsLib.getDocument(imageUrl).promise.then(function (pdf) {
+                    pdf.getPage(1).then(function (page) {
+                        var canvas = document.createElement('canvas');
+                        var context = canvas.getContext('2d');
+                        var viewport = page.getViewport({ scale: 1 });
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+                        var renderContext = {
+                            canvasContext: context,
+                            viewport: viewport,
+                        };
+                        page.render(renderContext);
+                        $('#modalContent').append(canvas);
+                    });
+                });
+            } else {
+                // It's not a PDF, so it's likely an image.
+                var img = document.createElement('img');
+                img.src = imageUrl;
+                $('#modalContent').append(img);
+            }
+
+            $('#hallPassImgModal').modal('show');
+        });
+
+    </script>
+}
+
+<!-- Modal for displaying hallPassImg -->
+<div id="hallPassImgModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upcoming Movie Poster</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <div id="modalContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal for displaying PDF -->
+<div id="pdfModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">PDF Viewer</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <canvas id="pdfCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+</div>

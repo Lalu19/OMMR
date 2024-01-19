@@ -1,0 +1,396 @@
+﻿@using Microsoft.Extensions.Configuration;
+@using Microsoft.AspNetCore.Http
+@inject IConfiguration Configuration;
+
+
+@{
+    ViewBag.Title = "ClientAdsFeedbackList";
+    string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
+    string ads = ""; // Declare ads as a global variable
+}
+
+
+<style>
+    /* Style for the rounded container with background color */
+    #progress-bar-container {
+        width: 100%;
+        background-color: #ccc; /* Background color for the rounded container */
+        border-radius: 20px; /* Adjust this value to control the roundness */
+        overflow: hidden; /* Clip the progress bar inside the container */
+    }
+
+
+    /* Style for the progress bar itself */
+    #progress-bar {
+        border-radius: 9px;
+        background-color: #4CAF50; /* Change this to the desired progress bar color */
+        height: 100%; /* Make the progress bar fill the entire height of the container */
+    }
+
+
+    /* Style for the progress text or label */
+    #progresss {
+        color: white; /* Text color */
+    }
+
+</style>
+
+<!-- PAGE-HEADER -->
+
+<div class="page-header">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#"><i class="fe fe-file-text mr-1"></i>Admin Console</a></li>
+        <li class="breadcrumb-item active" aria-current="page">ClientAdsFeedback List</li>
+    </ol>
+</div>
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="progress col-xl-12 col-lg-12 col-md-12" id="progress-bar-container" style="height:30px;">
+                    <div class="progress-bar bg-success rounded-pill" id="progress-bar" role="progressbar" style="width:0%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="1000"><span id="progresss" data-toggle="tooltip" data-placement="top" title="Hover for Details">0</span></div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive" id="data-table-container" style="display:none">
+                    @* <input type="text" id="Add" />*@
+                    <table id="Agent_Tb" class="table table-striped table-bordered nowrap dataTable no-footer dtr-inline" style="width:100%">
+                        <thead>
+                            <tr>
+                                @* <th>Sl.No</th>*@
+                                <th>State Name</th>
+                                <th>City Name</th>
+                                <th>Theater Name</th>
+                                <th>Ads Name</th>
+                                <th>Ads Variant Status</th>
+                                <th>Ads Duration Status</th>
+                                <th>Ads PlayTime Status</th>
+                                @*<th>Ads Sequence Status</th>
+                                <th>Language Status</th>*@
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        var dataVisible = false;
+
+        // Initialize tooltips for hover
+        $('[data-toggle="tooltip"]').tooltip();
+
+        // Add a click event handler for the progress bar
+        $('#progress-bar-container').click(function () {
+            if (dataVisible) {
+                // If data is visible, hide it
+                $('#data-table-container').hide();
+                dataVisible = false;
+            } else {
+                // If data is hidden, show it
+                loadAds(); // Load data
+                $('#data-table-container').show();
+                dataVisible = true;
+            }
+        });
+
+        // Move the declaration of ads outside of the GetAds function
+        var ads = "";
+
+        GetAds()
+        function GetAds() {
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/Users/GetAdsNameByUserId/" + @Context.Session.GetInt32("UserId"),
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (data) {
+                    if (data && data.data && data.data.length > 0) {
+                        // Loop through the array of advertisements
+                        ads = data.data.map(item => item.advertiseName).join(',');
+
+                        console.log('Ads:', ads); // Log the value of ads
+
+
+                        loadAds();
+                        totalFeedback();
+                    } else {
+                        sweetAlert("Validation Alert!", "Something unexpected!", "warning");
+                    }
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
+
+        loadAds()
+        async function loadAds() {
+            try {
+                var response = await $.ajax({
+                    "url": '@apiUrl/api/AdScreen/GetClientAdsFeedbackListbyAdsNames?adsNames=' + ads,
+                    "type": "GET",
+                    "dataType": "json",
+                    "headers": {
+                        "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                    },
+                    "error": function (data) {
+                        if (data.status == 401) {
+                            window.location.replace('/Message/TokenExpire');
+                        } else if (data.status == 403) {
+                            window.location.replace('/Message/Unauthorize');
+                        }
+                    }
+                });
+
+                console.log('API Response:', response);
+
+                var table = $('#Agent_Tb').DataTable({
+                    "destroy": true,
+                    "paging": true,
+                    "ordering": true,
+                    "searching": true,
+                    "info": true,
+                    "data": response.data,  // Use the data property directly if the structure is correct
+                    "columns": [
+                        { "data": "stateName", "orderable": true, "visible": true },
+                        { "data": "city", "orderable": true, "visible": true },
+                        { "data": "theatreName", "orderable": true, "visible": true },
+                        { "data": "adsName", "orderable": true, "visible": true },
+                        {
+                            "data": "adsVariantStatusOk",
+                            "render": function (data, type, row) {
+                                if (row.adsVariantStatusOk === 1) {
+                                    return '<p style="background-color: #06f95b; color: black;">Ok</p>';
+                                } else if (row.adsVariantStatusNotOk === 1) {
+                                    return '<p style="background-color: #f9060a; color: black;">Not Ok</p>' + row.adsVariantStatusRemark;
+                                } else {
+                                    return '';
+                                }
+                            }
+                        },
+                        {
+                            "data": "adsDurationStatusOk",
+                            "render": function (data, type, row) {
+                                if (row.adsDurationStatusOk === 1) {
+                                    return '<p style="background-color: #06f95b; color: black;">Ok</p>';
+                                } else if (row.adsDurationStatusNotOk === 1) {
+                                    return '<p style="background-color: #f9060a; color: black;">Not Ok</p>' + row.adsDurationStatusRemark;
+                                } else {
+                                    return '';
+                                }
+                            }
+                        },
+
+                        {
+                            "data": "adsPlayTimeStatusOk",
+                            "render": function (data, type, row) {
+                                if (row.adsPlayTimeStatusOk === 1) {
+                                    return '<p style="background-color: #06f95b; color: black;">Ok</p>';
+                                } else if (row.adsPlayTimeStatusNotOk === 1) {
+                                    //return '<p><lable style="color: #f90669;">Not Ok</lable></br>' + row.adsPlayTimeStatusRemark;
+                                    return '<p style="background-color: #f9060a; color: black;">Not Ok</p>' + row.adsPlayTimeStatusRemark;
+                                } else {
+                                    return '';
+                                }
+                            }
+                        },
+                    ]
+
+                });
+            } catch (error) {
+                console.error('Error loading ads:', error);
+            }
+        }
+
+        //async function loadAds() {
+        //    console.log('Before DataTable Initialization - ads:', ads);
+        //    var table = $('#Agent_Tb').DataTable();
+        //    console.log('After DataTable Initialization');
+        //    table.destroy();
+        //    table = $('#Agent_Tb').dataTable({
+        //        "paginationType": "full_numbers",
+        //        "dom": 'Bfrtip',
+        //        "buttons": ['excel'],
+        //        "searching": true,
+        //        "paging": true,
+        //        "sort": true,
+        //        "info": true,
+        //        "ajax": {
+        //            "url": '@apiUrl/api/AdScreen/GetClientAdsFeedbackListbyAdsNames?adsNames=' + ads,
+        //            "type": "GET",
+        //            "dataType": "json",
+        //            "headers": {
+        //                "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+        //            },
+        //            "error": function (data) {
+        //                if (data.status == 401) {
+        //                    window.location.replace('/Message/TokenExpire');
+        //                } else if (data.status == 403) {
+        //                    window.location.replace('/Message/Unauthorize');
+        //                }
+        //            }
+        //        },
+        //        "order": [],
+        //        "columns": [
+        //            //{
+        //            //    "data": null,
+        //            //    "orderable": false,
+        //            //    "render": function (data, type, row, meta) {
+        //            //        return meta.row + 1;
+        //            //    }
+        //            //},
+        //            { "data": "stateName", "orderable": true, "visible": true },
+        //            { "data": "city", "orderable": true, "visible": true },
+        //            { "data": "theatreName", "orderable": true, "visible": true },
+        //            { "data": "adsName", "orderable": true, "visible": true },
+        //            {
+        //                "data": "adsVariantStatusOk",
+        //                "render": function (data, type, row) {
+        //                    if (row.adsVariantStatusOk === 1) {
+        //                        return '<p style="background-color: #06f95b; color: black;">Ok</p>';
+        //                    } else if (row.adsVariantStatusNotOk === 1) {
+        //                        return '<p style="background-color: #f9060a; color: black;">Not Ok</p>' + row.adsVariantStatusRemark;
+        //                    } else {
+        //                        return '';
+        //                    }
+        //                }
+        //            },
+        //            {
+        //                "data": "adsDurationStatusOk",
+        //                "render": function (data, type, row) {
+        //                    if (row.adsDurationStatusOk === 1) {
+        //                        return '<p style="background-color: #06f95b; color: black;">Ok</p>';
+        //                    } else if (row.adsDurationStatusNotOk === 1) {
+        //                        return '<p style="background-color: #f9060a; color: black;">Not Ok</p>' + row.adsDurationStatusRemark;
+        //                    } else {
+        //                        return '';
+        //                    }
+        //                }
+        //            },
+
+        //            {
+        //                "data": "adsPlayTimeStatusOk",
+        //                "render": function (data, type, row) {
+        //                    if (row.adsPlayTimeStatusOk === 1) {
+        //                        return '<p style="background-color: #06f95b; color: black;">Ok</p>';
+        //                    } else if (row.adsPlayTimeStatusNotOk === 1) {
+        //                        //return '<p><lable style="color: #f90669;">Not Ok</lable></br>' + row.adsPlayTimeStatusRemark;
+        //                        return '<p style="background-color: #f9060a; color: black;">Not Ok</p>' + row.adsPlayTimeStatusRemark;
+        //                    } else {
+        //                        return '';
+        //                    }
+        //                }
+        //            },
+        //            //{
+        //            //    "data": "adsSequenceStatusOk",
+        //            //    "render": function (data, type, row) {
+        //            //        if (row.adsSequenceStatusOk === 1) {
+        //            //            return '<p><lable style="color: #064ef9;"">Ok</lable></br>';
+        //            //        } else if (row.adsSequenceStatusNotOk === 0) {
+        //            //            return '<p><lable style="color: #f90669;">Not Ok</lable></br>' + row.adsSequenceStatusRemark;
+        //            //        } else {
+        //            //            return '';
+        //            //        }
+        //            //    }
+        //            //},
+        //            //{
+        //            //    "data": "languageStatusOk",
+        //            //    "render": function (data, type, row) {
+        //            //        if (row.languageStatusOk === 1) {
+        //            //            return '<p><lable style="color: #064ef9;"">Ok</lable></br>';
+        //            //        } else if (row.languageStatusNotOk === 0) {
+        //            //            return '<p><lable style="color: #f90669;">Not Ok</lable></br>' + row.languageStatusRemark;
+        //            //        } else {
+        //            //            return '';
+        //            //        }
+        //            //    }
+        //            //},
+        //        ]
+        //    });
+        //}
+
+        totalFeedback()
+        async function totalFeedback() {
+            $.ajax({
+                "url": '@apiUrl/api/AdScreen/GetClientAdsFeedbackListbyAdsNames?adsNames=' + ads,
+                type: "GET",
+                success: function (data) {
+                    console.log(data);
+                    var x = '';
+
+                    if (data && data.totalFeedbackCount !== undefined) {
+                        var totalFeedbackCount = data.totalFeedbackCount;
+                        x = x + '<span>' + totalFeedbackCount + '</span>';
+                        $('#progresss').html(x);
+
+                        // Update the progress bar only if totalFeedbackCount is greater than 0
+                        if (totalFeedbackCount > 0) {
+                            var percentage = (totalFeedbackCount/5);
+                            $('#progress-bar').css('width', percentage + '%');
+                            $('#progress-bar').attr('aria-valuenow', percentage);
+                        } else {
+                            // Handle the case where totalFeedbackCount is 0 or less (optional)
+                            // You might want to set the progress bar to 0 or display a message.
+                            // Example: $('#progress-bar').css('width', '0%');
+                        }
+
+                        // Update tooltip content with the number of records
+                        $('#progresss').attr('data-original-title', totalFeedbackCount + " Records");
+                    } else {
+                        console.log("Invalid data returned from the API");
+                        // Handle the case where data is not valid (optional)
+                    }
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+        }
+
+       //async function totalFeedback() {
+                //    $.ajax({
+                //        "url": '@apiUrl/api/AdScreen/GetClientAdsFeedbackListbyAdsName/' + ads,
+                //        type: "GET",
+                //        success: function (data) {
+                //            console.log(data);
+                //            var x = '';
+                //            var recordsTotal = data.recordsTotal;
+                //            x = x + '<span>' + recordsTotal + '</span>';
+                //            $('#progresss').html(x);
+
+                //            ////For 1000
+                //            //var percentage = (recordsTotal/10);
+
+                //            ////For 500
+                //            //var percentage = (recordsTotal/5);
+
+                //            var percentage = (recordsTotal);
+                //            $('#progress-bar').css('width', percentage + '%');
+                //            $('#progress-bar').attr('aria-valuenow', percentage);
+
+
+                //            // Update tooltip content with the number of records
+                //            $('#progresss').attr('data-original-title', recordsTotal + " Records");
+
+
+                //        },
+                //        error: function (err) {
+                //            console.log(err);
+                //        }
+                //    });
+                //}
+
+
+    </script>
+
+}

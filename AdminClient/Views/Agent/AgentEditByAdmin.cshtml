@@ -1,0 +1,736 @@
+﻿@using Microsoft.Extensions.Configuration;
+@using Microsoft.AspNetCore.Http
+@inject IConfiguration Configuration;
+
+@{
+    ViewBag.Title = "Agent";
+    string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
+}
+<style>
+    #preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #fff;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+</style>
+<!-- PAGE-HEADER -->
+<div class="page-header">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#"><i class="fe fe-file-text mr-1"></i>Admin Consol</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Agent Edit</li>
+    </ol>
+    <div class="ml-auto">
+        <a href="~/Agent/AgentListByAdmin" class="btn btn-primary btn-icon btn-sm text-white mr-2">
+            <span>
+                <i class="fe fe-plus"></i>
+            </span> View
+        </a>
+    </div>
+</div>
+
+<div id="preloader" class="d-none">
+    <div class="spinner"></div>
+</div>
+
+<div class="row">
+    <div class="col-md">
+        <div class="card overflow-hidden">
+            <div class="card-header">
+                <h3 class="card-title">Agent Edit</h3>
+            </div>
+            <div class="card-body">
+                <form action="#" role="form" class="validate" id="formPost">
+                    <div class="row">
+                       
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">State Name &nbsp;<span style="color: red;"><b>*</b></span></label>
+                                <div class="input-box">
+                                    <select class="form-control" id="selectState">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">City Name &nbsp;<span style="color: red;"><b>*</b></span></label>
+                                <div class="input-box">
+                                    <select class="form-control" id="selectcity">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 form-group overflow-hidden" id="ifv">
+                            <div class="form-group">
+                                <label class="form-label">Theater Name</label>
+                                <div id="selectedAreasDisplay"></div>
+                                <select multiple="multiple" class="form-control select2 w-100" id="selectArea" name="selectedAreas[]" data-placeholder="Select Theater" required></select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Agent Name &nbsp;<span style="color: red;"><b>*</b></span></label>
+                                <input type="text" class="form-control" id="agentname" placeholder="Enter Name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Agent Role &nbsp;<span style="color: red;"><b>*</b></span></label>
+                                <select class="form-control" name="example-tex`t-input" placeholder="Agent Role" id="agentrole" required>
+                                    <option value="0">Please Select</option>
+                                    <option value="Primary">Primary Agent</option>
+                                    <option value="Backup">Backup Agent</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Phone Number &nbsp;<span style="color: red;"><b>*</b></span></label>
+                                <input type="text" class="form-control" id="phonenumber" placeholder="Enter Phone Number" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Email Id  &nbsp;<span style="color: red;"><b>*</b></span></label>
+                                <input type="text" class="form-control" id="emailid" placeholder="Enter Email Id" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Address &nbsp;<span style="color: red;"><b>*</b></span></label>
+                                <input type="text" class="form-control" id="address" placeholder="Enter Address" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Agent User Id &nbsp;<span style="color: red;"><b>*</b></span></label>
+                                <input type="text" class="form-control" id="agentuserid" placeholder="Enter UserId" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Password &nbsp;<span style="color: red;"><b>*</b></span></label>
+                                <input type="text" class="form-control" id="password" placeholder="Enter Password" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Profile Image &nbsp;<span style="color: red;"><b>*</b></span></label>
+                                <input type="file" class="form-control" id="profilephoto">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <img id="imgg" src="" width="100" class="rounded-circle">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" id="btnupdate" class="btn btn-radius btn-success">Update</button>
+                            <a type="button" href="~/Agent/AgentListByAdmin" class="btn btn-radius btn-danger">Reset</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@section scripts{
+    <script>
+        var selectedAreas = [];
+
+        GetState()
+        function GetState(Id) {
+            var opt = '';
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/ScreenList/GetStateList",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (res) {
+                    console.log(res)
+                    var options = [];
+                    options.push('<option value="">Please Select </option>');
+                    for (var i = 0; i < res.data.length; i++) {
+                        if (Id == res.data[i].stateId) {
+                            opt = 'selected'
+                        } else {
+                            opt = '';
+                        }
+                        options.push('<option value="' + res.data[i].stateId + '" ' + opt + '>' + res.data[i].state + '</option>');
+                    }
+                    $("#selectState").html(options.join(''));
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
+
+        $("#selectState").change(function () {
+            var vcategoeryid = $("#selectState").val()
+            var opt = '';
+            $.ajax({
+                type: "GET",
+                url: '@apiUrl/api/ScreenList/GetCityListbystateid/' + vcategoeryid,
+                dataType: "json",
+                success: function (data) {
+                    var options = [];
+                    options.push('<option>Please Select</option>');
+                    for (var i = 0; i < data['data'].length; i++) {
+                        //if (Id == res.data[i].stateId) {
+                        //    opt = 'selected'
+                        //} else {
+                        //    opt = '';
+                        //}
+                        options.push('<option value="' + data['data'][i].city + '" ' + opt + '>' + data['data'][i].city + '</option>');
+                    }
+                    $("#selectcity").html(options.join(''));
+
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        });
+
+        //$("#selectcity").change(function () {
+        //    var vcategoeryid = $("#selectcity").val()
+        //    var opt = '';
+        //    $.ajax({
+        //        type: "GET",
+        //        url: '@apiUrl/api/ScreenList/GetTheaterListbycityname/' + vcategoeryid,
+        //        dataType: "json",
+        //        success: function (data) {
+        //            console.log(data)
+        //            var options = [];
+        //            // options.push('<option>Please Select</option>');
+        //            for (var i = 0; i < data['data'].length; i++) {
+
+        //                options.push('<option value="' + data['data'][i].theatreName + '" ' + opt + '>' + data['data'][i].theatreName + '</option>');
+        //            }
+        //            $("#selectArea").html(options.join(''));
+        //            $('#selectArea').multipleSelect({
+        //                width: '100%'
+        //            });
+        //        },
+        //        error: function (data) {
+        //            if (data.status == 401) {
+        //                window.location.replace('/Message/TokenExpire');
+        //            } else if (data.status == 403) {
+        //                window.location.replace('/Message/Unauthorize');
+        //            }
+        //        }
+        //    });
+        //});
+
+        $("#selectcity").change(function () {
+            var vcategoeryid = $("#selectcity").val();
+            $.ajax({
+                type: "GET",
+                url: '@apiUrl/api/ScreenList/GetTheaterListbycityname/' + vcategoeryid,
+                dataType: "json",
+                success: function (data) {
+                    var options = [];
+
+                    // Add the "Select All Theaters" option with a unique value
+                    options.push('<option value="__select_all__">Select All</option>');
+
+                    for (var i = 0; i < data['data'].length; i++) {
+                        options.push('<option value="' + data['data'][i].theatreName + '">' + data['data'][i].theatreName + '</option>');
+                    }
+
+                    $("#selectArea").html(options.join(''));
+                    $('#selectArea').multipleSelect({
+                        width: '100%'
+                    });
+
+                    // Handle the "Select All Theaters" option
+                    $("#selectArea").on('change', function () {
+                        if ($(this).val() && $(this).val().includes('__select_all__')) {
+                            // Select all theaters except "__select_all__"
+                            var allTheaters = data['data'].map(theater => theater.theatreName);
+                            $('#selectArea').multipleSelect('setSelects', allTheaters);
+                        } else if ($(this).val() && $(this).val().includes('__select_all__')) {
+                            // If "__select_all__" is unchecked, remove it from the selected values
+                            var selectedValues = $(this).val().filter(value => value !== '__select_all__');
+                            $('#selectArea').multipleSelect('setSelects', selectedValues);
+                        }
+                    });
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        });
+
+    </script>
+    <script>
+        function StateList(Id) {
+            var opt = '';
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/ScreenList/GetStateList",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (res) {
+
+                    var options = [];
+                    options.push('<option value="">--Select State--</option>');
+                    for (var i = 0; i < res.data.length; i++) {
+                        if (Id == res.data[i].stateId) {
+                            opt = 'selected'
+                        } else {
+                            opt = '';
+                        }
+                        options.push('<option value="' + res.data[i].stateId + '" ' + opt + '>' + res.data[i].state + '</  option>');
+                    }
+                    $("#selectState").html(options.join(''));
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
+
+        //function CityList(Id) {
+        //    var opt = '';
+        //    $.ajax({
+        //        type: "GET",
+        //        url: "@apiUrl/api/ScreenList/GetCityList",
+        //        contentType: "application/json; charset=utf-8",
+        //        headers: {
+        //            "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+        //        },
+        //        dataType: "json",
+        //        success: function (res) {
+
+        //            var options = [];
+        //            options.push('<option value="">--Select City--</option>');
+        //            for (var i = 0; i < res.data.length; i++) {
+        //                //if (Id == res.data[i].stateId) {
+        //                //    opt = 'selected'
+        //                //} else {
+        //                //    opt = '';
+        //                //}
+        //                options.push('<option value="' + res.data[i].city + '" ' + opt + '>' + res.data[i].city + '</  option>');
+        //            }
+        //            $("#selectcity").html(options.join(''));
+        //        },
+        //        error: function (data) {
+        //            if (data.status == 401) {
+        //                window.location.replace('/Message/TokenExpire');
+        //            } else if (data.status == 403) {
+        //                window.location.replace('/Message/Unauthorize');
+        //            }
+        //        }
+        //    });
+        //}
+
+        function CityList(selectedCity) {
+            var opt = '';
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/ScreenList/GetCityList",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (res) {
+                    var options = [];
+                    options.push('<option value="">Select City</option>');
+                    for (var i = 0; i < res.data.length; i++) {
+                        var city = res.data[i].city;
+                        options.push('<option value="' + city + '">' + city + '</option>');
+                    }
+                    $("#selectcity").html(options.join(''));
+
+                    // Set the selected city if provided
+                    if (selectedCity) {
+                        $('#selectcity').val(selectedCity);
+                        // Trigger the change event to populate areas based on the selected city
+                        $('#selectcity').trigger('change');
+                    }
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
+
+        $('#selectcity').change(function () {
+            var selectedCity = $(this).val();
+            if (selectedCity) {
+                console.log("Selected City: " + selectedCity);
+                AreaList(selectedCity);
+            } else {
+                // Clear the areas if no city is selected
+                $('#selectArea').empty();
+            }
+        });
+
+        //function AreaList(selectedCity, selectedArea) {
+        //    console.log("AreaList function called with selectedCity: " + selectedCity);
+
+        //    $.ajax({
+        //        type: "GET",
+        //        url: "@apiUrl/api/ScreenList/GetTheaterListbycityname/" + selectedCity,
+        //        dataType: "json",
+        //        success: function (data) {
+        //            console.log("AreaList Data: ", data); // Log the data received from the API
+
+        //            var options = [];
+        //            if (data && data['data'] && data['data'].length > 0) {
+        //                for (var i = 0; i < data['data'].length; i++) {
+        //                    var theatreName = data['data'][i].theatreName;
+        //                    options.push('<option value="' + theatreName + '">' + theatreName + '</option>');
+        //                }
+        //            } else {
+        //                console.log("No theatreName Data"); // Log if there is no data
+        //            }
+
+        //            $("#selectArea").html(options.join('')); // Set options to the select element
+
+        //            // ... Rest of the code
+        //        },
+        //        error: function (data) {
+        //            console.log("theatreNameList Error: ", data); // Log any error messages
+
+        //            if (data.status == 401) {
+        //                window.location.replace('/Message/TokenExpire');
+        //            } else if (data.status == 403) {
+        //                window.location.replace('/Message/Unauthorize');
+        //            }
+        //        }
+        //    });
+        //}
+
+        function AreaList(selectedCity, selectedArea) {
+            console.log("AreaList function called with selectedCity: " + selectedCity);
+
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/ScreenList/GetTheaterListbycityname/" + selectedCity,
+                dataType: "json",
+                success: function (data) {
+                    console.log("AreaList Data: ", data); // Log the data received from the API
+
+                    var options = [];
+
+                    // Add the "Select All Theaters" option with a unique value
+                    options.push('<option value="__select_all__">Select All Theaters</option>');
+
+                    if (data && data['data'] && data['data'].length > 0) {
+                        for (var i = 0; i < data['data'].length; i++) {
+                            var theatreName = data['data'][i].theatreName;
+                            options.push('<option value="' + theatreName + '">' + theatreName + '</option>');
+                        }
+                    } else {
+                        console.log("No theatreName Data"); // Log if there is no data
+                    }
+
+                    $("#selectArea").html(options.join('')); // Set options to the select element
+
+                    $('#selectArea').multipleSelect({
+                        width: '100%'
+                    });
+
+                    // Handle the "Select All Theaters" option
+                    $("#selectArea").on('change', function () {
+                        if ($(this).val() && $(this).val().includes('__select_all__')) {
+                            // Select all theaters except "__select_all__"
+                            var allTheaters = data['data'].map(theater => theater.theatreName);
+                            $('#selectArea').multipleSelect('setSelects', allTheaters);
+                        } else {
+                            // Handle other selection logic if needed
+                        }
+                    });
+                },
+                error: function (data) {
+                    console.log("theatreNameList Error: ", data); // Log any error messages
+
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
+
+
+    </script>
+    <script>
+        var agentId = @ViewBag.agentId
+            loadSingleAgent()
+        function loadSingleAgent() {
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/Agent/GetSingleAgent/" + agentId,
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (data) {
+                    if (data) {
+                        $('#agentname').val(data.agentName);
+                        $('#agentrole').val(data.agentrole);
+                        StateList(data.stateId);
+                        //GetState(data.statename);
+                        CityList(data.cityname);
+                        AreaList(data.cityname, data.theatreName);
+                        //GetState(data.stateId);
+                        //CityList(data.cityId);
+                        //$('#selectState').val(data.stateId);
+                        //$('#selectcity').val(data.cityId);
+                        $('#phonenumber').val(data.agentPhoneNumber);
+                        $('#address').val(data.address);
+                        $('#emailid').val(data.emailId);
+                        $('#agentuserid').val(data.agentuserId);
+                        $('#password').val(data.passWord);
+                        //$('#profilephoto').attr('src', data.profilePhoto);
+                        $('#imgg').attr('src', data.profilePhoto);
+                    }
+                    else {
+                        sweetAlert("Validation Alert!", "Something unexpected!", "warning");
+                    }
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
+
+
+        $("#btnupdate").click(function (e) {
+
+
+            var selectedAreas = $("#selectArea").val();
+            if (selectedAreas.length === 0) {
+                e.preventDefault(); // Prevent form submission
+                var confirmAssignArea = confirm("Please Assign Theatre");
+                if (!confirmAssignArea) {
+                    return; // If the user clicks Cancel, stop further execution
+                }
+            }
+
+            if (!document.getElementById("formPost").checkValidity()) {
+                e.preventDefault();
+            } else {
+
+                imgPath = '';
+                var currentImageSrc = '';
+                currentImageSrc = $('#imgg').attr('src'); //eithi rahiba circle ra id
+
+                if ($('#profilephoto').val() != '' && $('#profilephoto').val() != 'Choose file') { //eithi rahiba circle ra upare thiba jou id
+                    uploadphoto();
+                } else if (currentImageSrc != '') {
+                    imgPath = currentImageSrc;
+                }
+
+                var selectedAreas = $("#selectArea").val();
+
+                //// Display selected areas in a more readable format
+                //var selectedAreasDisplay = selectedAreas.join(', '); // Join areas with a comma
+                //$("#selectedAreasDisplay").text(selectedAreasDisplay); // Display in the div
+
+                // Convert selectedAreas to a single string
+                var selectedAreasString = selectedAreas.join(', '); // Join areas with a comma
+
+
+                // Show preloader
+                var preloader = $("#preloader");
+                preloader.removeClass("d-none");
+                var model = {
+                    agentId: agentId,
+                    agentName: $.trim($("#agentname").val()),
+                    agentrole: $.trim($("#agentrole").val()),
+                    stateId: parseInt($("#selectState").val()),
+                    cityname: $.trim($("#selectcity").val()),
+                    theatreName: selectedAreasString, // Store as a single string
+                    agentPhoneNumber: $.trim($("#phonenumber").val()),
+                    address: $.trim($("#address").val()),
+                    emailId: $.trim($("#emailid").val()),
+                    agentuserId: $.trim($("#agentuserid").val()),
+                    passWord: $.trim($("#password").val()),
+                    profilePhoto: imgPath,
+                    updatedBy: @Context.Session.GetInt32("UserId"),
+                }
+                console.log(model)
+                $.ajax({
+                    type: "POST",
+                    url: "@apiUrl/api/Agent/updateAgent",
+                    data: JSON.stringify(model),
+                    contentType: "application/json; charset=utf-8",
+                    headers: {
+                        "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                    },
+
+                    //success: function (data, statusText, xhr) {
+                    //    console.log(data)
+                    //    if (xhr.status === 200) {
+                    //        $('#Store_Tb').DataTable().ajax.reload(null, false);
+                    //        sweetAlert({
+                    //            html: true,
+                    //            icon: "success",
+                    //            title: "Agent",
+                    //            text: "Successfully updated!",
+                    //            type: "success"
+                    //        });
+                    //    } else if (data.status === "duplicate") {
+                    //        sweetAlert("Validation Alert!", data.responseMsg, "warning");
+                    //    } else if (data.status === "error") {
+                    //        sweetAlert("Validation Alert!", data.responseMsg, "warning");
+                    //    } else {
+                    //        sweetAlert("Validation Alert!", "Something unexpected!", "warning");
+                    //    }
+                    //},
+
+                    success: function (data, statusText, xhr) {
+                        if (xhr.status === 200) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Agent",
+                                text: "Successfully updated!",
+                            }).then(function () {
+                                location.reload(); // Refresh the page
+                            });
+
+                            //preloader.addClass("d-none");
+                        } else if (data.status === "AlreadyExist") {
+                            Swal.fire({
+                                icon: "warning",
+                                title: "Validation Alert!",
+                                text: data.responseMsg,
+                            }).then(function () {
+                                location.reload(); // Refresh the page
+                            });
+                        } else if (data.status === "error") {
+                            Swal.fire({
+                                icon: "warning",
+                                title: "Validation Alert!",
+                                text: data.responseMsg,
+                            }).then(function () {
+                                location.reload(); // Refresh the page
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: "warning",
+                                title: "Validation Alert!",
+                                text: "Something unexpected!",
+                            }).then(function () {
+                                location.reload(); // Refresh the page
+                            });
+                        }
+                        preloader.addClass("d-none");
+                    },
+                    error: function (data) {
+                        console.log(data);
+                        if (data.status == 401) {
+                            window.location.replace('/Message/TokenExpire');
+                        } else if (data.status == 403) {
+                            window.location.replace('/Message/Unauthorize');
+                        } else if (data.status == 400) {
+                            sweetAlert("Validation Alert!", "Please check input data!", "warning");
+                        }
+                    }
+                });
+            }
+        });
+
+        function uploadphoto() {
+            var totalFiles = document.getElementById('profilephoto').files.length;
+            if (totalFiles > 0) {
+                var formData = new FormData();
+                var files = document.getElementById('profilephoto').files;
+                formData.append("file", files[0]);
+                $.ajax(
+                    {
+                        url: "/Upload/ImgUpload",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        async: false,
+                        type: "POST",
+
+                        success: function (data) {
+                            imgPath = data;
+
+                        },
+                        error: function (data) {
+                            window.location.replace('/Message/SessionExpire');
+                        }
+                    }
+                );
+            }
+        }
+    </script>
+}

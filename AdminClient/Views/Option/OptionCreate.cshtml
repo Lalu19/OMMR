@@ -1,0 +1,318 @@
+﻿@using Microsoft.Extensions.Configuration;
+@using Microsoft.AspNetCore.Http
+@inject IConfiguration Configuration;
+
+@{
+    ViewBag.Title = "Option Table";
+    string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
+}
+
+<style>
+    #preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #fff;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+</style>
+
+<!-- PAGE-HEADER -->
+<div class="page-header">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#"><i class="fe fe-file-text mr-1"></i>Admin Console</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Option Create</li>
+    </ol>
+    <div class="ml-auto">
+        <a href="~/Option/OptionList" class="btn btn-primary btn-icon btn-sm text-white mr-2">
+            <span>
+                <i class="fe fe-plus"></i>
+            </span> View
+        </a>
+    </div>
+</div>
+<!-- PAGE-HEADER END -->
+
+
+<div id="preloader" class="d-none">
+    <div class="spinner"></div>
+</div>
+
+<div class="row">
+    <div class="col-md">
+        <div class="card overflow-hidden">
+            <div class="card-header">
+                <h3 class="card-title">Option Create</h3>
+            </div>
+            <div class="card-body">
+                <form action="#" name="myForm" role="form" class="validate" id="formPost">
+                    <div class="row">
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Choose Question</label>
+                                <div class="input-box">
+                                    <select class="form-control" id="selectQs">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Create Option</label>
+                                <input type="text" class="form-control" id="createoption" placeholder="Option">
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button type="button" id="Add_Optn" class="btn btn-radius btn-info">Add Option</button>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="table-responsive">
+                        <table id="Optnn" class="table table-bordered table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Question</th>
+                                    <th>Options</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="Option_tb">
+                            </tbody>
+                        </table>
+                    </div>
+                    <br />
+                    <br />
+                    <br />
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <button type="button" id="btnSave" class="btn btn-radius btn-success">Save</button>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@section scripts{
+    <script>
+        $(function () {
+            $("#btnSave").click(function (e) {
+                if (!document.getElementById("formPost").checkValidity()) {
+                    e.preventDefault();
+                }
+                else {
+                    var OptionDetails = [];
+                  
+
+                    $.each($("#Optnn tbody tr"), function () {
+                        var $irow = $(this),
+                            rowObj = {};
+
+
+                        // Retrieve the data-value attributes
+                        var Question = parseInt($irow.find("td:eq(0)").data("value"));
+                        var Options = $irow.find("td:eq(1)").data("value");  // Change this line to handle Options as a string
+
+
+                        var a = {
+                            "questionId": Question,
+                            "option": Options
+                        }
+                        OptionDetails.push(a);
+                    });
+
+                    var preloader = $("#preloader");
+                    preloader.removeClass("d-none");
+                    var model = {
+                        "questionId": parseInt($("#selectQs").val()),
+                        "option": $.trim($("#createoption").val()),
+                        optionsTableDTOs: OptionDetails,
+                        createdBy: @Context.Session.GetInt32("UserId"),
+                    }
+                    console.log(model)
+                    $.ajax({
+                        type: "POST",
+                        url: "@apiUrl/api/Options/OptionsCreate",
+                        data: JSON.stringify(model),
+                        contentType: "application/json; charset=utf-8",
+                        headers: {
+                            "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                        },
+                        dataType: "json",
+                      
+                        success: function (data, statusText, xhr) {
+                            if (xhr.status === 200) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Option",
+                                    text: "Successfully created!",
+                                }).then(function () {
+                                    location.reload(); // Refresh the page
+                                });
+
+                                //preloader.addClass("d-none");
+                            } else if (data.status === "Duplicate") {
+                                Swal.fire({
+                                    icon: "warning",
+                                    title: "Validation Alert!",
+                                    text: data.responseMsg,
+                                }).then(function () {
+                                    location.reload(); // Refresh the page
+                                });
+                            } else if (data.status === "error") {
+                                Swal.fire({
+                                    icon: "warning",
+                                    title: "Validation Alert!",
+                                    text: data.responseMsg,
+                                }).then(function () {
+                                    location.reload(); // Refresh the page
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: "warning",
+                                    title: "Validation Alert!",
+                                    text: "Something unexpected!",
+                                }).then(function () {
+                                    location.reload(); // Refresh the page
+                                });
+                            }
+                            preloader.addClass("d-none");
+                        },
+                        error: function (data) {
+                            if (data.status == 401) {
+                                window.location.replace('/Message/TokenExpire');
+                            } else if (data.status == 403) {
+                                window.location.replace('/Message/Unauthorize');
+                            } else if (data.status == 400) {
+                                sweetAlert("Validation Alert!", "Please check input data!", "warning");
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        GetQuestion()
+        function GetQuestion(Id) {
+            var opt = '';
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/QuestionTable/GetQuestionList",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (res) {
+                    console.log(res)
+                    var options = [];
+                    options.push('<option value="">Please Select </option>');
+                    for (var i = 0; i < res.data.length; i++) {
+                        if (Id == res.data[i].questionTableId) {
+                            opt = 'selected'
+                        } else {
+                            opt = '';
+                        }
+                        options.push('<option value="' + res.data[i].questionTableId + '" ' + opt + '>' + res.data[i].questions + '</option>');
+                    }
+                    $("#selectQs").html(options.join(''));
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
+
+    
+        $(function () {
+
+            //$("#Add_Optn").click(function (e) {
+            //    var UserValue = $('#abc').val();
+            //    var UserText = $('#abc option:selected').text();
+            //    var StateValue = $('#cde').val();
+            //    var StateText = $('#cde option:selected').text();
+
+            //    var row = "<tr><td data-value='" + UserValue + "'>" + UserText + "</td><td data-value='" + StateValue + "'>" + StateText + "</td><td><button class='delRowBtn'><i class='ion-trash-b' style='color: red;'></i></button></td></tr>";
+
+            //    $('#Option_tb').append(row);
+            //});
+
+            //$("#Add_Optn").click(function (e) {
+            //    var x = $('#Option_tb').html();
+            //    var Qsn = $('#selectQs option:selected').text();
+            //    var Optn = $('#createoption').val();
+
+            //    x = x + "<tr><td>" + Qsn + "</td><td>" + Optn + "</td><td>" + "<button class='delRowBtn'><i class='ion-trash-b' style='color: red;'></i></button></td></tr>"
+            //    $('#Option_tb').html(x);
+            //    $(document.body).delegate(".delRowBtn", "click", function () {
+            //        $(this).closest("tr").remove();
+            //    });
+            //    $('#selectQs').val('');
+            //    $('#createoption').val('');
+            
+            //});
+
+            $("#Add_Optn").click(function (e) {
+                var Qsn = $('#selectQs').val();
+                var QsnText = $('#selectQs option:selected').text();
+                var Optn = $('#createoption').val();
+
+                var row = "<tr><td data-value='" + Qsn + "'>" + QsnText + "</td><td data-value='" + Optn + "'>" + Optn + "</td><td><button class='delRowBtn'><i class='ion-trash-b' style='color: red;'></i></button></td></tr>";
+
+                $('#Option_tb').append(row);
+
+                $(document.body).delegate(".delRowBtn", "click", function () {
+                    $(this).closest("tr").remove();
+                });
+
+                $('#selectQs').val('');
+                $('#createoption').val('');
+            });
+
+
+            $(document).on("click", ".delRowBtn", function () {
+                $(this).closest("tr").remove();
+            });
+        });
+
+    </script>
+}
+
+
+

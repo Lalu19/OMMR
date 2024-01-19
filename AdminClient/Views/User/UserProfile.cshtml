@@ -1,0 +1,259 @@
+﻿@using Microsoft.Extensions.Configuration;
+@using Microsoft.AspNetCore.Http
+@inject IConfiguration Configuration;
+
+@{
+    ViewBag.Title = "User";
+    string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
+}
+
+<style>
+    .userprofile .userpic {
+    height: 280px;
+    width: 280px;
+    clear: both;
+    margin: 0 auto;
+    display: block;
+    border-radius: 100%;
+}
+
+</style>
+<div class="page-header">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#"><i class="fe fe-file-text mr-1"></i> Admin Console</a></li>
+        <li class="breadcrumb-item active" aria-current="page">User Profile</li>
+    </ol> 
+</div>
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card">
+			<div class="card-body">
+				<div class="text-center">
+					<div class="userprofile">
+						<div class="userpic  brround"> <img src="" alt="" id="profilePic" class="userpicimg"> </div>
+						<h3 class="username text-dark mb-2"><b>@Context.Session.GetString("FullName")</b></h3>
+						<p class="mb-1 text-muted">@Context.Session.GetString("email")</p>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+    <div class="col-lg-8">
+
+        <form action="#" role="form" class="card validate" id="formPost" enctype="multipart/form-data">
+            <div class="card-header">
+                <h3 class="card-title">User Profiles</h3>
+            </div>
+            <div class=" card-body">
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="control-label">Name<i class="fas fa-exclamation-triangle text-danger fa-sm"></i></label>
+                                    <input type="text" class="form-control" id="name" autocomplete="off" required />
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="control-label">Mobile</label>
+                                    <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="fas fa-mobile-alt"></i></div>
+                                        </div>
+                                        <input type="text" class="form-control" id="mobile" autocomplete="off" />
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="control-label">Email</label>
+                                    <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="fas fa-envelope"></i></div>
+                                        </div>
+                                        <input type="email" class="form-control" id="email" autocomplete="off" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="control-label">Date of Birth</label>
+                                    <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="fas fa-calendar-alt"></i></div>
+                                        </div>
+                                        <input type="text" class="form-control datepicker" id="dob" autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="control-label">Profile picture</label>
+                                    <div class="custom-file mt-0">
+                                        <input type="file" class="custom-file-input" id="pp" name="pp">
+                                        <label class="custom-file-label" for="proPic">Choose file</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <button type="button" id="btnUpdate" class="btn btn-primary">Update</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+@section scripts{
+    <script>
+        var imgPath;
+
+        $(".custom-file-input").on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            if (checkImageFormat(fileName)) {
+                $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+            } else {
+                sweetAlert("Validation Alert!", "Upload Image file only!", "warning");
+                resetInputFile('#formPost');
+            }
+
+        });
+
+        $(function () {
+            loadSingleUser();
+        });
+
+
+        $("#btnUpdate").click(function (e) {
+                if (!document.getElementById("formPost").checkValidity()) {
+                    e.preventDefault();
+                } else {
+                    imgPath = '';
+                    var currentImageSrc = '';
+                    currentImageSrc = $('#profilePic').attr('src');
+
+                    if ($('.custom-file-label').text() != '' && $('.custom-file-label').text() !='Choose file') {
+                        uploadFile();
+                    } else if (currentImageSrc!='') {
+                        imgPath = currentImageSrc;
+                    }
+                    var model = {
+                        userId: @Context.Session.GetInt32("UserId"),                        
+                        fullName: $.trim($("#name").val()),
+                        mobile: $.trim($("#mobile").val()),
+                        email: $.trim($("#email").val()),
+                        dateOfBirth: $.trim($("#dob").val()) == '' ? null : $.trim($("#dob").val().replace(/\//g, '-')),
+                        imagePath: imgPath,
+                        lastUpdatedBy:@Context.Session.GetInt32("UserId"),
+                    }
+                    console.log(model);
+                    $.ajax({
+                        type: "POST",
+                        url: "@apiUrl/api/Users/UpdateUserProfile",
+                        data: JSON.stringify(model),
+                        contentType: "application/json; charset=utf-8",
+                        headers: {
+                            "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                        },
+                        dataType: "json",
+                        success: function (data, statusText, xhr) {
+                            if (xhr.status==200) {                               
+                                    sweetAlert({
+                                        html: true,
+                                        title: "User",
+                                        text: "Successfully updated!",
+                                        type: "success"
+                                    });
+                            } else {
+                                sweetAlert("Validation Alert!", "Something unexpected!", "warning");
+                            }
+                        },
+                        error: function (data) {
+                            if (data.status == 401) {
+                                window.location.replace('/Message/TokenExpire');
+                            } else if (data.status == 403) {
+                                window.location.replace('/Message/Unauthorize');
+                            } else if (data.status == 400) {
+                                sweetAlert("Validation Alert!", "Please check input data!", "warning");
+                            }
+                        }
+                    });
+                }
+        });
+
+
+        function loadSingleUser() {
+
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/Users/GetSingleUser/" + @Context.Session.GetInt32("UserId"),
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                            "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    if (data) {
+                        $('#name').val(data.fullName);
+                        $('#mobile').val(data.mobile);
+                        $('#email').val(data.email);
+                        if (data.dateOfBirth != null) {
+                            var dateVal = data.dateOfBirth.substring(0, 10);
+                            $('#dob').datepicker('setDate', new Date(dateVal.replace(/\-/g, '/')));
+                        }                       
+                        $('#profilePic').attr('src', data.imagePath);
+                    } else {
+                        sweetAlert("Validation Alert!", "Something unexpected!", "warning");
+                    }
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
+
+        function uploadFile() {
+            var totalFiles = document.getElementById('pp').files.length;
+            if (totalFiles > 0) {
+                var formData = new FormData();
+                var files = document.getElementById('pp').files;
+                formData.append("file", files[0]);
+                $.ajax(
+                    {
+                        url: "/Upload/ImgUpload",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        async: false,
+                        type: "POST",
+                        success: function (data) {
+                            imgPath = data;
+                            $('#profilePic').attr('src', imgPath);
+                            resetInputFile('#formPost');
+                        }
+                    }
+                );
+            }
+
+        }
+    </script>
+}

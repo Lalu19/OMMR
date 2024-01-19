@@ -1,0 +1,674 @@
+﻿@using Microsoft.Extensions.Configuration;
+@using Microsoft.AspNetCore.Http
+@inject IConfiguration Configuration;
+
+@{
+    ViewBag.Title = "User";
+    string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
+}
+
+<div class="page-header">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#"><i class="fe fe-pie-chart mr-1"></i> Admin Console</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Users</li>
+    </ol>
+    <div class="ml-auto">
+        <a href="#" onclick="showAddBtn()" data-toggle="modal" data-target="#userModal" class="btn btn-primary btn-icon btn-sm text-white mr-2">
+            <span>
+                <i class="fe fe-plus"></i>
+            </span> Create Users
+        </a>
+
+    </div>
+</div>
+
+<div class="col-md-12 col-lg-12">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Users</div>
+        </div>
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table id="userTable" class="table table-striped table-bordered nowrap dataTable no-footer dtr-inline" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Photo</th>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Mobile</th>
+                            <th>Email</th>
+                            <th>Address</th>
+                            @*<th>State Name</th>*@
+                            <th>User Name</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="userModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+            </div>
+            <div class="modal-body">
+                <form action="#" role="form" class="validate" id="formPost" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Name&nbsp;<span style="color: red;"><b>*</b></span></label>
+                                        <input type="text" class="form-control" id="name" autocomplete="off" placeholder="Name" required />
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Mobile&nbsp;<span style="color: red;"><b>*</b></span></label>
+                                        <input type="text" class="form-control" id="mobile" autocomplete="off" placeholder="Mobile" required />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Email&nbsp;<span style="color: red;"><b>*</b></span></label>
+                                        <input type="email" class="form-control" id="email" autocomplete="off" placeholder="Email" required />
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="control-label">User name&nbsp;<span style="color: red;"><b>*</b></span></label>
+                                        <input type="text" class="form-control" id="username" autocomplete="off" placeholder="User name" required />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Password&nbsp;<span style="color: red;"><b>*</b></span></label>
+                                        <input type="password" class="form-control" id="password" autocomplete="off" placeholder="Password" required />
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Address Name&nbsp;<span style="color: red;"><b>*</b></span></label>
+                                        <input type="text" class="form-control" id="Address" autocomplete="off" placeholder="Address Name" required />
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Role&nbsp;<span style="color: red;"><b>*</b></span></label>
+                                        <select id="role" class="custom-select" required></select>
+                                    </div>
+                                </div>
+                              @*  <div class="col-lg-6">
+                                    <div class="form-group" id="stateFormGroup">
+                                        <label class="control-label">State Name&nbsp;<span style="color: red;"><b>*</b></span></label>
+                                        <select class="form-control" id="hopital"></select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group" id="AdverFormGroup">
+                                        <label class="control-label">Advertise Name</label>
+                                        <select multiple="multiple" class="multi-select" id="adver" name="selectedAreas[]"></select>
+                                    </div>
+                                </div>*@
+                              
+                            </div>
+                          
+                            <div class="row">
+                                <div class="col-lg-6">
+
+                                    <div class="form-group">
+                                        <label class="control-label">Profile picture&nbsp;<span style="color: red;"><b>*</b></span></label>
+                                        <div class="custom-file mt-0">
+                                            <input type="file" class="custom-file-input" id="pp" name="pp">
+                                            <label class="custom-file-label" for="proPic">Choose file</label>
+                                        </div>
+                                    </div>
+                                </div>
+                              
+                                <div class="col-lg-2">
+                                    <div class="text-center">
+                                        <img id="profilePic" src="" width="90" class="rounded-circle" />
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <button type="button" id="btnSave" class="btn btn-radius btn-success" onclick="ValidateTextBox()" style="display:none">Save</button>
+                                    <button type="button" id="btnUpdate" class="btn btn-radius btn-success" style="display:none">Update</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+         var selectedAreas = [];
+   
+   @* <script>
+        $(document).ready(function () {
+            $('#role').change(function () {
+                if ($(this).val() === '3') {
+                    $('#stateFormGroup').show();
+                } else {
+                    $('#stateFormGroup').hide();
+                    $('#hopital').val(0);
+                }
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#role').change(function () {
+                if ($(this).val() === '4') {
+                    $('#AdverFormGroup').show();
+                } else {
+                    $('#AdverFormGroup').hide();
+                    $('#adver').val(0);
+                }
+            });
+        });
+    </script>*@
+
+    <script>
+
+        var userIdForUpdate;
+        var imgPath;
+
+        $(".custom-file-input").on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            if (checkImageFormat(fileName)) {
+                $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+            } else {
+                sweetAlert("Validation Alert!", "Upload Image file only!", "warning");
+                resetInputFile('#userModal');
+            }
+        });
+
+        $(function () {
+            loadUsers();
+
+            $('#userTable tbody').on('click', 'button[data-target="#userModal"]', function () {
+                var id = $(this).data('id');
+                loadSingleUser(id);
+                $('#btnUpdate').show();
+                $('#btnSave').hide();
+                userIdForUpdate = id;
+            });
+
+            $('#userTable tbody').on('click', 'button[data-target="#delete"]', function () {
+                var id = $(this).data('id');
+
+                swal({
+                    html: true,
+                    title: "Are you sure?",
+                    text: "You will not be able to recover this data!",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, confirm it!",
+                    closeOnConfirm: false
+                }, function () {
+                    $.ajax({
+                        type: "GET",
+                        url: "@apiUrl/api/Users/DeleteSingleUser/" + id,
+                        contentType: "application/json; charset=utf-8",
+                        headers: {
+                            "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                        },
+                        dataType: "json",
+                        success: function (data, statusText, xhr) {
+                            if (xhr.status == 200) {
+                                $('#userTable').DataTable().ajax.reload(null, false);
+                                sweetAlert({
+                                    html: true,
+                                    title: "User",
+                                    text: "Successfully deleted!",
+                                    type: "success"
+                                });
+                            } else if (xhr.status == 202) {
+                                sweetAlert("Validation Alert!", data.responseMsg, "warning");
+                            } else {
+                                sweetAlert("Validation Alert!", "Something unexpected!", "warning");
+                            }
+                        },
+                        error: function (data) {
+                            if (data.status == 401) {
+                                window.location.replace('/Message/TokenExpire');
+                            } else if (data.status == 403) {
+                                window.location.replace('/Message/Unauthorize');
+                            }
+                        }
+                    });
+                });
+            });
+
+           
+            $("#btnSave").click(function (e) {
+                if (!document.getElementById("formPost").checkValidity()) {
+                    e.preventDefault();
+                } else {
+                    imgPath = '';
+                    var Image = document.getElementById('pp').files.length;
+                    if (Image > 0) {
+                        uploadphoto();
+                    }
+                    //var selectedAreas = $("#adver").val();
+                    //var selectedAreasString = selectedAreas.join(', ');
+                    var model = {
+                        userRoleId: parseInt($("#role").val()),
+                        fullName: $.trim($("#name").val()),
+                        mobile: $.trim($("#mobile").val()),
+                        email: $.trim($("#email").val()),
+                        dateOfBirth: $.trim($("#dob").val()) == '' ? null : $.trim($("#dob").val().replace(/\//g, '-')),
+                        imagePath: imgPath,
+                        userName: $.trim($("#username").val()),
+                        password: $.trim($("#password").val()),
+                        //stateId: parseInt($("#hopital").val()),
+                        stateId: 0,
+                        address: $.trim($("#Address").val()),
+                        //advertiseName: selectedAreasString,
+                        addedBy: @Context.Session.GetInt32("UserId"),
+                    }
+                    //console.log(model);
+                    $.ajax({
+                        type: "POST",
+                        url: "@apiUrl/api/Users/CreateUser",
+                        data: JSON.stringify(model),
+                        contentType: "application/json; charset=utf-8",
+                        headers: {
+                            "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                        },
+                        dataType: "json",
+                        success: function (data, statusText, xhr) {
+                            //console.log(xhr.status);
+                            //console.log(data);
+                            if (xhr.status === 200) {
+                                $('#userTable').DataTable().ajax.reload(null, false);
+                                sweetAlert({
+                                    html: true,
+                                    title: "User",
+                                    text: "Successfully created!",
+                                    type: "success"
+                                });
+                            } else if (data.status === "duplicate") {
+                                sweetAlert("Validation Alert!", data.responseMsg, "warning");
+                            } else if (data.status === "error") {
+                                sweetAlert("Validation Alert!", data.responseMsg, "warning");
+                            } else {
+                                sweetAlert("Validation Alert!", "Something unexpected!", "warning");
+                            }
+                        },
+                        error: function (data) {
+                            if (data.status == 401) {
+                                window.location.replace('/Message/TokenExpire');
+                            } else if (data.status == 403) {
+                                window.location.replace('/Message/Unauthorize');
+                            } else if (data.status == 400) {
+                                sweetAlert("Validation Alert!", "Please check input data!", "warning");
+                            }
+                        }
+                    });
+                }
+            });
+
+            $("#btnUpdate").click(function (e) {
+                if (!document.getElementById("formPost").checkValidity()) {
+                    e.preventDefault();
+                } else {
+                    imgPath = '';
+                    var currentImageSrc = '';
+                    currentImageSrc = $('#profilePic').attr('src');
+
+                    if ($('.custom-file-label').text() != '' && $('.custom-file-label').text() != 'Choose file') {
+                        uploadphoto();
+                    } else if (currentImageSrc != '') {
+                        imgPath = currentImageSrc;
+                    }
+                    //var selectedAreas = $("#adver").val();
+                    //var selectedAreasString = selectedAreas.join(', ');
+                    var model = {
+                        userId: userIdForUpdate,
+                        userRoleId: parseInt($("#role").val()),
+                        fullName: $.trim($("#name").val()),
+                        mobile: $.trim($("#mobile").val()),
+                        email: $.trim($("#email").val()),
+                        dateOfBirth: $.trim($("#dob").val()) == '' ? null : $.trim($("#dob").val().replace(/\//g, '-')),
+                        imagePath: imgPath,
+                        userName: $.trim($("#username").val()),
+                        password: $.trim($("#password").val()),
+                        //stateId: parseInt($("#hopital").val()),
+                        stateId: 0,
+                        address: $.trim($("#Address").val()),
+                        //advertiseName: selectedAreasString,
+                        lastUpdatedBy: @Context.Session.GetInt32("UserId"),
+                    }
+                    //console.log(model);
+                    $.ajax({
+                        type: "POST",
+                        url: "@apiUrl/api/Users/UpdateUser",
+                        data: JSON.stringify(model),
+                        contentType: "application/json; charset=utf-8",
+                        headers: {
+                            "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                        },
+                        dataType: "json",
+                        success: function (data, statusText, xhr) {
+                            if (xhr.status == 200) {
+                                $('#userTable').DataTable().ajax.reload(null, false);
+                                sweetAlert({
+                                    html: true,
+                                    title: "User",
+                                    text: "Successfully updated!",
+                                    type: "success"
+                                });
+                            } else if (xhr.status == 202) {
+                                sweetAlert("Validation Alert!", data.responseMsg, "warning");
+                            } else {
+                                sweetAlert("Validation Alert!", "Something unexpected!", "warning");
+                            }
+                        },
+                        error: function (data) {
+                            if (data.status == 401) {
+                                window.location.replace('/Message/TokenExpire');
+                            } else if (data.status == 403) {
+                                window.location.replace('/Message/Unauthorize');
+                            } else if (data.status == 400) {
+                                sweetAlert("Validation Alert!", "Please check input data!", "warning");
+                            }
+                        }
+                    });
+                }
+            });
+
+        });
+
+        function loadSingleUser(id) {
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/Users/GetSingleUser/" + id,
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (data) {
+                    if (data) {
+                        $('#name').val(data.fullName);
+                        $('#mobile').val(data.mobile);
+                        $('#email').val(data.email);
+                        $('#username').val(data.userName);
+                        $('#password').val(data.password);
+                        if (data.dateOfBirth != null) {
+                            var dateVal = data.dateOfBirth.substring(0, 10);
+                            $('#dob').datepicker('setDate', new Date(dateVal.replace(/\-/g, '/')));
+                        } else {
+                            $('#dob').val('');
+                        }
+                        roleList(data.userRoleId);
+                        $('#profilePic').attr('src', data.imagePath);
+                        //GetHospitalName(data.stateId);
+                        $('#Address').val(data.address);
+                       // GetAdvertise(data.advertiseName);
+                    } else {
+                        sweetAlert("Validation Alert!", "Something unexpected!", "warning");
+                    }
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
+
+        function loadUsers() {
+            var table = $('#userTable').DataTable();
+            table.destroy();
+
+            table = $('#userTable').dataTable({
+                "paginationType": "full_numbers",
+                "dom": 'Bfrtip',
+                "buttons": ['copy', 'csv', 'excel', 'pdf', 'print'],
+                "searching": true,
+                "paging": true,
+                "sort": true,
+                "info": true,
+                "ajax": {
+                    "url": '@apiUrl/api/AdScreen/GetAdminList',
+                    "type": "GET",
+                    "dataType": "json",
+                    "headers": {
+                        "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                    },
+                    "error": function (data) {
+                        if (data.status == 401) {
+                            window.location.replace('/Message/TokenExpire');
+                        } else if (data.status == 403) {
+                            window.location.replace('/Message/Unauthorize');
+                        }
+                    }
+                },
+                "order": [],
+                "columns": [
+                    {
+                        "render": function (data, type, row) {
+                            if (row.imagePath === '')
+                                return '';
+                            else
+                                return '<img style="margin-left: 28px;" class="avatar avatar-md rounded-circle" src="' + row.imagePath + '"/>'
+                        }
+                    },
+                    { "data": "fullName", "orderable": true },
+                    { "data": "roleName", "orderable": true },
+                    { "data": "mobile", "orderable": true },
+                    { "data": "email", "orderable": true },
+                    { "data": "address", "orderable": true },
+                    //{ "data": "stateName", "orderable": true },
+                    { "data": "userName", "orderable": true },
+                    {
+                        "orderable": false,
+                        "class": "action_button",
+                        "render": function (data, type, row) {
+                            var id = row.userId;
+                            var actionButtonsHtml = "";
+                            actionButtonsHtml += generateActionButtonForList(id, 'userModal');
+                            return actionButtonsHtml;
+                        }
+                    }
+                ]
+            });
+        }
+
+        function roleList(id) {
+            var opt = '';
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/Users/GetUserRoleList",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (res) {
+                    //console.log(res.data[0].roleName);
+                    //console.log(res.data.length);
+                    var options = [];
+                    options.push('<option value="">Select Role</option>');
+                    //for (var i = 0; i < res.data.length; i++) {
+                    //    if (id == res.data[i].userRoleId) {
+                    //        opt = 'selected'
+                    //    } else {
+                    //        opt = '';
+                    //    }
+                    //    options.push('<option value="' + res.data[i].userRoleId + '" ' + opt + '>' + res.data[i].roleName + '</option>');
+                    //}
+                    for (var i = 0; i < res.data.length; i++) {
+                        if (res.data[i].userRoleId == 1 || res.data[i].userRoleId == 2 || res.data[i].userRoleId == 3) {
+                            if (id == res.data[i].userRoleId) {
+                                opt = 'selected';
+                            } else {
+                                opt = '';
+                            }
+                            options.push('<option value="' + res.data[i].userRoleId + '" ' + opt + '>' + res.data[i].roleName + '</option>');
+                        }
+                    }
+                    $("#role").html(options.join(''));
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
+
+        //GetHospitalName()
+        //function GetHospitalName(id) {
+        //    var opt = '';
+        //    $.ajax({
+        //        type: "GET",
+        //        url: "@apiUrl/api/State/GetStateList",
+        //        contentType: "application/json; charset=utf-8",
+        //        headers: {
+        //            "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+        //        },
+        //        dataType: "json",
+        //        success: function (res) {
+        //            var options = [];
+        //            options.push('<option value="0">Please Select</option>');
+        //            for (var i = 0; i < res.data.length; i++) {
+        //                if (id == res.data[i].stateId) {
+        //                    opt = 'selected'
+        //                } else {
+        //                    opt = '';
+        //                }
+        //                options.push('<option value="' + res.data[i].stateId + '" ' + opt + '>' + res.data[i].stateName + '</option>');
+        //            }
+        //            $("#hopital").html(options.join(''));
+        //        },
+        //        error: function (data) {
+        //            if (data.status == 401) {
+        //                window.location.replace('/Message/TokenExpire');
+        //            } else if (data.status == 403) {
+        //                window.location.replace('/Message/Unauthorize');
+        //            }
+        //        }
+        //    });
+        //}
+      
+        //GetAdvertise()
+        //function GetAdvertise() {
+        //    var opt = '';
+        //    $.ajax({
+        //        type: "GET",
+        //        url: "@apiUrl/api/AdScreen/GetAdvertiseList",
+        //        contentType: "application/json; charset=utf-8",
+        //        headers: {
+        //            "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+        //        },
+        //        dataType: "json",
+        //        success: function (res) {
+        //            console.log(res)
+        //            var options = [];
+        //            // options.push('<option value="">Please Select </option>');
+        //            for (var i = 0; i < res.data.length; i++) {
+        //                //if (Id == res.data[i].stateId) {
+        //                //    opt = 'selected'
+        //                //} else {
+        //                //    opt = '';
+        //                //}
+        //                options.push('<option value="' + res.data[i].adsName + '" ' + opt + '>' + res.data[i].adsName + '</option>');
+        //            }
+        //            $("#adver").html(options.join(''));
+        //            $('#adver').multipleSelect({
+        //                width: '100%'
+        //            });
+        //        },
+        //        error: function (data) {
+        //            if (data.status == 401) {
+        //                window.location.replace('/Message/TokenExpire');
+        //            } else if (data.status == 403) {
+        //                window.location.replace('/Message/Unauthorize');
+        //            }
+        //        }
+        //    });
+        //}
+
+        function showAddBtn() {
+            roleList('');
+            $('#btnSave').show();
+            $('#btnUpdate').hide();
+            resetInput('#userModal');
+            resetInputFile('#userModal');
+        }
+
+        function uploadphoto() {
+            var totalFiles = document.getElementById('pp').files.length;
+            if (totalFiles > 0) {
+                var formData = new FormData();
+                var files = document.getElementById('pp').files;
+                formData.append("file", files[0]);
+                $.ajax(
+                    {
+                        url: "/Upload/ImgUpload",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        async: false,
+                        type: "POST",
+                        success: function (data) {
+                            imgPath = data;
+                            $('#profilePic').attr('src', imgPath);
+                            resetInputFile('#userModal');
+                        },
+                        error: function (data) {
+                            window.location.replace('/Message/SessionExpire');
+                        }
+                    }
+                );
+            }
+        }
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#mobile").change(function () {
+                var inputvalues = $(this).val();
+                var gstinformat = new RegExp('^[0-9]{10}$');
+                if (gstinformat.test(inputvalues)) {
+                    return true;
+                } else {
+                    alert('Please Enter Valid Mobile No');
+                    $("#mobile").val;
+                    $("#mobile").focus();
+                }
+            });
+        });
+    </script>
+}

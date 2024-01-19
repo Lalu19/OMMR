@@ -1,0 +1,132 @@
+﻿@using Microsoft.Extensions.Configuration;
+@using Microsoft.AspNetCore.Http
+@inject IConfiguration Configuration;
+
+@{
+    ViewBag.Title = "Upcoming Movie Posters";
+    string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
+}
+
+
+    <div class="row">
+        <div class="col-md">
+            <div class="card overflow-hidden">
+                <div class="card-header">
+                <h3 class="card-title">Upcoming Movie Poster</h3>
+                <button type="button" class="btn btn-success" style="margin-left: 700px;border-radius: 13px;" onclick="downloadExcel()">Upcoming Movie Details</button>
+                </div>
+                <div class="card-body">
+                    <div class="row movies-container">
+                        <!-- Movie elements will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+
+
+@section scripts{
+        <script>
+            loadMovies();
+
+            function loadMovies() {
+                $.ajax({
+                    type: "GET",
+                    url: "@apiUrl/api/UpcomingMovie/GetUpcomingMovieList",
+                    contentType: "application/json; charset=utf-8",
+                    headers: {
+                        "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        console.log(data);
+                        if (data && data.data.length > 0) {
+                            // Clear existing content
+                            $('.movies-container').empty();
+
+                            // Iterate through the data and create elements
+                            $.each(data.data, function (index, movie) {
+                                var movieElement = `
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <img src="${movie.moviePoster}" class="posterr logo-image" alt="Posternotavailable" width="160" height="183">
+                                                    <button type="button" class="btn btn-info btn-icon btn-sm text-white btndesign" style="width: 160px;" onclick="window.location.href='${movie.teaserLink}'">
+                                                        <span>
+                                                            <i class="fa fa-link"></i>
+                                                        </span> Teaser Link
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        `;
+
+                                // Append the movie element to the container
+                                $('.movies-container').append(movieElement);
+                            });
+                        }
+                        else {
+                            sweetAlert("Validation Alert!", "No data available!", "warning");
+                        }
+                    },
+                    error: function (data) {
+                        if (data.status == 401) {
+                            window.location.replace('/Message/TokenExpire');
+                        } else if (data.status == 403) {
+                            window.location.replace('/Message/Unauthorize');
+                        }
+                    }
+                });
+            }
+
+            function downloadExcel() {
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/UpComingMovieListforClient/GetallList",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                success: function (data) {
+                    // Assuming the server responds with a list of movies
+                    var movies = data.data;
+
+                    if (movies && movies.length > 0) {
+                        // Prepare data for Excel
+                        var excelData = [
+                            ["Movie Name", "Release Date", "Star Cast", "Director", "Producer"]
+                        ];
+
+                        movies.forEach(function (movie) {
+                            var row = [
+                                movie.movieName,
+                                movie.releaseDate,
+                                movie.starCast,
+                                movie.director,
+                                movie.producer
+                            ];
+                            excelData.push(row);
+                        });
+
+                        // Create a worksheet
+                        var ws = XLSX.utils.aoa_to_sheet(excelData);
+
+                        // Create a workbook with a single worksheet
+                        var wb = XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(wb, ws, "Upcoming Movies");
+
+                        // Save the workbook as an Excel file
+                        XLSX.writeFile(wb, "upcoming_movies.xlsx");
+                    } else {
+                        sweetAlert("Validation Alert!", "No data available!", "warning");
+                    }
+                },
+                error: function (data) {
+                    // Handle errors (unchanged code)
+                }
+            });
+        }
+        </script>
+    }
+
