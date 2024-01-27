@@ -83,7 +83,7 @@ namespace AdminApi.Controllers
             {
                 return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
-        }
+        }                     
 
         [HttpGet]
         public ActionResult GetVerifiedFeedbackFormList()
@@ -153,6 +153,7 @@ namespace AdminApi.Controllers
                             join s in _context.States on u.StateId equals s.StateId
                             join p in _context.Agents on u.AgentId equals p.AgentId
                             join q in _context.AdScreen on u.AdScreenId equals q.AdScreenId
+                            join l in _context.ScreenList on q.TheatreName equals l.TheatreName
 
                             select new
                             {
@@ -163,6 +164,8 @@ namespace AdminApi.Controllers
                                u.StateId,
                                s.StateName,
                                q.TheatreName,
+                               q.Screen,
+                               l.TheatreCode,
                                q.AdsName,
                                 // u.AdsDuration,
                                 u.AdsVariantStatusOk,
@@ -269,6 +272,7 @@ namespace AdminApi.Controllers
                             join p in _context.Agents on u.AgentId equals p.AgentId
                             join q in _context.StateUser on u.StateId equals q.StateId
                             join c in _context.AdScreen on u.AdScreenId equals c.AdScreenId
+                            join l in _context.ScreenList on c.TheatreName equals l.TheatreName
 
                             select new
                             {
@@ -279,6 +283,8 @@ namespace AdminApi.Controllers
                                 s.StateId,
                                 s.StateName,
                                 c.TheatreName,
+                                c.Screen,
+                                l.TheatreCode,
                                 c.AdsName,
                                 // u.AdsDuration,
                                 u.AdsVariantStatusOk,

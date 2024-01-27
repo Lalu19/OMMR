@@ -33,6 +33,88 @@ namespace AdminApi.Controllers
             _AdScreenRepo = AdScreenRepo;
         }
 
+        //[HttpPost]
+        //public IActionResult AdScreenCreate(IFormFile file)
+        //{
+        //    try
+        //    {
+        //        if (file == null || file.Length == 0)
+        //        {
+        //            return BadRequest(new { status = "error", responseMsg = "No file uploaded" });
+        //        }
+        //        using (var package = new ExcelPackage(file.OpenReadStream()))
+        //        {
+        //            var worksheet = package.Workbook.Worksheets[0];
+
+        //            for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+        //            {
+        //                var excelData = new AdScreen
+        //                {
+        //                    State = worksheet.Cells[row, 1].Value?.ToString(),
+        //                    City = worksheet.Cells[row, 2].Value?.ToString(),
+        //                    TheatreName = worksheet.Cells[row, 3].Value?.ToString(),
+        //                    //Latitude = worksheet.Cells[row, 4].Value?.ToString(),
+        //                    //Longitude = worksheet.Cells[row, 5].Value?.ToString(),
+        //                    Screen = worksheet.Cells[row, 4].Value?.ToString(),
+        //                    AdsName = worksheet.Cells[row, 5].Value?.ToString(),
+        //                    AdsLanguage = worksheet.Cells[row, 6].Value?.ToString(),
+        //                    AdsSequence = worksheet.Cells[row, 7].Value?.ToString(),
+        //                    AdsDuration = worksheet.Cells[row, 8].Value?.ToString(),
+        //                    AdsPlaytime = worksheet.Cells[row, 9].Value?.ToString(),
+        //                    AdsYoutubeLink = worksheet.Cells[row, 10].Value?.ToString(),
+        //                };
+
+        //                var existingRecord = _context.AdScreen.FirstOrDefault(a =>
+        //                    a.State == excelData.State &&
+        //                    a.City == excelData.City &&
+        //                    a.TheatreName == excelData.TheatreName &&
+        //                    a.Screen == excelData.Screen);
+
+        //                if (existingRecord != null)
+        //                {
+        //                    // Update the existing record
+        //                    existingRecord.State = excelData.State;
+        //                    existingRecord.City = excelData.City;
+        //                    existingRecord.TheatreName = excelData.TheatreName;
+        //                    //existingRecord.Latitude = excelData.Latitude;
+        //                    //existingRecord.Longitude = excelData.Longitude;
+        //                    existingRecord.Screen = excelData.Screen;
+        //                    existingRecord.AdsName = excelData.AdsName;
+        //                    existingRecord.AdsLanguage = excelData.AdsLanguage;
+        //                    existingRecord.AdsSequence = excelData.AdsSequence;
+        //                    existingRecord.AdsDuration = excelData.AdsDuration;
+        //                    existingRecord.AdsPlaytime = excelData.AdsPlaytime;
+        //                    existingRecord.AdsYoutubeLink = excelData.AdsYoutubeLink;
+        //                    existingRecord.UpdatedBy = excelData.UpdatedBy;
+        //                    existingRecord.UpdatedOn = System.DateTime.Now;
+        //                }
+        //                else
+        //                {
+        //                    // Create a new record
+        //                    var stateEntity = _context.States.FirstOrDefault(s => s.StateName == excelData.State);
+        //                    if (stateEntity != null)
+        //                    {
+        //                        excelData.StateId = stateEntity.StateId;
+        //                    }
+
+        //                    _context.AdScreen.Add(excelData);
+        //                }
+        //            }
+
+        //            _context.SaveChanges();
+        //        }
+
+        //        return Ok(new { status = "success", responseMsg = "Data saved successfully" });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+        //    }
+        //}
+
+
+        /////Delete the previous data code
+
         [HttpPost]
         public IActionResult AdScreenCreate(IFormFile file)
         {
@@ -42,9 +124,16 @@ namespace AdminApi.Controllers
                 {
                     return BadRequest(new { status = "error", responseMsg = "No file uploaded" });
                 }
+
                 using (var package = new ExcelPackage(file.OpenReadStream()))
                 {
                     var worksheet = package.Workbook.Worksheets[0];
+
+                    // Delete all records from the AdScreen table
+                    _context.Database.ExecuteSqlRaw("DELETE FROM AdScreen");
+
+                    // Reset the identity column seed for AdScreenId
+                    _context.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('AdScreen', RESEED, 0)");
 
                     for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
                     {
@@ -64,41 +153,14 @@ namespace AdminApi.Controllers
                             AdsYoutubeLink = worksheet.Cells[row, 10].Value?.ToString(),
                         };
 
-                        var existingRecord = _context.AdScreen.FirstOrDefault(a =>
-                            a.State == excelData.State &&
-                            a.City == excelData.City &&
-                            a.TheatreName == excelData.TheatreName &&
-                            a.Screen == excelData.Screen);
-
-                        if (existingRecord != null)
+                        // Create a new record
+                        var stateEntity = _context.States.FirstOrDefault(s => s.StateName == excelData.State);
+                        if (stateEntity != null)
                         {
-                            // Update the existing record
-                            existingRecord.State = excelData.State;
-                            existingRecord.City = excelData.City;
-                            existingRecord.TheatreName = excelData.TheatreName;
-                            //existingRecord.Latitude = excelData.Latitude;
-                            //existingRecord.Longitude = excelData.Longitude;
-                            existingRecord.Screen = excelData.Screen;
-                            existingRecord.AdsName = excelData.AdsName;
-                            existingRecord.AdsLanguage = excelData.AdsLanguage;
-                            existingRecord.AdsSequence = excelData.AdsSequence;
-                            existingRecord.AdsDuration = excelData.AdsDuration;
-                            existingRecord.AdsPlaytime = excelData.AdsPlaytime;
-                            existingRecord.AdsYoutubeLink = excelData.AdsYoutubeLink;
-                            existingRecord.UpdatedBy = excelData.UpdatedBy;
-                            existingRecord.UpdatedOn = System.DateTime.Now;
+                            excelData.StateId = stateEntity.StateId;
                         }
-                        else
-                        {
-                            // Create a new record
-                            var stateEntity = _context.States.FirstOrDefault(s => s.StateName == excelData.State);
-                            if (stateEntity != null)
-                            {
-                                excelData.StateId = stateEntity.StateId;
-                            }
 
-                            _context.AdScreen.Add(excelData);
-                        }
+                        _context.AdScreen.Add(excelData);
                     }
 
                     _context.SaveChanges();
@@ -111,68 +173,6 @@ namespace AdminApi.Controllers
                 return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
         }
-
-     
-       ///////Delete the previous data code
-     
-        //[HttpPost]
-        //public IActionResult AdScreenCreate(IFormFile file)
-        //{
-        //    try
-        //    {
-        //        if (file == null || file.Length == 0)
-        //        {
-        //            return BadRequest(new { status = "error", responseMsg = "No file uploaded" });
-        //        }
-
-        //        using (var package = new ExcelPackage(file.OpenReadStream()))
-        //        {
-        //            var worksheet = package.Workbook.Worksheets[0];
-
-        //            // Delete all records from the AdScreen table
-        //            _context.Database.ExecuteSqlRaw("DELETE FROM AdScreen");
-
-        //            // Reset the identity column seed for AdScreenId
-        //            _context.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('AdScreen', RESEED, 0)");
-
-        //            for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
-        //            {
-        //                var excelData = new AdScreen
-        //                {
-        //                    State = worksheet.Cells[row, 1].Value?.ToString(),
-        //                    City = worksheet.Cells[row, 2].Value?.ToString(),
-        //                    TheatreName = worksheet.Cells[row, 3].Value?.ToString(),
-        //                    Latitude = worksheet.Cells[row, 4].Value?.ToString(),
-        //                    Longitude = worksheet.Cells[row, 5].Value?.ToString(),
-        //                    Screen = worksheet.Cells[row, 6].Value?.ToString(),
-        //                    AdsName = worksheet.Cells[row, 7].Value?.ToString(),
-        //                    AdsLanguage = worksheet.Cells[row, 8].Value?.ToString(),
-        //                    AdsSequence = worksheet.Cells[row, 9].Value?.ToString(),
-        //                    AdsDuration = worksheet.Cells[row, 10].Value?.ToString(),
-        //                    AdsPlaytime = worksheet.Cells[row, 11].Value?.ToString(),
-        //                    AdsYoutubeLink = worksheet.Cells[row, 12].Value?.ToString(),
-        //                };
-
-        //                // Create a new record
-        //                var stateEntity = _context.States.FirstOrDefault(s => s.StateName == excelData.State);
-        //                if (stateEntity != null)
-        //                {
-        //                    excelData.StateId = stateEntity.StateId;
-        //                }
-
-        //                _context.AdScreen.Add(excelData);
-        //            }
-
-        //            _context.SaveChanges();
-        //        }
-
-        //        return Ok(new { status = "success", responseMsg = "Data saved successfully" });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
-        //    }
-        //}
 
 
 
@@ -998,6 +998,45 @@ namespace AdminApi.Controllers
         //}
 
 
+        //[HttpGet("{TheaterName}/{Stateid}")]
+        //public ActionResult GetScreenListbyTheaterName(string TheaterName, int Stateid)
+        //{
+        //    try
+        //    {
+        //        var feedbackAdScreenIds = _context.AdScreenFeedbackForm
+        //            .Where(feedback => feedback.IsDeleted == false)
+        //            .Select(feedback => feedback.AdScreenId)
+        //            .Distinct()
+        //            .ToList();
+
+        //        var list = (from u in _context.AdScreen
+        //                    join a in _context.States on u.StateId equals a.StateId
+        //                    where u.IsDeleted == false && u.TheatreName == TheaterName && u.StateId == Stateid
+        //                          && !feedbackAdScreenIds.Contains(u.AdScreenId) // Filter out AdScreenIds with feedback
+        //                    select new
+        //                    {
+        //                        u.AdScreenId,
+        //                        a.StateId,
+        //                        u.TheatreName,
+        //                        u.Screen,
+        //                        u.AdsPlaytime,
+        //                        u.AdsName,
+        //                        u.AdsYoutubeLink,
+        //                        u.AdsSequence,
+        //                        u.AdsDuration,
+        //                        u.AdsLanguage,
+        //                        u.IsDeleted
+        //                    }).Distinct().ToList();
+
+        //        int totalRecords = list.Count();
+
+        //        return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+        //    }
+        //}
         [HttpGet("{TheaterName}/{Stateid}")]
         public ActionResult GetScreenListbyTheaterName(string TheaterName, int Stateid)
         {
@@ -1009,30 +1048,33 @@ namespace AdminApi.Controllers
                     .Distinct()
                     .ToList();
 
-                var list = (from u in _context.AdScreen
-                            join a in _context.States on u.StateId equals a.StateId
-                            where u.IsDeleted == false && u.TheatreName == TheaterName && u.StateId == Stateid
-                                  && !feedbackAdScreenIds.Contains(u.AdScreenId) // Filter out AdScreenIds with feedback
-                            select new
-                            {
-                                u.AdScreenId,
-                                a.StateId,
-                                u.TheatreName,
-                                //u.Latitude,
-                                //u.Longitude,
-                                u.Screen,
-                                u.AdsPlaytime,
-                                u.AdsName,
-                                u.AdsYoutubeLink,
-                                u.AdsSequence,
-                                u.AdsDuration,
-                                u.AdsLanguage,
-                                u.IsDeleted
-                            }).Distinct().ToList();
+                var adsList = _context.AdScreen
+                    .Where(u => u.IsDeleted == false && u.TheatreName == TheaterName && u.StateId == Stateid
+                                && !feedbackAdScreenIds.Contains(u.AdScreenId))
+                    .ToList();
 
-                int totalRecords = list.Count();
+                var groupedAds = adsList
+                    .GroupBy(u => new { u.StateId, u.TheatreName, u.Screen, u.AdsPlaytime })
+                    .Select(group => new
+                    {
+                        StateId = group.Key.StateId,
+                        TheatreName = group.Key.TheatreName,
+                        Screen = group.Key.Screen,
+                        AdsPlaytime = group.Key.AdsPlaytime,
+                        AdsNames = group.Select(u => u.AdsName).ToArray(),
+                       /* AdsPlaytime = group.Select(u => u.AdsPlaytime).FirstOrDefault(),*/
+                        AdScreenId = group.Select(u => u.AdScreenId).ToArray(),
+                        AdsYoutubeLink = group.Select(u => u.AdsYoutubeLink).ToArray(),
+                        AdsSequence = group.Select(u => u.AdsSequence).ToArray(),
+                        AdsDuration = group.Select(u => u.AdsDuration).ToArray(),
+                        AdsLanguage = group.Select(u => u.AdsLanguage).ToArray(),
+                        IsDeleted = group.Select(u => u.IsDeleted).FirstOrDefault(),
+                    })
+                    .ToList();
 
-                return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+                int totalRecords = groupedAds.Count();
+
+                return Ok(new { data = groupedAds, recordsTotal = totalRecords, recordsFiltered = totalRecords });
             }
             catch (Exception ex)
             {
