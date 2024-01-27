@@ -690,7 +690,7 @@ namespace AdminApi.Controllers
                         var notification = (dynamic)result;
                         var fcmToken = notification.FCMToken;
 
-                        await SendNotifications(fcmToken, "Hello Pritam", "Hello");
+                        await SendNotifications(fcmToken, "Theatre Assigned", "Hello");
 
                     }
                 }

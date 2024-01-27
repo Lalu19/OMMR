@@ -113,7 +113,7 @@ namespace AdminApi.Repository
                                 //notification.DeviceId,
                                 //notification.IMEINumber,
                                 notification.FCMToken,
-                                body = "Hello Pritam",
+                                body = "Theatre Assigned",
                                 title = "Hello"
                             };
                             resultList.Add(result);

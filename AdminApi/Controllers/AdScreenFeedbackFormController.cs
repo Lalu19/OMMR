@@ -152,6 +152,7 @@ namespace AdminApi.Controllers
                 var list = (from u in _context.AdScreenFeedbackForm
                             join s in _context.States on u.StateId equals s.StateId
                             join p in _context.Agents on u.AgentId equals p.AgentId
+                            join q in _context.AdScreen on u.AdScreenId equals q.AdScreenId
 
                             select new
                             {
@@ -161,6 +162,8 @@ namespace AdminApi.Controllers
                                p.AgentName,
                                u.StateId,
                                s.StateName,
+                               q.TheatreName,
+                               q.AdsName,
                                 // u.AdsDuration,
                                 u.AdsVariantStatusOk,
                                 u.AdsVariantStatusNotOk,
@@ -265,6 +268,7 @@ namespace AdminApi.Controllers
                             join s in _context.States on u.StateId equals s.StateId
                             join p in _context.Agents on u.AgentId equals p.AgentId
                             join q in _context.StateUser on u.StateId equals q.StateId
+                            join c in _context.AdScreen on u.AdScreenId equals c.AdScreenId
 
                             select new
                             {
@@ -274,6 +278,8 @@ namespace AdminApi.Controllers
                                 p.AgentName,
                                 s.StateId,
                                 s.StateName,
+                                c.TheatreName,
+                                c.AdsName,
                                 // u.AdsDuration,
                                 u.AdsVariantStatusOk,
                                 u.AdsVariantStatusNotOk,
