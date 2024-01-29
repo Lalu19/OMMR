@@ -1037,6 +1037,7 @@ namespace AdminApi.Controllers
         //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
         //    }
         //}
+
         [HttpGet("{TheaterName}/{Stateid}")]
         public ActionResult GetScreenListbyTheaterName(string TheaterName, int Stateid)
         {
@@ -1062,7 +1063,7 @@ namespace AdminApi.Controllers
                         Screen = group.Key.Screen,
                         AdsPlaytime = group.Key.AdsPlaytime,
                         AdsNames = group.Select(u => u.AdsName).ToArray(),
-                       /* AdsPlaytime = group.Select(u => u.AdsPlaytime).FirstOrDefault(),*/
+                        /* AdsPlaytime = group.Select(u => u.AdsPlaytime).FirstOrDefault(),*/
                         AdScreenId = group.Select(u => u.AdScreenId).ToArray(),
                         AdsYoutubeLink = group.Select(u => u.AdsYoutubeLink).ToArray(),
                         AdsSequence = group.Select(u => u.AdsSequence).ToArray(),
@@ -1081,7 +1082,47 @@ namespace AdminApi.Controllers
                 return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
         }
+        [HttpGet("{TheaterName}/{Stateid}/{Screen}/{AdsPlaytime}")]
+        public ActionResult GetAdsListbyScreenNo(int Stateid,string TheaterName, string Screen, string AdsPlaytime)
+        {
+            try
+            {
+                var feedbackAdScreenIds = _context.AdScreenFeedbackForm
+                   .Where(feedback => feedback.IsDeleted == false)
+                   .Select(feedback => feedback.AdScreenId)
+                   .Distinct()
+                   .ToList();
+                var list = (from u in _context.AdScreen
+                            join a in _context.States on u.StateId equals a.StateId
+                            where u.IsDeleted == false && u.StateId == Stateid && u.TheatreName == TheaterName && u.Screen == Screen && u.AdsPlaytime == AdsPlaytime
+                                  && !feedbackAdScreenIds.Contains(u.AdScreenId) // Filter out AdScreenIds with feedback
 
+                            select new
+                            {
+                                u.AdScreenId,
+                                a.StateId,
+                                u.TheatreName,
+                                u.Screen,
+                                u.AdsPlaytime,
+                                u.AdsName,
+                                u.AdsYoutubeLink,
+                                u.AdsSequence,
+                                u.AdsDuration,
+                                u.AdsLanguage,
+                                u.IsDeleted
+                            }).Distinct().ToList();
+
+
+                int totalRecords = list.Count();
+
+                return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+            }
+
+            catch (Exception ex)
+            {
+                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+            }
+        }
 
         [HttpGet("{agentid}")]
         public ActionResult TheatreListByAgentId(int agentid)
