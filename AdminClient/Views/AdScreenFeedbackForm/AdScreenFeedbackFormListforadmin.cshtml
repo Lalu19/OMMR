@@ -49,7 +49,7 @@
                                 <th>% of Male Ratio</th>
                                 @*<th>Theater Inspection Status Female</th>*@
                                 <th>% of Female Ratio</th>
-
+                                <th>Submitted Time</th>
                                  <th>Action</th>
                             </tr>
                         </thead>
@@ -205,7 +205,39 @@
                     //},
 
                     { "data": "theaterInspectionforFemale", "orderable": true, "visible": true },
+                    {
+                        "data": "createdOn",
+                        "render": function (data) {
+                            if (data === null) return "";
+                            var date = new Date(data);
+                            var day = date.getDate();
+                            var month = date.getMonth() + 1;
+                            var year = date.getFullYear();
+                            var hour = date.getHours();
+                            var amOrPm = hour >= 12 ? "PM" : "AM";
 
+                            // Convert 24-hour format to 12-hour format
+                            if (hour > 12) {
+                                hour = hour - 12;
+                            } else if (hour === 0) {
+                                hour = 12;
+                            }
+
+                            return (
+                                (day < 10 ? "0" + day : day) +
+                                "/" +
+                                (month < 10 ? "0" + month : month) +
+                                "/" +
+                                year.toString().substring(2) +
+                                "&nbsp;&nbsp;" +
+                                (hour < 10 ? "0" + hour : hour) +
+                                ":" +
+                                (date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()) +
+                                " " +
+                                amOrPm
+                            );
+                        }
+                    },
                     {
                         "render": function (data, type, row) {
                             return /*'<a class="btn btn-sm btn-primary" href="../AdScreenFeedbackForm/AdScreenFeedbackFormEditforadmin?adScreenFeedbackFormId=' + row.adScreenFeedbackFormId + '"><i class="fa fa-edit"></i></a>' + */ '&nbsp&nbsp<button class="btn btn-sm btn-danger" data-target="#delete" data-id=' + row.adScreenFeedbackFormId + ' data-title="Delete"><i class="fa fa-trash"></i></button>';

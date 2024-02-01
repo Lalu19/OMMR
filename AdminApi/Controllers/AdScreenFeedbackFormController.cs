@@ -9,6 +9,7 @@ using System.Linq;
 using AdminApi.DTO.App;
 using AdminApi.Models.App;
 using AdminApi.Models.User;
+using System.Collections.Generic;
 
 namespace AdminApi.Controllers
 {
@@ -193,10 +194,11 @@ namespace AdminApi.Controllers
                                u.TheaterInspectionforFemale,
                                u.AgentSelfie,
                                u.CreatedBy,
+                               u.CreatedOn,
                                u.IsDeleted
-                            }).Where(x => x.IsDeleted == false).ToList();
+                            }).Where(x => x.IsDeleted == false).Distinct().ToList();
 
-
+              
                 int totalRecords = list.Count();
 
 
@@ -313,8 +315,9 @@ namespace AdminApi.Controllers
                                 u.AgentSelfie,
                                 q.UserId,
                                 u.CreatedBy,
+                                u.CreatedOn,
                                 u.IsDeleted
-                            }).Where(x => x.IsDeleted == false && x.UserId == UserId).ToList();
+                            }).Where(x => x.IsDeleted == false && x.UserId == UserId).Distinct().ToList();
 
                 int totalRecords = list.Count();
 
@@ -561,7 +564,8 @@ namespace AdminApi.Controllers
             {
                 var list = (from u in _context.AdScreenFeedbackForm
                             join m in _context.Agents on u.AgentId equals m.AgentId
-                           
+                            join n in _context.AdScreen on u.AdScreenId equals n.AdScreenId
+
                             where u.IsDeleted == false && u.CreatedOn.Date >= fromDate.Date && u.CreatedOn.Date <= toDate.Date
                             select new
                             {
@@ -570,7 +574,7 @@ namespace AdminApi.Controllers
                                 u.AgentId,
                                 m.AgentName,
                                 m.Cityname,
-                                m.TheatreName,
+                                n.TheatreName,
                                 u.IsDeleted
                             }).Where(x => x.IsDeleted == false && x.AgentId == agentId).OrderByDescending(t => t.AdScreenFeedbackFormId);
 

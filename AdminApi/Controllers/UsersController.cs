@@ -215,27 +215,55 @@ namespace AdminApi.Controllers
         ///<summary>
         ///Get Role wise User Count
         ///</summary>
-        [AllowAnonymous]     
-        [HttpGet] 
+        //[AllowAnonymous]     
+        //[HttpGet] 
+        //public ActionResult GetRoleWiseUser()
+        //{
+        //    try
+        //    {              
+        //        var list=_context.Users.Join(_context.UserRole,
+        //                user=>user.UserRoleId,
+        //                role=>role.UserRoleId,
+        //                (user,role)=>new
+        //                {
+        //                    UserId=user.UserId,
+        //                    RoleName=role.RoleName
+        //                }).GroupBy(e=>e.RoleName)
+        //                .Select(e => new { e.Key, Count = e.Count() });
+
+        //        var userList=list.Select(s=>new UserLog{RoleName=s.Key,Count=s.Count});             
+        //        return Ok(userList);
+        //    }
+        //    catch (Exception ex)
+        //    {              
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+        //    }
+        //}
+        [AllowAnonymous]
+        [HttpGet]
         public ActionResult GetRoleWiseUser()
         {
             try
-            {              
-                var list=_context.Users.Join(_context.UserRole,
-                        user=>user.UserRoleId,
-                        role=>role.UserRoleId,
-                        (user,role)=>new
+            {
+                var list = _context.Users
+                    .Join(_context.UserRole,
+                        user => user.UserRoleId,
+                        role => role.UserRoleId,
+                        (user, role) => new
                         {
-                            UserId=user.UserId,
-                            RoleName=role.RoleName
-                        }).GroupBy(e=>e.RoleName)
-                        .Select(e => new { e.Key, Count = e.Count() });
-                        
-                var userList=list.Select(s=>new UserLog{RoleName=s.Key,Count=s.Count});             
+                            UserId = user.UserId,
+                            RoleName = role.RoleName,
+                            IsActive = user.IsActive
+                        })
+                    .Where(u => u.IsActive == true) // Adding the condition here
+                    .GroupBy(e => e.RoleName)
+                    .Select(e => new { e.Key, Count = e.Count() });
+
+                var userList = list.Select(s => new UserLog { RoleName = s.Key, Count = s.Count });
                 return Ok(userList);
             }
             catch (Exception ex)
-            {              
+            {
                 return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
         }
@@ -620,23 +648,23 @@ namespace AdminApi.Controllers
                 int adminUser=(from u in _context.Users join ur in _context.UserRole
                               on u.UserRoleId equals ur.UserRoleId where ur.RoleName=="Admin" 
                               select new {ur.RoleName}).Count();
-                int SuperadminUser = (from u in _context.Users 
+                int superadminUser = (from u in _context.Users 
                                       join ur in _context.UserRole
                                    on u.UserRoleId equals ur.UserRoleId
                                       where ur.RoleName == "Super Admin"
                                       select new { ur.RoleName }).Count();
-                int StateUser = (from u in _context.Users
+                int stateUser = (from u in _context.Users
                                       join ur in _context.UserRole
                                    on u.UserRoleId equals ur.UserRoleId
-                                      where ur.RoleName == "State User"
+                                      where ur.RoleName == "State User" && u.IsActive == true
                                  select new { ur.RoleName }).Count();
-                int ClientUser = (from u in _context.Users
+                int clientUser = (from u in _context.Users
                                       join ur in _context.UserRole
                                    on u.UserRoleId equals ur.UserRoleId
-                                      where ur.RoleName == "Client User"
-                                      select new { ur.RoleName }).Count();
+                                      where ur.RoleName == "Client User" && u.IsActive == true
+                                  select new { ur.RoleName }).Count();
 
-                UserStatus objStatus=new UserStatus{TotalUser=totalUser,ActiveUser=activeUser,InActiveUser=inActiveUser,AdminUser=adminUser, SuperAdminUser = SuperadminUser, StateUser = StateUser, ClientUser = ClientUser };
+                UserStatus objStatus=new UserStatus{TotalUser=totalUser,ActiveUser=activeUser,InActiveUser=inActiveUser,AdminUser=adminUser, SuperAdminUser = superadminUser, StateUser = stateUser, ClientUser = clientUser };
                 return Ok(objStatus);        
             }
             catch (Exception ex)
