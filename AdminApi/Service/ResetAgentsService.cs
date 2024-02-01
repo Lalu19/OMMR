@@ -15,24 +15,26 @@ namespace AdminApi.Services
 
         private readonly IServiceProvider _services;
         private readonly AppDbContext _context;
+        private readonly ILogger<ResetAgentsService> _logger;
 
-
-        public ResetAgentsService(IServiceProvider services, AppDbContext context)
+        public ResetAgentsService(IServiceProvider services, AppDbContext context, ILogger<ResetAgentsService> logger)
         {
             _services = services;
             _context = context;
+            _logger = logger;
         }
-
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                using (var scope = _services.CreateScope())
+              try
+              {
+                    using (var scope = _services.CreateScope())
                 {
                     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
                     var now = DateTime.Now;
-                    var twentyFourHoursAgo = now.AddHours(-24);
+                    var twentyFourHoursAgo = now.AddMinutes(-10);
 
                     var agentsToReset = context.Agents
                         .Where(hp => hp.NotificationSent == true && hp.NotifiedOn <= twentyFourHoursAgo)
@@ -49,7 +51,12 @@ namespace AdminApi.Services
                     context.SaveChanges();
                 }
 
-                await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+                await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
+              }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "An error occurred in the ResetAgentsService.");
+                }
             }
         }
     }

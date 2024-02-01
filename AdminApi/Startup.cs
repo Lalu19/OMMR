@@ -44,7 +44,7 @@ namespace AdminApi
 
             services.AddHostedService<HallPassCleanUpService>();
             services.AddHostedService<ClientCleanUpService>();
-            //services.AddHostedService<ResetAgentsService>();
+            services.AddHostedService<ResetAgentsService>();
 
 
             //services.AddHostedService<Adscreen30DaysCleanUp>();
@@ -154,7 +154,7 @@ namespace AdminApi
 
             }
 
-            //app.UseHangfireDashboard("/mydashboard");
+            app.UseHangfireDashboard("/mydashboard");
 
             app.UseDeveloperExceptionPage();
 

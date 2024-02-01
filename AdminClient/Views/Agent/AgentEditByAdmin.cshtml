@@ -68,7 +68,6 @@
             <div class="card-body">
                 <form action="#" role="form" class="validate" id="formPost">
                     <div class="row">
-                       
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label class="form-label">State Name &nbsp;<span style="color: red;"><b>*</b></span></label>
@@ -88,14 +87,30 @@
                             </div>
                         </div>
 
+
                         <div class="col-lg-3 form-group overflow-hidden" id="ifv">
                             <div class="form-group">
                                 <label class="form-label">Theater Name</label>
                                 <div id="selectedAreasDisplay"></div>
-                                <select multiple="multiple" class="form-control select2 w-100" id="selectArea" name="selectedAreas[]" data-placeholder="Select Theater" required></select>
+                                <select multiple="multiple" class="form-control select2 w-100" id="selectArea" name="selectedAreas[]" data-placeholder="Select Theater"></select>
                             </div>
                         </div>
 
+                        <div class="col-lg-3 form-group overflow-hidden" id="ifv">
+                            <div class="form-group">
+                                <label class="form-label">Update Theater Name</label>
+                                <div id="selectedAreasDisplay"></div>
+                                <select multiple="multiple" class="form-control select2 w-100" id="selectTheatre" name="selectedTheatres[]" data-placeholder="Select Theater"></select>
+                            </div>
+                        </div>
+
+                        @*  <div class="col-lg-3 form-group overflow-hidden" id="ifv">
+                        <div class="form-group">
+                        <label class="form-label">Theater Name</label>
+                        <div id="selectedAreasDisplay"></div>
+                        <select multiple="multiple" class="form-control select2 w-100" id="selectTheatre" name="selectedTheatres[]" data-placeholder="Select Theater"></select>
+                        </div>
+                        </div>*@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label class="form-label">Agent Name &nbsp;<span style="color: red;"><b>*</b></span></label>
@@ -172,150 +187,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @section scripts{
-    <script>
-        var selectedAreas = [];
-
-        GetState()
-        function GetState(Id) {
-            var opt = '';
-            $.ajax({
-                type: "GET",
-                url: "@apiUrl/api/ScreenList/GetStateList",
-                contentType: "application/json; charset=utf-8",
-                headers: {
-                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
-                },
-                dataType: "json",
-                success: function (res) {
-                    console.log(res)
-                    var options = [];
-                    options.push('<option value="">Please Select </option>');
-                    for (var i = 0; i < res.data.length; i++) {
-                        if (Id == res.data[i].stateId) {
-                            opt = 'selected'
-                        } else {
-                            opt = '';
-                        }
-                        options.push('<option value="' + res.data[i].stateId + '" ' + opt + '>' + res.data[i].state + '</option>');
-                    }
-                    $("#selectState").html(options.join(''));
-                },
-                error: function (data) {
-                    if (data.status == 401) {
-                        window.location.replace('/Message/TokenExpire');
-                    } else if (data.status == 403) {
-                        window.location.replace('/Message/Unauthorize');
-                    }
-                }
-            });
-        }
-
-        $("#selectState").change(function () {
-            var vcategoeryid = $("#selectState").val()
-            var opt = '';
-            $.ajax({
-                type: "GET",
-                url: '@apiUrl/api/ScreenList/GetCityListbystateid/' + vcategoeryid,
-                dataType: "json",
-                success: function (data) {
-                    var options = [];
-                    options.push('<option>Please Select</option>');
-                    for (var i = 0; i < data['data'].length; i++) {
-                        //if (Id == res.data[i].stateId) {
-                        //    opt = 'selected'
-                        //} else {
-                        //    opt = '';
-                        //}
-                        options.push('<option value="' + data['data'][i].city + '" ' + opt + '>' + data['data'][i].city + '</option>');
-                    }
-                    $("#selectcity").html(options.join(''));
-
-                },
-                error: function (data) {
-                    if (data.status == 401) {
-                        window.location.replace('/Message/TokenExpire');
-                    } else if (data.status == 403) {
-                        window.location.replace('/Message/Unauthorize');
-                    }
-                }
-            });
-        });
-
-        //$("#selectcity").change(function () {
-        //    var vcategoeryid = $("#selectcity").val()
-        //    var opt = '';
-        //    $.ajax({
-        //        type: "GET",
-        //        url: '@apiUrl/api/ScreenList/GetTheaterListbycityname/' + vcategoeryid,
-        //        dataType: "json",
-        //        success: function (data) {
-        //            console.log(data)
-        //            var options = [];
-        //            // options.push('<option>Please Select</option>');
-        //            for (var i = 0; i < data['data'].length; i++) {
-
-        //                options.push('<option value="' + data['data'][i].theatreName + '" ' + opt + '>' + data['data'][i].theatreName + '</option>');
-        //            }
-        //            $("#selectArea").html(options.join(''));
-        //            $('#selectArea').multipleSelect({
-        //                width: '100%'
-        //            });
-        //        },
-        //        error: function (data) {
-        //            if (data.status == 401) {
-        //                window.location.replace('/Message/TokenExpire');
-        //            } else if (data.status == 403) {
-        //                window.location.replace('/Message/Unauthorize');
-        //            }
-        //        }
-        //    });
-        //});
-
-        $("#selectcity").change(function () {
-            var vcategoeryid = $("#selectcity").val();
-            $.ajax({
-                type: "GET",
-                url: '@apiUrl/api/ScreenList/GetTheaterListbycityname/' + vcategoeryid,
-                dataType: "json",
-                success: function (data) {
-                    var options = [];
-
-                    // Add the "Select All Theaters" option with a unique value
-                    options.push('<option value="__select_all__">Select All</option>');
-
-                    for (var i = 0; i < data['data'].length; i++) {
-                        options.push('<option value="' + data['data'][i].theatreName + '">' + data['data'][i].theatreName + '</option>');
-                    }
-
-                    $("#selectArea").html(options.join(''));
-                    $('#selectArea').multipleSelect({
-                        width: '100%'
-                    });
-
-                    // Handle the "Select All Theaters" option
-                    $("#selectArea").on('change', function () {
-                        if ($(this).val() && $(this).val().includes('__select_all__')) {
-                            // Select all theaters except "__select_all__"
-                            var allTheaters = data['data'].map(theater => theater.theatreName);
-                            $('#selectArea').multipleSelect('setSelects', allTheaters);
-                        } else if ($(this).val() && $(this).val().includes('__select_all__')) {
-                            // If "__select_all__" is unchecked, remove it from the selected values
-                            var selectedValues = $(this).val().filter(value => value !== '__select_all__');
-                            $('#selectArea').multipleSelect('setSelects', selectedValues);
-                        }
-                    });
-                },
-                error: function (data) {
-                    if (data.status == 401) {
-                        window.location.replace('/Message/TokenExpire');
-                    } else if (data.status == 403) {
-                        window.location.replace('/Message/Unauthorize');
-                    }
-                }
-            });
-        });
-
-    </script>
+   
     <script>
         function StateList(Id) {
             var opt = '';
@@ -420,54 +292,27 @@
                 }
             });
         }
+        //Disabled & Clear the Theatre Name Dropdown if Clicked in State & City Dropdown
+        $(document).on('click', function (e) {
+            if ($(e.target).is('#selectState, #selectcity')) {
+                $('#selectArea').val(null).prop('disabled', true).trigger('change');
+                $('#selectedAreasDisplay').empty();
+            }
+        });
 
+        //Clear the Update Theatre Name Dropdown if Clicked in City Dropdown
         $('#selectcity').change(function () {
             var selectedCity = $(this).val();
             if (selectedCity) {
                 console.log("Selected City: " + selectedCity);
                 AreaList(selectedCity);
             } else {
-                // Clear the areas if no city is selected
                 $('#selectArea').empty();
             }
         });
 
-        //function AreaList(selectedCity, selectedArea) {
-        //    console.log("AreaList function called with selectedCity: " + selectedCity);
 
-        //    $.ajax({
-        //        type: "GET",
-        //        url: "@apiUrl/api/ScreenList/GetTheaterListbycityname/" + selectedCity,
-        //        dataType: "json",
-        //        success: function (data) {
-        //            console.log("AreaList Data: ", data); // Log the data received from the API
-
-        //            var options = [];
-        //            if (data && data['data'] && data['data'].length > 0) {
-        //                for (var i = 0; i < data['data'].length; i++) {
-        //                    var theatreName = data['data'][i].theatreName;
-        //                    options.push('<option value="' + theatreName + '">' + theatreName + '</option>');
-        //                }
-        //            } else {
-        //                console.log("No theatreName Data"); // Log if there is no data
-        //            }
-
-        //            $("#selectArea").html(options.join('')); // Set options to the select element
-
-        //            // ... Rest of the code
-        //        },
-        //        error: function (data) {
-        //            console.log("theatreNameList Error: ", data); // Log any error messages
-
-        //            if (data.status == 401) {
-        //                window.location.replace('/Message/TokenExpire');
-        //            } else if (data.status == 403) {
-        //                window.location.replace('/Message/Unauthorize');
-        //            }
-        //        }
-        //    });
-        //}
-
+        //Get Theatre Name
         function AreaList(selectedCity, selectedArea) {
             console.log("AreaList function called with selectedCity: " + selectedCity);
 
@@ -492,18 +337,18 @@
                         console.log("No theatreName Data"); // Log if there is no data
                     }
 
-                    $("#selectArea").html(options.join('')); // Set options to the select element
+                    $("#selectTheatre").html(options.join('')); // Set options to the select element
 
-                    $('#selectArea').multipleSelect({
+                    $('#selectTheatre').multipleSelect({
                         width: '100%'
                     });
 
                     // Handle the "Select All Theaters" option
-                    $("#selectArea").on('change', function () {
+                    $("#selectTheatre").on('change', function () {
                         if ($(this).val() && $(this).val().includes('__select_all__')) {
                             // Select all theaters except "__select_all__"
                             var allTheaters = data['data'].map(theater => theater.theatreName);
-                            $('#selectArea').multipleSelect('setSelects', allTheaters);
+                            $('#selectTheatre').multipleSelect('setSelects', allTheaters);
                         } else {
                             // Handle other selection logic if needed
                         }
@@ -540,13 +385,23 @@
                         $('#agentname').val(data.agentName);
                         $('#agentrole').val(data.agentrole);
                         StateList(data.stateId);
-                        //GetState(data.statename);
                         CityList(data.cityname);
-                        AreaList(data.cityname, data.theatreName);
-                        //GetState(data.stateId);
-                        //CityList(data.cityId);
-                        //$('#selectState').val(data.stateId);
-                        //$('#selectcity').val(data.cityId);
+                        //AreaList(data.cityname, data.theatreName);
+
+                        var theaterNames = data.theatreName;
+                        var theaterNamesArray = theaterNames.split(',').map(function (name) {
+                            return name.trim();
+                        });
+                        console.log(theaterNamesArray);
+                        $(document).ready(function () {
+                            var selectArea = $("#selectArea");
+                            for (var i = 0; i < theaterNamesArray.length; i++) {
+                                var option = new Option(theaterNamesArray[i], theaterNamesArray[i], true, true);
+                                selectArea.append(option);
+                            }
+                            selectArea.select2();
+                        });
+
                         $('#phonenumber').val(data.agentPhoneNumber);
                         $('#address').val(data.address);
                         $('#emailid').val(data.emailId);
@@ -573,13 +428,13 @@
         $("#btnupdate").click(function (e) {
 
 
+
             var selectedAreas = $("#selectArea").val();
-            if (selectedAreas.length === 0) {
+            var selectedTheatre = $("#selectTheatre").val();
+            if (selectedAreas.length === 0 && selectedTheatre.length === 0) {
                 e.preventDefault(); // Prevent form submission
-                var confirmAssignArea = confirm("Please Assign Theatre");
-                if (!confirmAssignArea) {
-                    return; // If the user clicks Cancel, stop further execution
-                }
+                alert("Please Assign Theatre.");
+                return; // Stop further execution
             }
 
             if (!document.getElementById("formPost").checkValidity()) {
@@ -596,14 +451,18 @@
                     imgPath = currentImageSrc;
                 }
 
+
+                //var selectedAreas = $("#selectTheatre").val();
+                //// Convert selectedAreas to a single string
+                //var selectedAreasString = selectedAreas.join(', '); // Join areas with a comma
+
+
                 var selectedAreas = $("#selectArea").val();
-
-                //// Display selected areas in a more readable format
-                //var selectedAreasDisplay = selectedAreas.join(', '); // Join areas with a comma
-                //$("#selectedAreasDisplay").text(selectedAreasDisplay); // Display in the div
-
-                // Convert selectedAreas to a single string
-                var selectedAreasString = selectedAreas.join(', '); // Join areas with a comma
+                var selectedTheatre = $("#selectTheatre").val();
+                if (selectedAreas && selectedTheatre) {
+                    var uniqueValuesSet = new Set(selectedAreas.concat(selectedTheatre));
+                    var selectedAreasString = Array.from(uniqueValuesSet).join(', ');
+                }
 
 
                 // Show preloader

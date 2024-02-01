@@ -90,7 +90,7 @@
                         </div>
                       
 
-                       @* <div class="col-lg-3 form-group overflow-hidden" id="ifv">
+                        <div class="col-lg-3 form-group overflow-hidden" id="ifv">
                             <div class="form-group">
                                 <label class="form-label">Theater Name</label>
                                 <div id="selectedAreasDisplay"></div>
@@ -104,15 +104,15 @@
                                 <div id="selectedAreasDisplay"></div>
                                 <select multiple="multiple" class="form-control select2 w-100" id="selectTheatre" name="selectedTheatres[]" data-placeholder="Select Theater"></select>
                             </div>
-                        </div>*@
+                        </div>
 
-                        <div class="col-lg-3 form-group overflow-hidden" id="ifv">
+                      @*  <div class="col-lg-3 form-group overflow-hidden" id="ifv">
                             <div class="form-group">
                                 <label class="form-label">Theater Name</label>
                                 <div id="selectedAreasDisplay"></div>
                                 <select multiple="multiple" class="form-control select2 w-100" id="selectTheatre" name="selectedTheatres[]" data-placeholder="Select Theater"></select>
                             </div>
-                        </div>
+                        </div>*@
 
                         <div class="col-md-3">
                             <div class="form-group">
@@ -402,21 +402,21 @@
 
         $("#btnupdate").click(function (e) {
 
-            var selectedTheatre = $("#selectTheatre").val();
-            if (selectedTheatre.length === 0) {
-                e.preventDefault(); // Prevent form submission
-                alert("Please Assign Theatre.");
-                return; // Stop further execution
-            }
-
-
-            //var selectedAreas = $("#selectArea").val();
             //var selectedTheatre = $("#selectTheatre").val();
-            //if (selectedAreas.length === 0 && selectedTheatre.length === 0) {
+            //if (selectedTheatre.length === 0) {
             //    e.preventDefault(); // Prevent form submission
             //    alert("Please Assign Theatre.");
             //    return; // Stop further execution
             //}
+
+
+            var selectedAreas = $("#selectArea").val();
+            var selectedTheatre = $("#selectTheatre").val();
+            if (selectedAreas.length === 0 && selectedTheatre.length === 0) {
+                e.preventDefault(); // Prevent form submission
+                alert("Please Assign Theatre.");
+                return; // Stop further execution
+            }
 
 
 
@@ -435,17 +435,17 @@
 
 
 
-                var selectedAreas = $("#selectTheatre").val();
-                // Convert selectedAreas to a single string
-                var selectedAreasString = selectedAreas.join(', '); // Join areas with a comma
+                //var selectedAreas = $("#selectTheatre").val();
+                //// Convert selectedAreas to a single string
+                //var selectedAreasString = selectedAreas.join(', '); // Join areas with a comma
 
 
-                //var selectedAreas = $("#selectArea").val();
-                //var selectedTheatre = $("#selectTheatre").val();
-                //if (selectedAreas && selectedTheatre) {
-                //    var uniqueValuesSet = new Set(selectedAreas.concat(selectedTheatre));
-                //    var selectedAreasString = Array.from(uniqueValuesSet).join(', ');
-                //}
+                var selectedAreas = $("#selectArea").val();
+                var selectedTheatre = $("#selectTheatre").val();
+                if (selectedAreas && selectedTheatre) {
+                    var uniqueValuesSet = new Set(selectedAreas.concat(selectedTheatre));
+                    var selectedAreasString = Array.from(uniqueValuesSet).join(', ');
+                }
 
 
                 // Show preloader

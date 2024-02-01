@@ -695,7 +695,7 @@ namespace AdminApi.Controllers
                     }
                 }
 
-                //BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromMinutes(1));
+                BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromMinutes(5));
 
                 var response = new
                 {
@@ -710,6 +710,88 @@ namespace AdminApi.Controllers
             }
         }
 
+        //[HttpGet("{AgentId}")]
+        //public IActionResult AllAgentAccept(int AgentId)
+        //{
+        //    try
+        //    {
+        //        var agent = _context.Agents.FirstOrDefault(u => u.AgentId == AgentId && u.IsDeleted == false);
+
+        //        if (agent == null)
+        //        {
+        //            return Accepted(new Confirmation { Status = "error", ResponseMsg = "Primary agent not found for the specified AgentId." });
+        //        }
+
+        //        if (agent.IsTimeExpired == true)
+        //        {
+        //            return Accepted(new Confirmation { Status = "error", ResponseMsg = "You didn't give any response in the first 30 minutes." });
+        //        }
+
+        //        if (!agent.TaskAccepted)
+        //        {
+        //            // If TaskAccepted is false, return no data.
+        //            return Ok(new { data = new List<object>(), recordsTotal = 0, recordsFiltered = 0 });
+        //        }
+
+        //        // Continue with your existing logic to fetch and return data.
+        //        agent.NotificationSent = true;
+        //        _context.SaveChanges();
+
+        //        var theatreNames = agent.TheatreName.Split(',').Select(t => t.Trim()).ToList();
+
+        //        var list = _context.AdScreen
+        //             .Where(u => theatreNames.Contains(u.TheatreName) && !u.IsDeleted)
+        //             .Select(u => new
+        //             {
+        //                 u.StateId,
+        //                 u.State,
+        //                 u.TheatreName,
+        //                 //u.Screen,
+        //                 AgentId,
+        //                 agent.AgentName
+        //             })
+        //             .Distinct()
+        //             .ToList();
+
+        //        int totalRecords = list.Count;
+        //        return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+        //    }
+        //}
+
+        /// <summary>
+        /// Accept Button API
+        /// </summary>
+
+        [HttpGet("{AgentId}")]
+        public IActionResult Activate(int AgentId)
+        {
+            try
+            {
+                var agent = _context.Agents.FirstOrDefault(u => u.AgentId == AgentId && u.IsDeleted == false);
+
+                if (agent == null)
+                {
+                    return Accepted(new Confirmation { Status = "error", ResponseMsg = "Agent not found for the specified AgentId." });
+                }
+
+                agent.TaskAccepted = true;
+                _context.SaveChanges();
+
+                return Ok(new Confirmation { Status = "success", ResponseMsg = "Task for the agent has been activated successfully." });
+            }
+            catch (Exception ex)
+            {
+                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+            }
+        }
+
+        /// <summary>
+        ///After Flutter login API
+        /// </summary>
         [HttpGet("{AgentId}")]
         public IActionResult AllAgentAccept(int AgentId)
         {
@@ -717,43 +799,52 @@ namespace AdminApi.Controllers
             {
                 var agent = _context.Agents.FirstOrDefault(u => u.AgentId == AgentId && u.IsDeleted == false);
 
-
                 if (agent == null)
                 {
                     return Accepted(new Confirmation { Status = "error", ResponseMsg = "Primary agent not found for the specified AgentId." });
                 }
-
 
                 if (agent.IsTimeExpired == true)
                 {
                     return Accepted(new Confirmation { Status = "error", ResponseMsg = "You didn't give any response in the first 30 minutes." });
                 }
 
+                if (!agent.NotificationSent)
+                {
+                    // If NotificationSent is false, return no data.
+                    return Ok(new { data = new List<object>(), recordsTotal = 0, recordsFiltered = 0 });
+                }
 
-                agent.TaskAccepted = true;
-                _context.SaveChanges();
+                // If TaskAccepted is true, include theater names.
+                if (agent.TaskAccepted)
+                {
+                    agent.NotificationSent = true;
+                    _context.SaveChanges();
 
+                    var theatreNames = agent.TheatreName.Split(',').Select(t => t.Trim()).ToList();
 
-                var theatreNames = agent.TheatreName.Split(',').Select(t => t.Trim()).ToList();
+                    var list = _context.AdScreen
+                        .Where(u => theatreNames.Contains(u.TheatreName) && !u.IsDeleted)
+                        .Select(u => new
+                        {
+                            u.StateId,
+                            u.State,
+                            u.TheatreName,
+                            //u.Screen,
+                            AgentId,
+                            agent.AgentName
+                        })
+                        .Distinct()
+                        .ToList();
 
-
-                var list = _context.AdScreen
-                     .Where(u => theatreNames.Contains(u.TheatreName) && !u.IsDeleted)
-                     .Select(u => new
-                     {
-                         u.StateId,
-                         u.State,
-                         u.TheatreName,
-                         //u.Screen,
-                         AgentId,
-                         agent.AgentName
-                     })
-                     .Distinct()
-                     .ToList();
-
-
-                int totalRecords = list.Count;
-                return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+                    int totalRecords = list.Count;
+                    return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+                }
+                else
+                {
+                    // If TaskAccepted is false, return no data.
+                    return Ok(new { data = new List<object>(), recordsTotal = 0, recordsFiltered = 0 });
+                }
             }
             catch (Exception ex)
             {
@@ -813,7 +904,7 @@ namespace AdminApi.Controllers
                         {
                             uniqueNotifications.Add(notificationKey);
                             set.Add(new { data = item });
-                            await SendNotifications(item.FCMToken, "Your message here", "Your title here");
+                            await SendNotifications(item.FCMToken, "Theatre Assigned", "Hello");
                         }
                     }
                     resultList = set.ToList();
@@ -836,7 +927,12 @@ namespace AdminApi.Controllers
                                 .ToList();
 
 
+                var agentService = new AgentRepository(_context);
                 var resultList = new List<object>();
+
+
+                // Initialize the HashSet for unique email addresses
+                var emailSet = new HashSet<string>();
 
 
                 foreach (var agent in agents)
@@ -845,11 +941,10 @@ namespace AdminApi.Controllers
                     agent.UpdatedOn = DateTime.Now;
                     _context.SaveChanges();
 
-                    //BackgroundJob.Schedule(() => BackupAgentNoResponse(), TimeSpan.FromMinutes(1));
 
                     var primaryAgentTheatreNames = agent.TheatreName.Split(',')
-                                                     .Select(t => t.Trim())
-                                                     .ToList();
+                                                      .Select(t => t.Trim())
+                                                      .ToList();
 
 
                     foreach (var theatreName in primaryAgentTheatreNames)
@@ -860,34 +955,51 @@ namespace AdminApi.Controllers
 
 
                         var backupAgents = _context.Agents
-                             .Where(u => !u.IsDeleted
-                                 && u.Agentrole == "Backup")
-                             .AsEnumerable()
-                             .Where(u => u.TheatreName.Split(',').Select(t => t.Trim()).Contains(theatreName, StringComparer.OrdinalIgnoreCase))
-                             .ToList();
+                              .Where(u => !u.IsDeleted
+                                  && u.Agentrole == "Backup")
+                              .AsEnumerable()
+                              .Where(u => u.TheatreName.Split(',').Select(t => t.Trim()).Contains(theatreName, StringComparer.OrdinalIgnoreCase))
+                              .ToList();
 
 
                         var filteredNotifications = pushNotifications
-                             .Join(backupAgents,
-                                 p => p.AgentId,
-                                 a => a.AgentId,
-                                 (p, a) => new
-                                 {
-                                     p.AgentId,
-                                     p.DeviceId,
-                                     p.IMEINumber,
-                                     p.FCMToken
-                                 })
-                             .ToList();
+                              .Join(backupAgents,
+                                  p => p.AgentId,
+                                  a => a.AgentId,
+                                  (p, a) => new
+                                  {
+                                      p.AgentId,
+                                      p.DeviceId,
+                                      p.IMEINumber,
+                                      p.FCMToken,
+                                      a.EmailId,
+                                  })
+                              .ToList();
 
 
-                        var set = new HashSet<object>(resultList);
                         foreach (var item in filteredNotifications)
                         {
-                            set.Add(new { data = item });
-                            await SendNotifications(item.FCMToken, "Your message here", "Your title here");
+                            if (emailSet.Add(item.EmailId))
+                            {
+                                await SendNotifications(item.FCMToken, "Your message here", "Your title here");
+                                var backupAg = _context.Agents.FirstOrDefault(z => z.EmailId == item.EmailId);
+                                backupAg.NotificationSent = true;
+                                backupAg.NotifiedOn = DateTime.Now;
+                                _context.SaveChanges();
+
+
+                                var mailTo = item.EmailId;
+                                string subject = "Important Notice: Non-Responsive Auto-Generated Email";
+                                string body = "Dear Recipient,\r\n\r\nThis auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.\r\n\r\nThank you for your understanding.\r\n\r\nBest regards,\r\n Ommr";
+
+
+                                await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
+
+
+                                // Add the processed data to resultList
+                                resultList.Add(new { data = item });
+                            }
                         }
-                        resultList = set.ToList();
                     }
                 }
 
