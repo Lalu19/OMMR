@@ -565,62 +565,7 @@ namespace AdminApi.Controllers
             }
         }
 
-        //[HttpPost]
-        //public async Task<ActionResult> SendNotification()
-        //{
-        //    try
-        //    {
-        //        // Retrieve FCM tokens from the database
-        //        var fcmTokens = _context.PushNotifications.Select(p => new { p.FCMToken, p.AgentId }).ToList();
-
-        //        using (var client = new HttpClient())
-        //        {
-        //            client.BaseAddress = new Uri("https://fcm.googleapis.com");
-        //            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        //            client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", "key=AAAAuy-qyK0:APA91bGSfg44Q2EbjZGpoAaDvQkJn9bshg1NVhV15pc7R3Egb8wU8ZZDBhXkWb3Q-jNEkXT0H-XFS5VBnkmVh2bCuBC14Kh3o7cxrQLwaK9lq4rgUeuHzxfOAF9h_OyRJrp4Czf2knE_");
-        //            client.DefaultRequestHeaders.TryAddWithoutValidation("Sender", "id=803958605997");
-
-        //            foreach (var entry in fcmTokens)
-        //            {
-        //                // Retrieve the agent's role based on AgentId
-        //                var agentRole = _context.Agents
-        //                    .Where(a => a.AgentId == entry.AgentId)
-        //                    .Select(a => a.Agentrole)
-        //                    .FirstOrDefault();
-
-        //                if (agentRole != null && agentRole.Equals("Primary"))
-        //                {
-        //                    var data = new
-        //                    {
-        //                        to = entry.FCMToken,
-        //                        notification = new
-        //                        {
-        //                            body = "Hello Pritam, this is Lalu",
-        //                            title = "Hello",
-        //                        }
-        //                    };
-
-        //                    var json = JsonConvert.SerializeObject(data);
-        //                    var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
-
-        //                    var result = await client.PostAsync("/fcm/send", httpContent);
-
-        //                    if (!result.IsSuccessStatusCode)
-        //                    {
-        //                        // Handle the case where sending the notification was unsuccessful
-        //                    }
-        //                }
-        //            }
-
-        //            return Ok("Notifications sent successfully");
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
-        //    }
-        //}
-
+      
         [HttpPost]
         public async Task<ActionResult> SendNotifications(string fcmToken, string message, string title)
         {
@@ -665,6 +610,51 @@ namespace AdminApi.Controllers
         }
 
 
+        //[HttpGet]
+        //public async Task<IActionResult> PrimaryAgentsForPushNotification()
+        //{
+        //    try
+        //    {
+        //        var agentService = new AgentRepository(_context);
+
+        //        var resultList = await agentService.RunAgentProcessing();
+
+        //        List<object> data = new List<object>();
+        //        List<object> errorMessages = new List<object>();
+
+        //        foreach (var result in resultList)
+        //        {
+        //            if (result.GetType().GetProperty("Status") != null && result.GetType().GetProperty("ResponseMsg") != null)
+        //            {
+        //                errorMessages.Add(result);
+        //            }
+        //            else
+        //            {
+        //                data.Add(result);
+
+        //                var notification = (dynamic)result;
+        //                var fcmToken = notification.FCMToken;
+
+        //                await SendNotifications(fcmToken, "Theatre Assigned", "Hello");
+
+        //            }
+        //        }
+
+        //        BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromHours(24));
+
+        //        var response = new
+        //        {
+        //            Data = data,
+        //            //ErrorMessages = errorMessages
+        //        };
+        //        return Ok(response);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+        //    }
+        //}
+
         [HttpGet]
         public async Task<IActionResult> PrimaryAgentsForPushNotification()
         {
@@ -672,10 +662,13 @@ namespace AdminApi.Controllers
             {
                 var agentService = new AgentRepository(_context);
 
+
                 var resultList = await agentService.RunAgentProcessing();
+
 
                 List<object> data = new List<object>();
                 List<object> errorMessages = new List<object>();
+
 
                 foreach (var result in resultList)
                 {
@@ -687,15 +680,24 @@ namespace AdminApi.Controllers
                     {
                         data.Add(result);
 
+
                         var notification = (dynamic)result;
                         var fcmToken = notification.FCMToken;
+                        //var mailTo = notification.Mail;
+                        var mailTo = notification.EmailId;
+                        string subject = "Important Notice: Non-Responsive Auto-Generated Email";
+                        string body = "Dear Recipient,\r\n\r\nThis auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.\r\n\r\nThank you for your understanding.\r\n\r\nBest regards,\r\n Ommr";
 
                         await SendNotifications(fcmToken, "Theatre Assigned", "Hello");
+                        await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
+
 
                     }
                 }
 
-                BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromMinutes(5));
+                BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromHours(24));
+                //BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromMinutes(1));
+
 
                 var response = new
                 {
@@ -792,6 +794,7 @@ namespace AdminApi.Controllers
         /// <summary>
         ///After Flutter login API
         /// </summary>
+        /// 
         [HttpGet("{AgentId}")]
         public IActionResult AllAgentAccept(int AgentId)
         {
@@ -857,6 +860,8 @@ namespace AdminApi.Controllers
         {
             try
             {
+
+                var agentService = new AgentRepository(_context);
                 var agent = _context.Agents.FirstOrDefault(u => u.AgentId == AgentId);
 
                 if (agent == null)
@@ -892,21 +897,56 @@ namespace AdminApi.Controllers
                                  p.AgentId,
                                  p.DeviceId,
                                  p.IMEINumber,
-                                 p.FCMToken
+                                 p.FCMToken,
+                                 a.EmailId
                              })
                          .ToList();
 
                     var set = new HashSet<object>(resultList);
+                    //foreach (var item in filteredNotifications)
+                    //{
+
+                    //    var backupAg = _context.Agents.FirstOrDefault(z => z.EmailId == item.EmailId);
+                    //    backupAg.NotificationSent = true;
+                    //    backupAg.NotifiedOn = DateTime.Now;
+                    //    _context.SaveChanges();
+
+
+                    //    var notificationKey = $"{item.DeviceId}_{item.IMEINumber}_{item.FCMToken}";
+                    //    if (!uniqueNotifications.Contains(notificationKey))
+                    //    {
+                    //        uniqueNotifications.Add(notificationKey);
+                    //        set.Add(new { data = item });
+                    //        await SendNotifications(item.FCMToken, "Theatre Assigned", "Hello");
+                    //    }
+                    //}
+
                     foreach (var item in filteredNotifications)
                     {
+
+
+                        var backupAg = _context.Agents.FirstOrDefault(z => z.EmailId == item.EmailId);
+                        backupAg.NotificationSent = true;
+                        _context.SaveChanges();
+
+
                         var notificationKey = $"{item.DeviceId}_{item.IMEINumber}_{item.FCMToken}";
                         if (!uniqueNotifications.Contains(notificationKey))
                         {
                             uniqueNotifications.Add(notificationKey);
                             set.Add(new { data = item });
-                            await SendNotifications(item.FCMToken, "Theatre Assigned", "Hello");
+                            await SendNotifications(item.FCMToken, "Your message here", "Your title here");
+
+
+                            var mailTo = item.EmailId;
+                            string subject = "Important Notice: Non-Responsive Auto-Generated Email";
+                            string body = "Dear Recipient,\r\n\r\nThis auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.\r\n\r\nThank you for your understanding.\r\n\r\nBest regards,\r\n Ommr";
+
+
+                            await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
                         }
                     }
+
                     resultList = set.ToList();
                 }
 
@@ -981,7 +1021,7 @@ namespace AdminApi.Controllers
                         {
                             if (emailSet.Add(item.EmailId))
                             {
-                                await SendNotifications(item.FCMToken, "Your message here", "Your title here");
+                                await SendNotifications(item.FCMToken, "Theatre Assigned", "Hello");
                                 var backupAg = _context.Agents.FirstOrDefault(z => z.EmailId == item.EmailId);
                                 backupAg.NotificationSent = true;
                                 backupAg.NotifiedOn = DateTime.Now;

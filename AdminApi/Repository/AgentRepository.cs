@@ -9,7 +9,10 @@ using AdminApi.Models;
 using AdminApi.Models.App;
 using AdminApi.Models.Helper;
 using Microsoft.EntityFrameworkCore;
-
+using NPOI.XWPF.UserModel;
+using Amazon;
+using Amazon.SimpleEmail;
+using Amazon.SimpleEmail.Model;
 namespace AdminApi.Repository
 {
     public class AgentRepository
@@ -136,41 +139,41 @@ namespace AdminApi.Repository
         }
 
 
-
-        public async Task SendEmail(string from, string to, string subject, string msgBody)
-
-
-        //public static void SendEmail( string to, string msgBody, string from = "dotnetemailsender60@gmail.com", string subject = "Below is your Self-generated Password")
-        //direct assigning with "=" is to be done from the end only(like "from" and "subject" here)
+        public async Task<string> SendEmail(string from, string to, string subject, string msgBody)
         {
-
             try
             {
+                using (var client = new AmazonSimpleEmailServiceClient("AKIAVKJ2J2YWBU2P6HU3", "p+mi2QpJsOky03imPdz5W/Hhe86y23I/BshScmGK", RegionEndpoint.APSouth1))
+                {
+                    var sendRequest = new SendEmailRequest
+                    {
+                        Source = from,
+                        Destination = new Destination
+                        {
+                            ToAddresses = new List<string> { to }
+                        },
+                        Message = new Message
+                        {
+                            Subject = new Content(subject),
+                            Body = new Body
+                            {
+                                Html = new Content(msgBody)
+                            }
+                        }
+                    };
 
-                MailMessage message = new MailMessage(from, to);   // From address has to be GMAIL only             
-                message.Subject = subject;
-                message.IsBodyHtml = true;
-                message.Body = "" + msgBody;
 
-                SmtpClient smtp = new SmtpClient();
-                smtp.Host = "smtp.gmail.com";           // This is free SMTP given by gmail
-                smtp.EnableSsl = true;
-                NetworkCredential NetworkCred = new NetworkCredential("dotnetemailsender60@gmail.com", "nailtzdxmccccizo");
-                smtp.UseDefaultCredentials = false;
-                smtp.Credentials = NetworkCred;
-                smtp.Port = 587;                        // 587 is for free account
-
-                smtp.Send(message);
-
+                    var response = await client.SendEmailAsync(sendRequest);
+                    //Console.WriteLine(response.ToString());
+                    return response.ToString();
+                }
             }
             catch (Exception ex)
             {
                 string err = ex.Message;
+                return err;
             }
         }
-
-
-
 
 
 
