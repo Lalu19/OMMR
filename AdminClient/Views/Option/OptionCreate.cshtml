@@ -136,22 +136,39 @@
                     var OptionDetails = [];
                   
 
+                    //$.each($("#Optnn tbody tr"), function () {
+                    //    var $irow = $(this),
+                    //        rowObj = {};
+
+
+                    //    // Retrieve the data-value attributes
+                    //    var Question = parseInt($irow.find("td:eq(0)").data("value"));
+                    //    var Options = $irow.find("td:eq(1)").data("value");  // Change this line to handle Options as a string
+
+
+                    //    var a = {
+                    //        "questionId": Question,
+                    //        "option": Options
+                    //    }
+                    //    OptionDetails.push(a);
+                    //});
                     $.each($("#Optnn tbody tr"), function () {
                         var $irow = $(this),
                             rowObj = {};
 
-
                         // Retrieve the data-value attributes
                         var Question = parseInt($irow.find("td:eq(0)").data("value"));
-                        var Options = $irow.find("td:eq(1)").data("value");  // Change this line to handle Options as a string
 
+                        // Fix: Access the text content of the td element for Options
+                        var Options = $irow.find("td:eq(1)").text();
 
                         var a = {
                             "questionId": Question,
                             "option": Options
-                        }
+                        };
                         OptionDetails.push(a);
                     });
+
 
                     var preloader = $("#preloader");
                     preloader.removeClass("d-none");
@@ -261,32 +278,6 @@
 
     
         $(function () {
-
-            //$("#Add_Optn").click(function (e) {
-            //    var UserValue = $('#abc').val();
-            //    var UserText = $('#abc option:selected').text();
-            //    var StateValue = $('#cde').val();
-            //    var StateText = $('#cde option:selected').text();
-
-            //    var row = "<tr><td data-value='" + UserValue + "'>" + UserText + "</td><td data-value='" + StateValue + "'>" + StateText + "</td><td><button class='delRowBtn'><i class='ion-trash-b' style='color: red;'></i></button></td></tr>";
-
-            //    $('#Option_tb').append(row);
-            //});
-
-            //$("#Add_Optn").click(function (e) {
-            //    var x = $('#Option_tb').html();
-            //    var Qsn = $('#selectQs option:selected').text();
-            //    var Optn = $('#createoption').val();
-
-            //    x = x + "<tr><td>" + Qsn + "</td><td>" + Optn + "</td><td>" + "<button class='delRowBtn'><i class='ion-trash-b' style='color: red;'></i></button></td></tr>"
-            //    $('#Option_tb').html(x);
-            //    $(document.body).delegate(".delRowBtn", "click", function () {
-            //        $(this).closest("tr").remove();
-            //    });
-            //    $('#selectQs').val('');
-            //    $('#createoption').val('');
-            
-            //});
 
             $("#Add_Optn").click(function (e) {
                 var Qsn = $('#selectQs').val();

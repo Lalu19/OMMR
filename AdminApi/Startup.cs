@@ -49,8 +49,8 @@ namespace AdminApi
 
             //services.AddHostedService<Adscreen30DaysCleanUp>();
 
-           services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=DESKTOP-8AP7SAV\SQLEXPRESS;Database=OMMR;Trusted_Connection=True;")));
-           // services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=103.145.37.246,10230;Database=OMMR;User Id=sa;Password=Software@2016;TrustServerCertificate=True;")));
+           //services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=DESKTOP-8AP7SAV\SQLEXPRESS;Database=OMMR;Trusted_Connection=True;")));
+            services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=103.145.37.246,10230;Database=OMMR;User Id=sa;Password=Software@2016;TrustServerCertificate=True;")));
             services.AddHangfireServer();
 
 

@@ -117,7 +117,8 @@ namespace AdminApi.Repository
                                 //notification.IMEINumber,
                                 notification.FCMToken,
                                 body = "Theatre Assigned",
-                                title = "Hello"
+                                title = "Hello",
+                                agent.EmailId
                             };
                             resultList.Add(result);
                         }

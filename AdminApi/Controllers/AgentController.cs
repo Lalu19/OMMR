@@ -263,12 +263,13 @@ namespace AdminApi.Controllers
             try
             {
                 var list = (from u in _context.Agents
-                            //join c in _context.Citys on u.CityId equals c.CityId
+                                //join c in _context.Citys on u.CityId equals c.CityId
                             join s in _context.States on u.StateId equals s.StateId
                             //join p in _context.Areas on u.AreaId equals p.AreaId
                             //join p in _context.ScreenList on u.StateId equals p.StateId
 
-                            select new { 
+                            select new
+                            {
                                 u.AgentId,
                                 u.StateId,
                                 s.StateName,
@@ -276,14 +277,14 @@ namespace AdminApi.Controllers
                                 u.TheatreName,
                                 u.AgentName,
                                 u.Agentrole,
-                                u.AgentPhoneNumber, 
-                                u.Address, 
+                                u.AgentPhoneNumber,
+                                u.Address,
                                 u.EmailId,
                                 u.ProfilePhoto,
-                                u.AgentuserId, 
+                                u.AgentuserId,
                                 u.PassWord,
                                 u.CreatedBy,
-                                u.IsDeleted 
+                                u.IsDeleted
                             }).Where(x => x.IsDeleted == false).ToList();
 
 
@@ -343,12 +344,13 @@ namespace AdminApi.Controllers
             try
             {
                 var list = (from u in _context.Agents
-                            //join a in _context.Users on u.CreatedBy equals a.UserId
+                                //join a in _context.Users on u.CreatedBy equals a.UserId
                             join s in _context.States on u.StateId equals s.StateId
                             where u.IsDeleted == false
                             join p in _context.StateUser on u.StateId equals p.StateId
 
-                            select new {
+                            select new
+                            {
                                 u.AgentId,
                                 s.StateId,
                                 s.StateName,
@@ -363,11 +365,11 @@ namespace AdminApi.Controllers
                                 u.AgentuserId,
                                 u.PassWord,
                                 p.UserId,
-                                u.DeleteRequested, 
-                                u.AdminDeletionResponse, 
-                                u.CreatedBy, 
+                                u.DeleteRequested,
+                                u.AdminDeletionResponse,
+                                u.CreatedBy,
                                 p.IsDeleted,
-                            }).Where(x => x.IsDeleted == false && x.UserId==UserId && x.DeleteRequested == false).ToList();
+                            }).Where(x => x.IsDeleted == false && x.UserId == UserId && x.DeleteRequested == false).ToList();
 
 
                 int totalRecords = list.Count();
@@ -489,7 +491,7 @@ namespace AdminApi.Controllers
                 return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
         }
-      
+
 
         [HttpGet("{Id}/{DeletedBy}")]
         public ActionResult DeleteAgent(int Id, int DeletedBy)
@@ -565,7 +567,7 @@ namespace AdminApi.Controllers
             }
         }
 
-      
+
         [HttpPost]
         public async Task<ActionResult> SendNotifications(string fcmToken, string message, string title)
         {
