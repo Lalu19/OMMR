@@ -154,51 +154,50 @@ namespace AdminApi.Controllers
                             join s in _context.States on u.StateId equals s.StateId
                             join p in _context.Agents on u.AgentId equals p.AgentId
                             join q in _context.AdScreen on u.AdScreenId equals q.AdScreenId
-                            join l in _context.ScreenList on q.TheatreName equals l.TheatreName
 
                             select new
                             {
-                               u.AdScreenFeedbackFormId,
-                               u.AdScreenId,
-                               u.AgentId,
-                               p.AgentName,
-                               u.StateId,
-                               s.StateName,
-                               q.TheatreName,
-                               q.Screen,
-                               l.TheatreCode,
-                               q.AdsName,
+                                u.AdScreenFeedbackFormId,
+                                u.AdScreenId,
+                                u.AgentId,
+                                p.AgentName,
+                                u.StateId,
+                                s.StateName,
+                                q.TheatreName,
+                                q.Screen,
+                                q.AdsName,
+                                q.City,
                                 // u.AdsDuration,
                                 u.AdsVariantStatusOk,
                                 u.AdsVariantStatusNotOk,
                                 u.AdsVariantStatusRemark,
                                 u.AdsDurationStatusOk,
-                               u.AdsDurationStatusNotOk,
-                               u.AdsDurationStatusRemark,
-                              // u.AdsPlayTime,
-                               u.AdsPlayTimeStatusOk,
-                               u.AdsPlayTimeStatusNotOk,
-                               u.AdsPlayTimeStatusRemark,
-                              // u.AdsSequence,
-                               u.AdsSequenceStatusOk,
-                               u.AdsSequenceStatusNotOk,
-                               u.AdsSequenceStatusRemark,
-                               u.Occupancy,
-                              // u.Language,
-                               u.LanguageStatusOk,
-                               u.LanguageStatusNotOk,
-                               u.LanguageStatusRemark,
-                               u.TheaterInspectionStatusforMale,
-                               u.TheaterInspectionStatusforFemale,
-                               u.TheaterInspectionforMale,
-                               u.TheaterInspectionforFemale,
-                               u.AgentSelfie,
-                               u.CreatedBy,
-                               u.CreatedOn,
-                               u.IsDeleted
-                            }).Where(x => x.IsDeleted == false).Distinct().ToList();
+                                u.AdsDurationStatusNotOk,
+                                u.AdsDurationStatusRemark,
+                                // u.AdsPlayTime,
+                                u.AdsPlayTimeStatusOk,
+                                u.AdsPlayTimeStatusNotOk,
+                                u.AdsPlayTimeStatusRemark,
+                                // u.AdsSequence,
+                                u.AdsSequenceStatusOk,
+                                u.AdsSequenceStatusNotOk,
+                                u.AdsSequenceStatusRemark,
+                                u.Occupancy,
+                                // u.Language,
+                                u.LanguageStatusOk,
+                                u.LanguageStatusNotOk,
+                                u.LanguageStatusRemark,
+                                u.TheaterInspectionStatusforMale,
+                                u.TheaterInspectionStatusforFemale,
+                                u.TheaterInspectionforMale,
+                                u.TheaterInspectionforFemale,
+                                u.AgentSelfie,
+                                u.CreatedBy,
+                                u.CreatedOn,
+                                u.IsDeleted
+                            }).Where(x => x.IsDeleted == false).ToList();
 
-              
+
                 int totalRecords = list.Count();
 
 
@@ -209,6 +208,69 @@ namespace AdminApi.Controllers
                 return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
         }
+
+        //[HttpGet]
+        //public ActionResult GetAdScreenFeedbackFormList()
+        //{
+        //    try
+        //    {
+        //        var list = (from u in _context.AdScreenFeedbackForm
+        //                    join s in _context.States on u.StateId equals s.StateId
+        //                    join p in _context.Agents on u.AgentId equals p.AgentId
+        //                    join q in _context.AdScreen on u.AdScreenId equals q.AdScreenId
+
+        //                    select new
+        //                    {
+        //                       u.AdScreenFeedbackFormId,
+        //                       u.AdScreenId,
+        //                       u.AgentId,
+        //                       p.AgentName,
+        //                       u.StateId,
+        //                       s.StateName,
+        //                       q.TheatreName,
+        //                       q.Screen,
+        //                       q.AdsName,
+        //                        // u.AdsDuration,
+        //                        u.AdsVariantStatusOk,
+        //                        u.AdsVariantStatusNotOk,
+        //                        u.AdsVariantStatusRemark,
+        //                        u.AdsDurationStatusOk,
+        //                       u.AdsDurationStatusNotOk,
+        //                       u.AdsDurationStatusRemark,
+        //                      // u.AdsPlayTime,
+        //                       u.AdsPlayTimeStatusOk,
+        //                       u.AdsPlayTimeStatusNotOk,
+        //                       u.AdsPlayTimeStatusRemark,
+        //                      // u.AdsSequence,
+        //                       u.AdsSequenceStatusOk,
+        //                       u.AdsSequenceStatusNotOk,
+        //                       u.AdsSequenceStatusRemark,
+        //                       u.Occupancy,
+        //                      // u.Language,
+        //                       u.LanguageStatusOk,
+        //                       u.LanguageStatusNotOk,
+        //                       u.LanguageStatusRemark,
+        //                       u.TheaterInspectionStatusforMale,
+        //                       u.TheaterInspectionStatusforFemale,
+        //                       u.TheaterInspectionforMale,
+        //                       u.TheaterInspectionforFemale,
+        //                       u.AgentSelfie,
+        //                       u.CreatedBy,
+        //                       u.CreatedOn,
+        //                       u.IsDeleted
+        //                    }).Where(x => x.IsDeleted == false).ToList();
+
+
+        //        int totalRecords = list.Count();
+
+
+        //        return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+        //    }
+        //}
 
         [HttpGet("{AdScreenId}")]
         public ActionResult GetAdScreenFeedbackFormListByAdScreenId(int AdScreenId)
@@ -274,7 +336,7 @@ namespace AdminApi.Controllers
                             join p in _context.Agents on u.AgentId equals p.AgentId
                             join q in _context.StateUser on u.StateId equals q.StateId
                             join c in _context.AdScreen on u.AdScreenId equals c.AdScreenId
-                            join l in _context.ScreenList on c.TheatreName equals l.TheatreName
+                            //join l in _context.ScreenList on c.TheatreName equals l.TheatreName
 
                             select new
                             {
@@ -286,7 +348,7 @@ namespace AdminApi.Controllers
                                 s.StateName,
                                 c.TheatreName,
                                 c.Screen,
-                                l.TheatreCode,
+                                c.City,
                                 c.AdsName,
                                 // u.AdsDuration,
                                 u.AdsVariantStatusOk,
@@ -317,7 +379,7 @@ namespace AdminApi.Controllers
                                 u.CreatedBy,
                                 u.CreatedOn,
                                 u.IsDeleted
-                            }).Where(x => x.IsDeleted == false && x.UserId == UserId).Distinct().ToList();
+                            }).Where(x => x.IsDeleted == false && x.UserId == UserId).ToList();
 
                 int totalRecords = list.Count();
 
