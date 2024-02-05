@@ -34,8 +34,8 @@ namespace AdminApi.Services
                     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
                     var now = DateTime.Now;
-                   // var twentyFourHoursAgo = now.AddMinutes(-4);
-                    var twentyFourHoursAgo = now.AddHours(-25);
+                    var twentyFourHoursAgo = now.AddMinutes(-4);
+                   // var twentyFourHoursAgo = now.AddHours(-25);
 
                     var agentsToReset = context.Agents
                         .Where(hp => hp.NotificationSent == true && hp.NotifiedOn <= twentyFourHoursAgo)

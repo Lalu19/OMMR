@@ -41,7 +41,11 @@
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="#"><i class="fe fe-file-text mr-1"></i>Admin Console</a></li>
         <li class="breadcrumb-item active" aria-current="page">ClientAdsFeedback List</li>
+       @*<p class=" mb-0 font-weight-semibold">@Context.Session.GetString("AdvertiseName")</p>*@
     </ol>
+   @* <div class="ml-auto">
+        <p class=" mb-0 font-weight-semiboldbtn btn-primary btn-icon btn-sm text-white mr-2">@Context.Session.GetString("AdvertiseName")</p>
+    </div>*@
 </div>
 <div class="row">
     <div class="col-md-12 col-lg-12">
@@ -75,7 +79,12 @@
         </div>
     </div>
 </div>
+
 @section scripts{
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
+  
     <script>
         var dataVisible = false;
 
@@ -157,6 +166,8 @@
                 var table = $('#Agent_Tb').DataTable({
                     "destroy": true,
                     "paging": true,
+                    "dom": 'Bfrtip',
+                    "buttons": ['excel'],
                     "ordering": true,
                     "searching": true,
                     "info": true,

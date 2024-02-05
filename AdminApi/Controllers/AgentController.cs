@@ -697,8 +697,8 @@ namespace AdminApi.Controllers
                     }
                 }
 
-                BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromHours(24));
-                //BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromMinutes(1));
+                //BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromHours(24));
+                BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromMinutes(2));
 
 
                 var response = new
@@ -937,7 +937,7 @@ namespace AdminApi.Controllers
                         {
                             uniqueNotifications.Add(notificationKey);
                             set.Add(new { data = item });
-                            await SendNotifications(item.FCMToken, "Your message here", "Your title here");
+                            await SendNotifications(item.FCMToken, "Theatre Assigned", "Hello");
 
 
                             var mailTo = item.EmailId;

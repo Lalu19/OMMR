@@ -12,13 +12,13 @@
         <li class="breadcrumb-item"><a href="#"><i class="fe fe-file-text mr-1"></i>Admin Console</a></li>
         <li class="breadcrumb-item active" aria-current="page">Screen List View</li>
     </ol>
-    <div class="ml-auto">
+   @* <div class="ml-auto">
         <a href="~/ScreenList/UploadScreenList" class="btn btn-primary btn-icon btn-sm text-white mr-2">
             <span>
                 <i class="fe fe-plus"></i>
             </span> UploadScreenList
         </a>
-    </div>
+    </div>*@
 </div>
 
 <div class="row">
@@ -33,7 +33,7 @@
                         <div class="form-group">
                             <label for="stateFilter">STATE:</label>
                             <div class="input-box">
-                                <select multiple="multiple" class="multi-select" id="selectStates" name="selectedState[]">
+                                <select multiple="multiple" class="form-control select2 w-100" id="selectStates" name="selectedState[]">
                                 </select>
                             </div>
                         </div>
@@ -43,7 +43,7 @@
                         <div class="form-group">
                             <label for="cityFilter">CITY:</label>
                             <div class="input-box">
-                                <select multiple="multiple" class="multi-select" @*class="form-control cityFilter"*@ id="selectcity" name="selectedcity[]">
+                                <select multiple="multiple" class="form-control select2 w-100" @*class="form-control cityFilter"*@ id="selectcity" name="selectedcity[]">
                                 </select>
                             </div>
                         </div>
@@ -63,7 +63,7 @@
                         <div class="form-group">
                             <label for="secFilter">SEC:</label>
                             <div class="input-box">
-                                <select multiple="multiple" class="multi-select" @*class="form-control cityFilter"*@ id="selectSec" name="selectedSec[]">
+                                <select multiple="multiple" class="form-control select2 w-100" @*class="form-control cityFilter"*@ id="selectSec" name="selectedSec[]">
                                 </select>
                             </div>
                         </div>
@@ -73,7 +73,7 @@
                         <div class="form-group">
                             <label for="ratingFilter">THEATRE RATING:</label>
                             <div class="input-box">
-                                <select multiple="multiple" class="multi-select" @*class="form-control cityFilter"*@ id="selectRating" name="selectedRating[]">
+                                <select multiple="multiple" class="form-control select2 w-100" @*class="form-control cityFilter"*@ id="selectRating" name="selectedRating[]">
                                 </select>
                             </div>
                         </div>
@@ -83,7 +83,7 @@
                         <div class="form-group">
                             <label for="mediaFilter">MEDIA:</label>
                             <div class="input-box">
-                                <select multiple="multiple" class="multi-select" @*class="form-control cityFilter"*@ id="selectMedia" name="selectedMedia[]">
+                                <select multiple="multiple" class="form-control select2 w-100" @*class="form-control cityFilter"*@ id="selectMedia" name="selectedMedia[]">
                                 </select>
                             </div>
                         </div>

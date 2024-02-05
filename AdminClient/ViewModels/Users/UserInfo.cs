@@ -16,5 +16,6 @@ namespace AdminClient.ViewModels.Users
         public string ImagePath { get; set; }
         public int StateId { get; set; }
         public string StateName { get; set; }
+       // public string AdvertiseName { get; set; }
     }
 }

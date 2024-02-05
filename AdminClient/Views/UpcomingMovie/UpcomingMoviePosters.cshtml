@@ -3,84 +3,131 @@
 @inject IConfiguration Configuration;
 
 @{
-    ViewBag.Title = "Upcoming Movie Posters";
+    ViewBag.Title = "Upcoming Movies";
     string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
 }
 
+<style>
+    .aspect-ratio-wrapper {
+        position: relative;
+        overflow: hidden;
+        padding-top: 150%; /* Adjust this value to set the desired aspect ratio (height:width) */
+    }
 
-    <div class="row">
-        <div class="col-md">
-            <div class="card overflow-hidden">
-                <div class="card-header">
-                <h3 class="card-title">Upcoming Movie Poster</h3>
-                <button type="button" class="btn btn-success" style="margin-left: 700px;border-radius: 13px;" onclick="downloadExcel()">Upcoming Movie Details</button>
+        .aspect-ratio-wrapper img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+</style>
+<div class="row">
+    <div class="col-md">
+        <div class="card overflow-hidden">
+            <div class="card-header">
+                <h3 class="card-title">Upcoming Movies</h3>
+                <div class="ml-auto">
+                    <button type="button" class="btn btn-success btn-sm" onclick="downloadExcel()">
+                        Movie
+                        Details
+                    </button>
                 </div>
-                <div class="card-body">
-                    <div class="row movies-container">
-                        <!-- Movie elements will be dynamically added here -->
-                    </div>
+                @*<button type="button" class="btn btn-success" style="margin-left: 700px;border-radius: 13px;"
+                onclick="downloadExcel()">Upcoming Movie Details</button>*@
+            </div>
+            <div class="card-body">
+                <div class="row movies-container">
+                    <!-- Movie elements will be dynamically added here -->
                 </div>
             </div>
         </div>
     </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"
+        integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
 
 
 @section scripts{
-        <script>
-            loadMovies();
+    <script>
+        loadMovies();
 
-            function loadMovies() {
-                $.ajax({
-                    type: "GET",
-                    url: "@apiUrl/api/UpcomingMovie/GetUpcomingMovieList",
-                    contentType: "application/json; charset=utf-8",
-                    headers: {
-                        "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
-                    },
-                    dataType: "json",
-                    success: function (data) {
-                        console.log(data);
-                        if (data && data.data.length > 0) {
-                            // Clear existing content
-                            $('.movies-container').empty();
+        function loadMovies() {
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/UpcomingMovie/GetUpcomingMovieList",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    if (data && data.data.length > 0) {
+                        // Clear existing content
+                        $('.movies-container').empty();
 
-                            // Iterate through the data and create elements
-                            $.each(data.data, function (index, movie) {
-                                var movieElement = `
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <img src="${movie.moviePoster}" class="posterr logo-image" alt="Posternotavailable" width="160" height="183">
-                                                    <button type="button" class="btn btn-info btn-icon btn-sm text-white btndesign" style="width: 160px;" onclick="window.location.href='${movie.teaserLink}'">
-                                                        <span>
-                                                            <i class="fa fa-link"></i>
-                                                        </span> Teaser Link
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        `;
+                        $.each(data.data, function (index, movie) {
+                            var movieElement = `
+                <div class="col-md-3">
+                    <div class="card mb-4">
+                        <div class="aspect-ratio-wrapper">
+                            <img src="${movie.moviePoster}" class="card-img-top posterr logo-image img-fluid" alt="Posternotavailable">
+                        </div>
+                        <div class="card-body">
+                            <button type="button" class="btn btn-info btn-block btn-icon btn-sm text-white btndesign" onclick="window.location.href='${movie.teaserLink}'">
+                                <span>
+                                    <i class="fa fa-link"></i>
+                                </span> Teaser Link
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
 
-                                // Append the movie element to the container
-                                $('.movies-container').append(movieElement);
-                            });
-                        }
-                        else {
-                            sweetAlert("Validation Alert!", "No data available!", "warning");
-                        }
-                    },
-                    error: function (data) {
-                        if (data.status == 401) {
-                            window.location.replace('/Message/TokenExpire');
-                        } else if (data.status == 403) {
-                            window.location.replace('/Message/Unauthorize');
-                        }
+                            // Append the movie element to the container
+                            $('.movies-container').append(movieElement);
+                        });
+
+                        //$.each(data.data, function (index, movie) {
+                        //    var movieElement = `
+                        //                            <div class="col-md-3">
+                        //                                <div class="form-group">
+                        //                                    <img src="${movie.moviePoster}" class="posterr logo-image" alt="Posternotavailable" width="160" height="183">
+                        //                                    <div class="ml-auto">
+                        //                                    <button type="button" class="btn btn-info btn-icon btn-sm text-white btndesign" style="width: 160px;" onclick="window.location.href='${movie.teaserLink}'">
+                        //                                        <span>
+                        //                                            <i class="fa fa-link"></i>
+                        //                                        </span> Teaser Link
+                        //                                    </button>
+                        //                                 </div>
+                        //                                </div>
+                        //                            </div>
+                        //                        `;
+
+                        //    // Append the movie element to the container
+                        //    $('.movies-container').append(movieElement);
+                        //});
                     }
-                });
-            }
+                    else {
+                        sweetAlert("Validation Alert!", "No data available!", "warning");
+                    }
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
 
-            function downloadExcel() {
+        function downloadExcel() {
             $.ajax({
                 type: "GET",
                 url: "@apiUrl/api/UpComingMovieListforClient/GetallList",
@@ -127,6 +174,5 @@
                 }
             });
         }
-        </script>
+    </script>
     }
-

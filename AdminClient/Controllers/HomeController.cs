@@ -96,7 +96,7 @@ namespace AdminClient.Controllers
                                         HttpContext.Session.SetInt32(stateId, objUser.obj.StateId);
                                         string stateNameValue = objUser.obj.StateName ?? ""; // If StateName is null, set it to an empty string
                                         HttpContext.Session.SetString(stateName, stateNameValue);
-
+                                      // HttpContext.Session.SetString(adsname, objUser.obj.AdvertiseName);
                                         CreateLoginHistory(objUser.obj.UserId, logCode, objUser.token);
                                         return RedirectToAction("Index","DashBoard");
                                     }
