@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using AdminApi.Repository;
 using Hangfire;
+using System.Runtime.InteropServices;
 
 namespace AdminApi.Controllers
 {
@@ -96,6 +97,75 @@ namespace AdminApi.Controllers
         //    return result.ToString();
         //}
 
+        //[HttpPost]
+        //public IActionResult AgentCreate(AgentCreateDTO AgentCreateDTO)
+        //{
+        //    var objcheck = _context.Agents.SingleOrDefault(opt => opt.AgentuserId == AgentCreateDTO.AgentuserId && opt.IsDeleted == false);
+
+        //    var existingAgents = _context.Agents.Where(opt => opt.IsDeleted == false).ToList();
+
+        //    foreach (var agent in existingAgents)
+        //    {
+        //        var theaterNames = agent.TheatreName.Split(',').Select(x => x.Trim()).ToList();
+        //        var newTheaterNames = AgentCreateDTO.TheatreName.Split(',').Select(x => x.Trim()).ToList();
+
+
+        //        foreach (var newTheaterName in newTheaterNames)
+        //        {
+        //            foreach (var theaterName in theaterNames)
+        //            {
+        //                if (theaterName.Equals(newTheaterName, StringComparison.OrdinalIgnoreCase))
+        //                {
+        //                    if (agent.Agentrole.Equals("Primary", StringComparison.OrdinalIgnoreCase) && AgentCreateDTO.Agentrole.Equals("Primary", StringComparison.OrdinalIgnoreCase))
+        //                    {
+        //                        return Accepted(new Confirmation { Status = "AlreadyExist", ResponseMsg = "A 'Primary' agent with the same TheatreName already exists!" });
+        //                    }
+        //                    else if (agent.Agentrole.Equals("Backup", StringComparison.OrdinalIgnoreCase) && AgentCreateDTO.Agentrole.Equals("Backup", StringComparison.OrdinalIgnoreCase))
+        //                    {
+        //                        return Accepted(new Confirmation { Status = "AlreadyExist", ResponseMsg = "A 'Backup' agent with the same TheatreName already exists!" });
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //    try
+        //    {
+        //        if (objcheck == null)
+        //        {
+        //            Agent Agent = new Agent();
+        //            Agent.AgentName = AgentCreateDTO.AgentName;
+        //            Agent.Agentrole = AgentCreateDTO.Agentrole;
+        //            Agent.Agentrole = AgentCreateDTO.Agentrole;
+        //            Agent.StateId = AgentCreateDTO.StateId;
+        //            //Agent.Statename = AgentCreateDTO.Statename;
+        //            Agent.Cityname = AgentCreateDTO.Cityname;
+        //            Agent.TheatreName = AgentCreateDTO.TheatreName;
+        //            Agent.AgentPhoneNumber = AgentCreateDTO.AgentPhoneNumber;
+        //            Agent.Address = AgentCreateDTO.Address;
+        //            Agent.EmailId = AgentCreateDTO.EmailId;
+        //            Agent.ProfilePhoto = AgentCreateDTO.ProfilePhoto;
+        //            Agent.AgentuserId = AgentCreateDTO.AgentuserId;
+        //            //Agent.PassWord = EncryptPassword(AgentCreateDTO.PassWord);
+        //            Agent.PassWord = AgentCreateDTO.PassWord;
+        //            Agent.CreatedBy = AgentCreateDTO.CreatedBy;
+        //            Agent.CreatedOn = System.DateTime.Now;
+        //            var obj = _AgentRepo.Insert(Agent);
+        //            return Ok(obj);
+        //        }
+        //        else if (objcheck != null)
+        //        {
+        //            return Accepted(new Confirmation { Status = "Duplicate", ResponseMsg = "Duplicate User Id..!" });
+        //        }
+        //        return Accepted(new Confirmation { Status = "Error", ResponseMsg = "Something unexpected!" });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+        //    }
+
+
+        //}
+
         [HttpPost]
         public IActionResult AgentCreate(AgentCreateDTO AgentCreateDTO)
         {
@@ -136,7 +206,6 @@ namespace AdminApi.Controllers
                     Agent.Agentrole = AgentCreateDTO.Agentrole;
                     Agent.Agentrole = AgentCreateDTO.Agentrole;
                     Agent.StateId = AgentCreateDTO.StateId;
-                    //Agent.Statename = AgentCreateDTO.Statename;
                     Agent.Cityname = AgentCreateDTO.Cityname;
                     Agent.TheatreName = AgentCreateDTO.TheatreName;
                     Agent.AgentPhoneNumber = AgentCreateDTO.AgentPhoneNumber;
@@ -144,12 +213,34 @@ namespace AdminApi.Controllers
                     Agent.EmailId = AgentCreateDTO.EmailId;
                     Agent.ProfilePhoto = AgentCreateDTO.ProfilePhoto;
                     Agent.AgentuserId = AgentCreateDTO.AgentuserId;
-                    //Agent.PassWord = EncryptPassword(AgentCreateDTO.PassWord);
                     Agent.PassWord = AgentCreateDTO.PassWord;
                     Agent.CreatedBy = AgentCreateDTO.CreatedBy;
                     Agent.CreatedOn = System.DateTime.Now;
-                    var obj = _AgentRepo.Insert(Agent);
-                    return Ok(obj);
+                    var insertedAgent = _AgentRepo.Insert(Agent);
+
+                    // Create AgentMapping entries
+                    foreach (var theaterName in AgentCreateDTO.TheatreName.Split(',').Select(x => x.Trim()))
+                    {
+                        AgentMapping agentMapping = new AgentMapping
+                        {
+                            AgentId = insertedAgent.AgentId,
+                            StateId = AgentCreateDTO.StateId,
+                            AgentName = AgentCreateDTO.AgentName,
+                            Agentrole = AgentCreateDTO.Agentrole,
+                            AgentPhoneNumber = AgentCreateDTO.AgentPhoneNumber,
+                            EmailId = AgentCreateDTO.EmailId,
+                            TheatreName = theaterName,
+                            TaskAccepted = false, 
+                            IsTimeExpired = false, // or set based on your requirement
+                            CreatedBy = AgentCreateDTO.CreatedBy,
+                            CreatedOn = System.DateTime.Now
+                        };
+                        _context.AgentMappings.Add(agentMapping);
+                    }
+
+                    _context.SaveChanges();
+
+                    return Ok(insertedAgent);
                 }
                 else if (objcheck != null)
                 {
@@ -161,9 +252,9 @@ namespace AdminApi.Controllers
             {
                 return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
-
-
         }
+
+
 
         //[HttpPost]
         //public IActionResult AgentCreate(AgentCreateDTO AgentCreateDTO)
@@ -905,24 +996,7 @@ namespace AdminApi.Controllers
                          .ToList();
 
                     var set = new HashSet<object>(resultList);
-                    //foreach (var item in filteredNotifications)
-                    //{
-
-                    //    var backupAg = _context.Agents.FirstOrDefault(z => z.EmailId == item.EmailId);
-                    //    backupAg.NotificationSent = true;
-                    //    backupAg.NotifiedOn = DateTime.Now;
-                    //    _context.SaveChanges();
-
-
-                    //    var notificationKey = $"{item.DeviceId}_{item.IMEINumber}_{item.FCMToken}";
-                    //    if (!uniqueNotifications.Contains(notificationKey))
-                    //    {
-                    //        uniqueNotifications.Add(notificationKey);
-                    //        set.Add(new { data = item });
-                    //        await SendNotifications(item.FCMToken, "Theatre Assigned", "Hello");
-                    //    }
-                    //}
-
+                   
                     foreach (var item in filteredNotifications)
                     {
 
@@ -959,6 +1033,64 @@ namespace AdminApi.Controllers
                 return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
         }
+
+
+        //[HttpGet("{AgentId}/{TheaterName}")]
+        //public async Task<IActionResult> RejectedTheatreNotificationToBackup(int AgentId,string TheaterName)
+        //{
+
+        //    var agent = _context.Agents.FirstOrDefault(a => a.AgentId == AgentId);
+        //    if (agent != null)
+        //    {
+        //        var theatrenames = agent.TheatreName.Split(',').Select(t => t.Trim()).ToList();
+
+        //        foreach(var theatre in theatrenames)
+        //        {
+
+        //            var backupAgents = _context.Agents
+        //                .Where(a => !a.IsDeleted && a.Agentrole == "Backup")
+        //                .AsEnumerable()
+        //                .Where(a => a.TheatreName.Split(',').Select(t => t.Trim()).Contains(theatre, StringComparer.OrdinalIgnoreCase))
+        //                .ToList();
+
+
+        //            foreach (var bkAgent in backupAgents)
+        //            {
+        //                var fcm = _context.PushNotifications.Where(a => a.AgentId == bkAgent.AgentId).Select(z => z.FCMToken).FirstOrDefault();
+
+        //                var backupAg = _context.Agents.FirstOrDefault();
+        //                backupAg.NotificationSent = true;
+        //                _context.SaveChanges();
+
+
+        //                //var notificationKey = $"{item.DeviceId}_{item.IMEINumber}_{item.FCMToken}";
+        //                //if (!uniqueNotifications.Contains(notificationKey))
+        //                //{
+        //                //    uniqueNotifications.Add(notificationKey);
+        //                //    set.Add(new { data = item });
+        //                //    await SendNotifications(item.FCMToken, "Theatre Assigned", "Hello");
+
+        //                //}
+
+
+
+
+        //            }
+        //        }
+
+
+        //    }
+        //    else
+        //    {
+
+        //    }
+
+
+        //    var backupagents = _context.Agents.Where(a => a.TheatreName == TheaterName && a.Agentrole == "Backup").ToList();
+
+
+        //}
+
 
         [HttpGet]
         public async Task<IActionResult> PrimaryAgentNoResponseBackupAgentAssign()

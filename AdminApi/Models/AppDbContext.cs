@@ -31,6 +31,7 @@ namespace AdminApi.Models
         public virtual DbSet<MenuGroupWiseMenuMapping> MenuGroupWiseMenuMapping { get; set; }
         public virtual DbSet<State> States { get; set; }
         public virtual DbSet<Agent> Agents { get; set; }
+        public virtual DbSet<AgentMapping> AgentMappings { get; set; }
         public virtual DbSet<ScreenList> ScreenList { get; set; }
         public virtual DbSet<HallPass> HallPass { get; set; }
         public virtual DbSet<AdScreen> AdScreen { get; set; }
@@ -70,6 +71,17 @@ namespace AdminApi.Models
             .HasDefaultValueSql("getdate()");
 
             modelBuilder.Entity<Agent>()
+             .Property(s => s.IsDeleted)
+             .HasDefaultValue(false)
+             .ValueGeneratedNever();
+            //Website pages end
+
+            //Website pages start
+            modelBuilder.Entity<AgentMapping>()
+            .Property(s => s.CreatedOn)
+            .HasDefaultValueSql("getdate()");
+
+            modelBuilder.Entity<AgentMapping>()
              .Property(s => s.IsDeleted)
              .HasDefaultValue(false)
              .ValueGeneratedNever();

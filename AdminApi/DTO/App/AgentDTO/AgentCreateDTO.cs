@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace AdminApi.DTO.App.AgentDTO
 {
@@ -36,5 +37,19 @@ namespace AdminApi.DTO.App.AgentDTO
         public string PassWord { get; set; }
         public int? UpdatedBy { get; set; }
         public DateTime? UpdatedOn { get; set; }
+    }
+    public class AgentMapiingDTO
+    {
+        public int AgentId { get; set; }
+        public int StateId { get; set; }
+        public string TheatreName { get; set; }
+        public bool TaskAccepted { get; set; }
+        public DateTime? NotifiedOn { get; set; }
+        public bool IsTimeExpired { get; set; }
+        public int CreatedBy { get; set; }
+    }
+    public class AgentMappingMasterDTO
+    {
+        public List<AgentMapiingDTO> AgentMapiingDTOs { get; set; }
     }
 }

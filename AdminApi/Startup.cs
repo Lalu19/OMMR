@@ -42,15 +42,18 @@ namespace AdminApi
         {
             //For Hallpass and Client expiry
 
-            services.AddHostedService<HallPassCleanUpService>();
-            services.AddHostedService<ClientCleanUpService>();
-            services.AddHostedService<ResetAgentsService>();
+            //services.AddHostedService<HallPassCleanUpService>();
+            //services.AddHostedService<ClientCleanUpService>();
+            //services.AddHostedService<ResetAgentsService>();
 
 
             //services.AddHostedService<Adscreen30DaysCleanUp>();
 
-           //services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=DESKTOP-8AP7SAV\SQLEXPRESS;Database=OMMR;Trusted_Connection=True;")));
-            services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=103.145.37.246,10230;Database=OMMR;User Id=sa;Password=Software@2016;TrustServerCertificate=True;")));
+          // services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=DESKTOP-8AP7SAV\SQLEXPRESS;Database=OMMR;Trusted_Connection=True;")));
+
+           // services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=103.145.37.246,10230;Database=OMMR;User Id=sa;Password=Software@2016;TrustServerCertificate=True;")));
+
+            services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=103.145.37.246,10230;Database=OMMR_Local;User Id=sa;Password=Software@2016;TrustServerCertificate=True;")));
             services.AddHangfireServer();
 
 

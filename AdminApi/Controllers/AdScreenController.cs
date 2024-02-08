@@ -1038,6 +1038,11 @@ namespace AdminApi.Controllers
         //    }
         //}
 
+
+        /// <summary>
+        /// After Clicking Theatre
+        /// </summary>
+       
         [HttpGet("{TheaterName}/{Stateid}")]
         public ActionResult GetScreenListbyTheaterName(string TheaterName, int Stateid)
         {
@@ -1082,6 +1087,54 @@ namespace AdminApi.Controllers
                 return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
         }
+
+
+
+        //[HttpGet("{TheaterName}/{Stateid}")]
+        //public ActionResult GetScreenListbyTheaterName(string TheaterName, int Stateid)
+        //{
+        //    try
+        //    {
+        //        var feedbackAdScreenIds = _context.AdScreenFeedbackForm
+        //            .Where(feedback => feedback.IsDeleted == false)
+        //            .Select(feedback => feedback.AdScreenId)
+        //            .Distinct()
+        //            .ToList();
+
+        //        var adsList = _context.AdScreen
+        //            .Where(u => u.IsDeleted == false && u.TheatreName == TheaterName && u.StateId == Stateid
+        //                        && !feedbackAdScreenIds.Contains(u.AdScreenId))
+        //            .ToList();
+
+        //        var groupedAds = adsList
+        //            .GroupBy(u => new { u.StateId, u.TheatreName, u.Screen, u.AdsPlaytime })
+        //            .Select(group => new
+        //            {
+        //                StateId = group.Key.StateId,
+        //                TheatreName = group.Key.TheatreName,
+        //                Screen = group.Key.Screen,
+        //                AdsPlaytime = group.Key.AdsPlaytime,
+        //                AdsNames = group.Select(u => u.AdsName).ToArray(),
+        //                /* AdsPlaytime = group.Select(u => u.AdsPlaytime).FirstOrDefault(),*/
+        //                AdScreenId = group.Select(u => u.AdScreenId).ToArray(),
+        //                AdsYoutubeLink = group.Select(u => u.AdsYoutubeLink).ToArray(),
+        //                AdsSequence = group.Select(u => u.AdsSequence).ToArray(),
+        //                AdsDuration = group.Select(u => u.AdsDuration).ToArray(),
+        //                AdsLanguage = group.Select(u => u.AdsLanguage).ToArray(),
+        //                IsDeleted = group.Select(u => u.IsDeleted).FirstOrDefault(),
+        //            })
+        //            .ToList();
+
+        //        int totalRecords = groupedAds.Count();
+
+        //        return Ok(new { data = groupedAds, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+        //    }
+        //}
+
         [HttpGet("{TheaterName}/{Stateid}/{Screen}/{AdsPlaytime}")]
         public ActionResult GetAdsListbyScreenNo(int Stateid,string TheaterName, string Screen, string AdsPlaytime)
         {

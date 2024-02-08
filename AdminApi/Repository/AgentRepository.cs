@@ -42,10 +42,51 @@ namespace AdminApi.Repository
             }
         }
 
+        public async Task<List<object>> ProcessAgentsFromTheaterName(List<string> distinctTheatreNames)
+        {
+            try
+            {
+                var agents = _context.Agents.Where(u => u.IsDeleted == false && u.Agentrole == "Primary").ToList();
+                var resultList = new List<object>();
 
+                foreach (var agent in agents)
+                {
+                    var primaryAgentTheatreNames = agent.TheatreName.Split(',').Select(t => t.Trim()).ToList();
 
+                    // Check if any of the theater names assigned to the primary agent are present in AdScreen table
+                    var theatersAssignedToAgent = distinctTheatreNames.Where(theatre => primaryAgentTheatreNames.Contains(theatre)).ToList();
 
-        //public async Task<object> ProcessAgentsFromTheaterName(List<string> distinctTheatreNames)
+                    if (theatersAssignedToAgent.Any())
+                    {
+                        var pushNotifications = _context.PushNotifications.Where(p => p.AgentId == agent.AgentId).ToList();
+                        foreach (var notification in pushNotifications)
+                        {
+                            var result = new
+                            {
+                                agent.AgentId,
+                                notification.FCMToken,
+                                body = "Theatre Assigned",
+                                title = "Hello",
+                                agent.EmailId
+                            };
+                            resultList.Add(result);
+                        }
+                        agent.NotificationSent = true;
+                        agent.NotifiedOn = DateTime.Now;
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+
+                return resultList;
+            }
+            catch (Exception ex)
+            {
+                return new List<object> { new { Status = "error", ResponseMsg = "An error occurred while processing agents." } };
+            }
+        }
+
+        //public async Task<List<object>> ProcessAgentsFromTheaterName(List<string> distinctTheatreNames)
         //{
         //    try
         //    {
@@ -66,79 +107,31 @@ namespace AdminApi.Repository
         //                    {
         //                        agent.AgentId,
         //                        //agent.TheatreName,
-        //                        notification.DeviceId,
-        //                        notification.IMEINumber,
-        //                        notification.FCMToken
+        //                        //notification.DeviceId,
+        //                        //notification.IMEINumber,
+        //                        notification.FCMToken,
+        //                        body = "Theatre Assigned",
+        //                        title = "Hello",
+        //                        agent.EmailId
         //                    };
         //                    resultList.Add(result);
         //                }
         //                agent.NotificationSent = true;
+        //                agent.NotifiedOn = DateTime.Now;
         //            }
         //        }
 
         //        await _context.SaveChangesAsync();
 
-        //        //return new { data = resultList };
         //        return resultList;
-
         //    }
-        //    catch
+        //    catch (Exception ex)
         //    {
         //        // Log the exception details
         //        //Console.WriteLine("Error occurred: " + ex.Message);
-        //        return new { Status = "error", ResponseMsg = "An error occurred while processing agents." };
+        //        return new List<object> { new { Status = "error", ResponseMsg = "An error occurred while processing agents." } };
         //    }
         //}
-
-
-
-        public async Task<List<object>> ProcessAgentsFromTheaterName(List<string> distinctTheatreNames)
-        {
-            try
-            {
-                var agents = _context.Agents.Where(u => u.IsDeleted == false && u.Agentrole == "Primary").ToList();
-
-                var resultList = new List<object>();
-
-                foreach (var agent in agents)
-                {
-                    var primaryAgentTheatreNames = agent.TheatreName.Split(',').Select(t => t.Trim()).ToList();
-
-                    if (distinctTheatreNames.Any(theatre => primaryAgentTheatreNames.Contains(theatre)))
-                    {
-                        var pushNotifications = _context.PushNotifications.Where(p => p.AgentId == agent.AgentId).ToList();
-                        foreach (var notification in pushNotifications)
-                        {
-                            var result = new
-                            {
-                                agent.AgentId,
-                                //agent.TheatreName,
-                                //notification.DeviceId,
-                                //notification.IMEINumber,
-                                notification.FCMToken,
-                                body = "Theatre Assigned",
-                                title = "Hello",
-                                agent.EmailId
-                            };
-                            resultList.Add(result);
-                        }
-                        agent.NotificationSent = true;
-                        agent.NotifiedOn = DateTime.Now;
-                    }
-                }
-
-                await _context.SaveChangesAsync();
-
-                return resultList;
-            }
-            catch (Exception ex)
-            {
-                // Log the exception details
-                //Console.WriteLine("Error occurred: " + ex.Message);
-                return new List<object> { new { Status = "error", ResponseMsg = "An error occurred while processing agents." } };
-            }
-        }
-
 
         public async Task<string> SendEmail(string from, string to, string subject, string msgBody)
         {
@@ -175,239 +168,6 @@ namespace AdminApi.Repository
                 return err;
             }
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //public async Task<List<object>> RunAgentProcessing()
-        //{
-        //    try
-        //    {
-        //        var result = await ProcessAgentsFromTheaterName();
-        //        return new List<object> { result };
-        //    }
-        //    catch
-        //    {
-        //        return new List<object> { new { Status = "error", ResponseMsg = "An error occurred while processing agents." } };
-        //    }
-        //}
-
-        //public async Task<object> ProcessAgentsFromTheaterName()
-        //{
-        //    //var agents = _context.Agents.Where(u => !u.IsDeleted).ToList();
-
-        //    //var primaryAgent = agents.FirstOrDefault(u => u.Agentrole == "Primary");
-        //    //var backupAgent = agents.FirstOrDefault(u => u.Agentrole == "Backup");
-
-        //    //if (primaryAgent == null && backupAgent == null)
-        //    //{
-        //    //    return new Confirmation { Status = "error", ResponseMsg = "No agents found." };
-        //    //}
-
-        //    //if (primaryAgent == null)
-        //    //{
-        //    //    return new Confirmation { Status = "error", ResponseMsg = "Primary agent not found." };
-        //    //}
-
-        //    var list = (from u in _context.PushNotifications
-        //                join x in _context.Agents on u.AgentId equals x.AgentId
-
-
-        //                where x.Agentrole == "Primary"
-        //                where u.IsDeleted == false
-        //                where x.IsDeleted == false
-
-
-
-
-        //                select new
-        //                {
-        //                    u.AgentId,
-        //                    u.DeviceId,
-        //                    u.IMEINumber,
-        //                    u.FCMToken,
-
-        //                }).ToList();
-
-        //    //int totalRecords = list.Count();
-
-        //    if (list.Count == 0)
-        //    {
-        //        return new Confirmation { Status = "error", ResponseMsg = "AgentId not matching" };
-        //    }
-
-        //    var selectedAgentIds = list.Select(item => item.AgentId).ToList();
-        //    var agentsToUpdate = _context.Agents.Where(agent => selectedAgentIds.Contains(agent.AgentId)).ToList();
-        //        foreach (var agent in agentsToUpdate)
-        //        {
-        //            agent.NotificationSent = true;
-        //        }
-
-        //    await _context.SaveChangesAsync();
-
-        //    return new { data = list };
-        //}
-
-
-        //public async Task<List<object>> RunAgentProcessing()
-        //{
-        //    try
-        //    {
-
-        //        var result = await ProcessAgentsFromTheaterName();
-        //        return new List<object> { result };
-        //    }
-        //    catch
-        //    {
-        //        return new List<object> { new { Status = "error", ResponseMsg = "An error occurred while processing agents." } };
-        //    }
-        //}
-
-        //public async Task<object> ProcessAgentsFromTheaterName()
-        //{
-        //    var distinctTheatreNames = _context.AdScreen.Select(a => a.TheatreName).Distinct().ToList();
-
-        //    var list = (from u in _context.PushNotifications
-        //                join x in _context.Agents on u.AgentId equals x.AgentId
-        //                where x.Agentrole == "Primary"
-        //                    && u.IsDeleted == false
-        //                    && x.IsDeleted == false
-        //                    && distinctTheatreNames.Any(theatre => Regex.IsMatch(x.TheatreName, $@"\b{theatre}\b"))
-
-        //                select new
-        //                {
-        //                    x.AgentId,
-        //                    x.TheatreName,
-        //                    u.DeviceId,
-        //                    u.IMEINumber,
-        //                    u.FCMToken,
-        //                }).ToList();
-
-        //    if (list.Count == 0)
-        //    {
-        //        return new Confirmation { Status = "error", ResponseMsg = "AgentId not matching" };
-        //    }
-
-        //    var selectedAgentIds = list.Select(item => item.AgentId).ToList();
-        //    var agentsToUpdate = _context.Agents.Where(agent => selectedAgentIds.Contains(agent.AgentId)).ToList();
-        //    foreach (var agent in agentsToUpdate)
-        //    {
-        //        agent.NotificationSent = true;
-        //    }
-
-        //    await _context.SaveChangesAsync();
-
-        //    return new { data = list };
-        //}
-
-
-
-
-
-
-        //public async Task<List<object>> RunAgentProcessing()
-        //{
-        //    try
-        //    {
-        //        var notificationToSend = _context.Agents.Where(ex => !ex.IsDeleted).ToList();
-
-        //        var resultList = new List<object>();
-
-
-        //            var allAgents = _context.Agents.Where(ex => !ex.IsDeleted)
-        //                //.Select(agent => agent.TheatreName)
-        //                .Distinct()
-        //                .ToList();
-
-        //            foreach (var agent in allAgents)
-        //            {
-        //                var result = await ProcessAgentsFromTheaterName();
-        //                resultList.Add(result);
-        //            }
-        //            return resultList;
-        //    }
-        //    catch
-        //    {
-        //        return new List<object> { new { Status = "error", ResponseMsg = "An error occurred while processing agents." } };
-        //    }
-        //}
-
-
-        //public async Task<object> ProcessAgentsFromTheaterName()
-        //{
-        //    var agents = _context.Agents.Where(u => u.IsDeleted == false).ToList();
-
-        //    var primaryAgent = agents.FirstOrDefault(u => u.Agentrole == "Primary");
-        //    var backupAgent = agents.FirstOrDefault(u => u.Agentrole == "Backup");
-
-        //    if (primaryAgent == null && backupAgent == null)
-        //    {
-        //        return new Confirmation { Status = "error", ResponseMsg = "No agents found for the specified TheatreName." };
-        //    }
-
-        //    if (primaryAgent == null)
-        //    {
-        //        return new Confirmation { Status = "error", ResponseMsg = "Primary agent not found for the specified TheatreName." };
-        //    }
-
-        //    var list = (from u in _context.PushNotifications
-        //                join x in _context.Agents on u.AgentId equals x.AgentId
-        //                //where x.TheatreName == TheatreName
-
-
-        //                select new
-        //                {
-        //                    u.AgentId,
-        //                    u.DeviceId,
-        //                    u.IMEINumber,
-        //                    u.FCMToken,
-        //                    u.IsDeleted
-        //                }).Where(x => x.IsDeleted == false).ToList();
-
-        //    int totalRecords = list.Count();
-
-        //    if (list.Count == 0)
-        //    {
-        //        return new Confirmation { Status = "error", ResponseMsg = "AgentId not matching" };
-        //    }
-
-
-        //    var selectedAgentIds = list.Select(item => item.AgentId).ToList();
-        //    var agentsToUpdate = _context.Agents.Where(agent => selectedAgentIds.Contains(agent.AgentId)).ToList();
-        //    foreach (var agent in agentsToUpdate)
-        //    {
-        //        agent.NotificationSent = true;
-        //    }
-
-
-        //    await _context.SaveChangesAsync();
-
-        //    return new { data = list };
-        //}
-
 
     }
 }
