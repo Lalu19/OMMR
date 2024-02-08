@@ -23,39 +23,105 @@ namespace AdminApi.Services
             _context = context;
             _logger = logger;
         }
+        //protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        //{
+        //    while (!stoppingToken.IsCancellationRequested)
+        //    {
+        //      try
+        //      {
+        //            using (var scope = _services.CreateScope())
+        //        {
+        //            var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        //            var now = DateTime.Now;
+        //            var twentyFourHoursAgo = now.AddMinutes(-4);
+        //            // var twentyFourHoursAgo = now.AddHours(-25);
+
+        //            var agentsToReset = context.Agents
+        //                .Where(hp => hp.NotificationSent == true && hp.NotifiedOn <= twentyFourHoursAgo)
+        //                .ToList();
+
+        //            var taskRejectedbyPrimary = context.AgentMappings.Where(a => a.TaskRejected == true && a.NotifiedOn <= twentyFourHoursAgo).ToList();
+        //            var taskAcceptedbyPrimary = context.AgentMappings.Where(q => q.TaskAccepted == true && q.NotifiedOn <= twentyFourHoursAgo).ToList();
+
+        //            foreach (var agent in agentsToReset)
+        //            {
+        //                agent.NotificationSent = false;
+        //                agent.TaskAccepted = false;
+        //                agent.IsTimeExpired = false;
+        //                //hallPass.UpdatedOn = now;
+        //            }
+
+        //            foreach (var agent in taskRejectedbyPrimary)
+        //            {
+        //                agent.TaskRejected = false;
+        //            }
+        //            foreach (var agent in taskAcceptedbyPrimary)
+        //            {
+        //                    agent.TaskAccepted = false;
+        //            }
+
+        //            context.SaveChanges();
+        //        }
+
+        //        await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+        //      }
+        //        catch (Exception ex)
+        //        {
+        //            _logger.LogError(ex, "An error occurred in the ResetAgentsService.");
+        //        }
+        //    }
+        //}
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-              try
-              {
-                    using (var scope = _services.CreateScope())
+                try
                 {
-                    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-                    var now = DateTime.Now;
-                    var twentyFourHoursAgo = now.AddMinutes(-4);
-                    // var twentyFourHoursAgo = now.AddHours(-25);
-
-                    var agentsToReset = context.Agents
-                        .Where(hp => hp.NotificationSent == true && hp.NotifiedOn <= twentyFourHoursAgo)
-                        .ToList();
-
-                    var agentsFromAgentsMapping = _context.AgentMappings.Where(a => a.TaskAccepted == true).ToList();
-
-                    foreach (var agent in agentsToReset)
+                    using (var scope = _services.CreateScope())
                     {
-                        agent.NotificationSent = false;
-                        agent.TaskAccepted = false;
-                        agent.IsTimeExpired = false;
-                        //hallPass.UpdatedOn = now;
+                        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+                        var now = DateTime.Now;
+                        var twentyFourHoursAgo = now.AddMinutes(-4);
+                        // var twentyFourHoursAgo = now.AddHours(-25);
+
+                        var agentsToReset = context.Agents
+                            .Where(hp => hp.NotificationSent == true && hp.NotifiedOn <= twentyFourHoursAgo)
+                            .ToList();
+
+                        var taskRejectedbyPrimary = context.AgentMappings
+                            .Where(a => a.TaskRejected == true && a.NotifiedOn <= twentyFourHoursAgo)
+                            .ToList();
+
+                        var taskAcceptedbyPrimary = context.AgentMappings
+                            .Where(q => q.TaskAccepted == true && q.NotifiedOn <= twentyFourHoursAgo)
+                            .ToList();
+
+                        foreach (var agent in agentsToReset)
+                        {
+                            agent.NotificationSent = false;
+                            agent.TaskAccepted = false;
+                            agent.IsTimeExpired = false;
+                            // hallPass.UpdatedOn = now;
+                        }
+
+                        foreach (var agent1 in taskRejectedbyPrimary)
+                        {
+                            agent1.TaskRejected = false;
+                        }
+
+                        foreach (var agent2 in taskAcceptedbyPrimary)
+                        {
+                            agent2.TaskAccepted = false;
+                        }
+
+                        context.SaveChanges();
                     }
 
-                    context.SaveChanges();
+                    await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
                 }
-
-                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
-              }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "An error occurred in the ResetAgentsService.");

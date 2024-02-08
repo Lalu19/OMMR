@@ -1063,7 +1063,7 @@ namespace AdminApi.Controllers
             var agentService = new AgentRepository(_context);
 
             var priAgent = _context.AgentMappings.FirstOrDefault(a => a.AgentId == AgentId);
-            priAgent.TaskAccepted = true;            
+            priAgent.TaskRejected = true;
             _context.SaveChanges();
 
             var backUpAgents = _context.AgentMappings.FirstOrDefault(q => q.TheatreName == TheaterName && q.Agentrole == "Backup");
@@ -1073,6 +1073,7 @@ namespace AdminApi.Controllers
                 var fcm = _context.PushNotifications.Where(w => w.AgentId == backUpAgents.AgentId).Select(q=> q.FCMToken).FirstOrDefault();
                 await SendNotifications(fcm, "Theatre Assigned", "Hello");
                 backUpAgents.NotifiedOn = DateTime.Now;
+                _context.SaveChanges();
 
                 var mailTo = backUpAgents.EmailId;
                 string subject = "Important Notice: Non-Responsive Auto-Generated Email";
@@ -1085,7 +1086,7 @@ namespace AdminApi.Controllers
                 Ok("No Backup Agent is assigned to this Theatre");
             }
 
-            var theatresNames = _context.AgentMappings.Where(z => z.AgentId == AgentId && z.TaskAccepted == false && z.Agentrole == "Primary").Select(a=> a.TheatreName).ToList();
+            var theatresNames = _context.AgentMappings.Where(z => z.AgentId == AgentId && z.TaskRejected == false && z.Agentrole == "Primary").Select(a=> a.TheatreName).ToList();
 
             return Ok(theatresNames);
 
@@ -1359,6 +1360,30 @@ namespace AdminApi.Controllers
             }
         }
 
+
+        [HttpGet]
+        public IActionResult ForgotPassword(string email)
+        {
+
+            var agentService = new AgentRepository(_context);
+            var user = _context.Users.Where(z=> z.Email == email).FirstOrDefault();
+
+            if (user != null)
+            {
+
+                var mailTo = user.Email;
+                string subject = "Important Notice: Password Retrieval Request";
+                string body = $"Dear {user.FullName},\r\n\r\nThis auto-generated email serves the purpose of providing you with your forgotten password.\r\n\r\n Password: {user.Password} \r\n\r\nBest regards,\r\n Ommr";
+
+                agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
+
+            }
+            else
+            {
+                return Ok("This E-mail is not registered");
+            }
+            return Ok("Your Password is sent to your registered email");
+        }
     }
 
 }
