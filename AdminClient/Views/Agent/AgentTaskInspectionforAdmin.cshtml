@@ -1,0 +1,113 @@
+﻿@using Microsoft.Extensions.Configuration;
+@using Microsoft.AspNetCore.Http
+@inject IConfiguration Configuration;
+
+@{
+    ViewBag.Title = "Agent Task Inspection for Admin";
+    string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
+}
+<!-- PAGE-HEADER -->
+<div class="page-header">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#"><i class="fe fe-file-text mr-1"></i>Admin Console</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Agent Task Inspection for Admin</li>
+    </ol>
+</div>
+
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Agent Task Inspection for Admin</div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="Agent_Tb" class="table table-striped table-bordered nowrap dataTable no-footer dtr-inline" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Task Accepted</th>
+                                <th>Task Rejected</th>
+                                <th>State Name</th>
+                                <th>Theatre Name</th>
+                                <th>Agent Name</th>
+                                <th>Agent Role</th>
+                                <th>Agent Phone Number</th>
+                                <th>Email Id</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+     
+        //List
+        loadAgent()
+        async function loadAgent() {
+            var table = $('#Agent_Tb').DataTable();
+            table.destroy();
+            table = $('#Agent_Tb').dataTable({
+                "paginationType": "full_numbers",
+                "dom": 'Bfrtip',
+                "buttons": ['excel'],
+                "searching": true,
+                "paging": true,
+                "sort": true,
+                "info": true,
+                "ajax": {
+                    "url": '@apiUrl/api/Agent/AgentTaskInspection',
+                    "type": "GET",
+                    "dataType": "json",
+                    "headers": {
+                        "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                    },
+                    "error": function (data) {
+                        if (data.status == 401) {
+                            window.location.replace('/Message/TokenExpire');
+                        } else if (data.status == 403) {
+                            window.location.replace('/Message/Unauthorize');
+                        }
+                    }
+                },
+                "order": [],
+                "columns": [
+                    {
+                        "data": "taskAccepted",
+                        "render": function (data, type, row) {
+                            if (row.taskAccepted === true) {
+                                return '<p><lable style="color: #064ef9;"">Yes</lable></br>';
+                            } else if (row.taskAccepted === false) {
+                                return '<p><lable style="color: #f90669;">No</lable></br>';
+                            } else {
+                                return '';
+                            }
+                        }
+                    },
+                    {
+                        "data": "taskRejected",
+                        "render": function (data, type, row) {
+                            if (row.taskRejected === true) {
+                                return '<p><lable style="color: #064ef9;"">Yes</lable></br>';
+                            } else if (row.taskRejected === false) {
+                                return '<p><lable style="color: #f90669;">No</lable></br>';
+                            } else {
+                                return '';
+                            }
+                        }
+                    },
+                    { "data": "stateName", "orderable": true, "visible": true },
+                    { "data": "theatreName", "orderable": true, "visible": true },
+                    { "data": "agentName", "orderable": true, "visible": true },
+                    { "data": "agentrole", "orderable": true, "visible": true },
+                    { "data": "agentPhoneNumber", "orderable": true, "visible": true },
+                    { "data": "emailId", "orderable": true, "visible": true },
+                ]
+            });
+        }
+
+    </script>
+}

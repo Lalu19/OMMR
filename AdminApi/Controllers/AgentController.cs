@@ -1384,6 +1384,81 @@ namespace AdminApi.Controllers
             }
             return Ok("Your Password is sent to your registered email");
         }
+        [HttpGet]
+        public ActionResult AgentTaskInspection()
+        {
+            try
+            {
+                var list = (from u in _context.AgentMappings
+                            join s in _context.States on u.StateId equals s.StateId
+                           
+                            select new
+                            {
+                                u.AgentId,
+                                u.StateId,
+                                s.StateName,
+                                u.TheatreName,
+                                u.AgentName,
+                                u.Agentrole,
+                                u.AgentPhoneNumber,
+                                u.EmailId,
+                                u.NotifiedOn,
+                                u.TaskAccepted,
+                                u.TaskRejected,
+                                u.CreatedBy,
+                                u.IsDeleted
+                            }).Where(x => x.IsDeleted == false).ToList();
+
+
+                int totalRecords = list.Count();
+
+
+                return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+            }
+            catch (Exception ex)
+            {
+                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+            }
+        }
+
+        [HttpGet("{UserId}")]
+        public ActionResult AgentTaskInspectionbyUserId(int UserId)
+        {
+            try
+            {
+                var list = (from u in _context.AgentMappings
+                            join s in _context.States on u.StateId equals s.StateId
+                            join p in _context.StateUser on u.StateId equals p.StateId
+
+                            select new
+                            {
+                                u.AgentId,
+                                u.StateId,
+                                s.StateName,
+                                u.TheatreName,
+                                u.AgentName,
+                                u.Agentrole,
+                                u.AgentPhoneNumber,
+                                u.EmailId,
+                                u.NotifiedOn,
+                                u.TaskAccepted,
+                                u.TaskRejected,
+                                p.UserId,
+                                u.CreatedBy,
+                                p.IsDeleted,
+                            }).Where(x => x.IsDeleted == false && x.UserId == UserId).ToList();
+
+
+                int totalRecords = list.Count();
+
+
+                return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+            }
+            catch (Exception ex)
+            {
+                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+            }
+        }
     }
 
 }
