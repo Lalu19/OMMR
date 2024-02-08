@@ -44,6 +44,7 @@ namespace AdminApi.DTO.App.AgentDTO
         public int StateId { get; set; }
         public string TheatreName { get; set; }
         public bool TaskAccepted { get; set; }
+        public bool TaskRejected { get; set; }
         public DateTime? NotifiedOn { get; set; }
         public bool IsTimeExpired { get; set; }
         public int CreatedBy { get; set; }

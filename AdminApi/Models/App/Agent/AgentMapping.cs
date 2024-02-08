@@ -13,6 +13,7 @@ namespace AdminApi.Models.App.Agent
         public string AgentPhoneNumber { get; set; }
         public string EmailId { get; set; }
         public bool TaskAccepted { get; set; }
+        public bool TaskRejected { get; set; }
         public DateTime? NotifiedOn { get; set; }
         public bool IsTimeExpired { get; set; }
         public int CreatedBy { get; set; }

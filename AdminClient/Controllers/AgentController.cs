@@ -31,8 +31,16 @@ namespace AdminClient.Controllers
             ViewBag.agentId = agentId;
             return View();
         }
-
+        
         public IActionResult AgentDeletion()
+        {
+            return View();
+        }
+        public IActionResult AgentNotificationInspection()
+        {
+            return View();
+        }
+        public IActionResult AgentNotificationInspectionforAdmin()
         {
             return View();
         }
