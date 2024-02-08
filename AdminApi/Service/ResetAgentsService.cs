@@ -35,11 +35,13 @@ namespace AdminApi.Services
 
                     var now = DateTime.Now;
                     var twentyFourHoursAgo = now.AddMinutes(-4);
-                   // var twentyFourHoursAgo = now.AddHours(-25);
+                    // var twentyFourHoursAgo = now.AddHours(-25);
 
                     var agentsToReset = context.Agents
                         .Where(hp => hp.NotificationSent == true && hp.NotifiedOn <= twentyFourHoursAgo)
                         .ToList();
+
+                    var agentsFromAgentsMapping = _context.AgentMappings.Where(a => a.TaskAccepted == true).ToList();
 
                     foreach (var agent in agentsToReset)
                     {
