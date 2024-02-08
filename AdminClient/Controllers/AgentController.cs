@@ -44,5 +44,13 @@ namespace AdminClient.Controllers
         {
             return View();
         }
+        public IActionResult AgentTaskInspectionforAdmin()
+        {
+            return View();
+        }
+        public IActionResult AgentTaskInspection()
+        {
+            return View();
+        }
     }
 }

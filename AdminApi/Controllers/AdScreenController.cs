@@ -1040,11 +1040,11 @@ namespace AdminApi.Controllers
 
 
         /// <summary>
-        /// After Clicking Theatre
+        /// After Clicking Accept Btn in TheaterName
         /// </summary>
-       
-        [HttpGet("{TheaterName}/{Stateid}")]
-        public ActionResult GetScreenListbyTheaterName(string TheaterName, int Stateid)
+
+        [HttpGet("{TheaterName}/{Stateid}/{AgentId}")]
+        public ActionResult GetScreenListbyTheaterName(string TheaterName, int Stateid, int AgentId)
         {
             try
             {
@@ -1079,7 +1079,17 @@ namespace AdminApi.Controllers
                     .ToList();
 
                 int totalRecords = groupedAds.Count();
+                // Update AgentMapping table
+                var agentMappingsToUpdate = _context.AgentMappings
+                    .Where(mapping => mapping.StateId == Stateid && mapping.AgentId == AgentId && mapping.TheatreName == TheaterName)
+                    .ToList();
 
+                foreach (var mapping in agentMappingsToUpdate)
+                {
+                    mapping.TaskAccepted = true; // Set TaskAccepted to true
+                }
+
+                _context.SaveChanges();
                 return Ok(new { data = groupedAds, recordsTotal = totalRecords, recordsFiltered = totalRecords });
             }
             catch (Exception ex)
