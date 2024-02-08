@@ -231,6 +231,7 @@ namespace AdminApi.Controllers
                             EmailId = AgentCreateDTO.EmailId,
                             TheatreName = theaterName,
                             TaskAccepted = false, 
+                            TaskRejected = false, 
                             IsTimeExpired = false, // or set based on your requirement
                             CreatedBy = AgentCreateDTO.CreatedBy,
                             CreatedOn = System.DateTime.Now
@@ -374,6 +375,9 @@ namespace AdminApi.Controllers
                                 u.ProfilePhoto,
                                 u.AgentuserId,
                                 u.PassWord,
+                                u.NotificationSent,
+                                u.NotifiedOn,
+                                u.TaskAccepted,
                                 u.CreatedBy,
                                 u.IsDeleted
                             }).Where(x => x.IsDeleted == false).ToList();
@@ -455,6 +459,9 @@ namespace AdminApi.Controllers
                                 u.ProfilePhoto,
                                 u.AgentuserId,
                                 u.PassWord,
+                                u.NotificationSent,
+                                u.NotifiedOn,
+                                u.TaskAccepted,
                                 p.UserId,
                                 u.DeleteRequested,
                                 u.AdminDeletionResponse,
@@ -658,7 +665,6 @@ namespace AdminApi.Controllers
             }
         }
 
-
         [HttpPost]
         public async Task<ActionResult> SendNotifications(string fcmToken, string message, string title)
         {
@@ -701,7 +707,6 @@ namespace AdminApi.Controllers
                 return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
         }
-
 
         //[HttpGet]
         //public async Task<IActionResult> PrimaryAgentsForPushNotification()
