@@ -753,6 +753,9 @@ namespace AdminApi.Controllers
         //    }
         //}
 
+
+
+
         [HttpGet]
         public async Task<IActionResult> PrimaryAgentsForPushNotification()
         {
@@ -953,12 +956,26 @@ namespace AdminApi.Controllers
             }
         }
 
+
+        //[HttpPost]
+        //public IActionResult PrimaryAgentTheatreRejectNotificationToBackUp(int AgentId, string TheatreName)
+        //{
+
+
+
+
+
+        //    return Ok();
+        //}
+
+
+
+
         [HttpGet("{AgentId}")]
         public async Task<IActionResult> PrimaryAgentRejectNotificationToBackup(int AgentId)
         {
             try
             {
-
                 var agentService = new AgentRepository(_context);
                 var agent = _context.Agents.FirstOrDefault(u => u.AgentId == AgentId);
 
@@ -1040,62 +1057,100 @@ namespace AdminApi.Controllers
         }
 
 
-        //[HttpGet("{AgentId}/{TheaterName}")]
-        //public async Task<IActionResult> RejectedTheatreNotificationToBackup(int AgentId,string TheaterName)
-        //{
+        [HttpGet("{AgentId}/{TheaterName}")]
+        public async Task<IActionResult> RejectedTheatreNotificationToBackup(int AgentId, string TheaterName)
+        {
+            var agentService = new AgentRepository(_context);
 
-        //    var agent = _context.Agents.FirstOrDefault(a => a.AgentId == AgentId);
-        //    if (agent != null)
-        //    {
-        //        var theatrenames = agent.TheatreName.Split(',').Select(t => t.Trim()).ToList();
+            var priAgent = _context.AgentMappings.FirstOrDefault(a => a.AgentId == AgentId);
+            priAgent.TaskAccepted = true;            
+            _context.SaveChanges();
 
-        //        foreach(var theatre in theatrenames)
-        //        {
+            var backUpAgents = _context.AgentMappings.FirstOrDefault(q => q.TheatreName == TheaterName && q.Agentrole == "Backup");
 
-        //            var backupAgents = _context.Agents
-        //                .Where(a => !a.IsDeleted && a.Agentrole == "Backup")
-        //                .AsEnumerable()
-        //                .Where(a => a.TheatreName.Split(',').Select(t => t.Trim()).Contains(theatre, StringComparer.OrdinalIgnoreCase))
-        //                .ToList();
+            if (backUpAgents != null)
+            {                
+                var fcm = _context.PushNotifications.Where(w => w.AgentId == backUpAgents.AgentId).Select(q=> q.FCMToken).FirstOrDefault();
+                await SendNotifications(fcm, "Theatre Assigned", "Hello");
+                backUpAgents.NotifiedOn = DateTime.Now;
 
+                var mailTo = backUpAgents.EmailId;
+                string subject = "Important Notice: Non-Responsive Auto-Generated Email";
+                string body = "Dear Recipient,\r\n\r\nThis auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.\r\n\r\nThank you for your understanding.\r\n\r\nBest regards,\r\n Ommr";
 
-        //            foreach (var bkAgent in backupAgents)
-        //            {
-        //                var fcm = _context.PushNotifications.Where(a => a.AgentId == bkAgent.AgentId).Select(z => z.FCMToken).FirstOrDefault();
+                await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
+            }
+            else
+            {
+                Ok("No Backup Agent is assigned to this Theatre");
+            }
 
-        //                var backupAg = _context.Agents.FirstOrDefault();
-        //                backupAg.NotificationSent = true;
-        //                _context.SaveChanges();
+            var theatresNames = _context.AgentMappings.Where(z => z.AgentId == AgentId && z.TaskAccepted == false && z.Agentrole == "Primary").Select(a=> a.TheatreName).ToList();
 
-
-        //                //var notificationKey = $"{item.DeviceId}_{item.IMEINumber}_{item.FCMToken}";
-        //                //if (!uniqueNotifications.Contains(notificationKey))
-        //                //{
-        //                //    uniqueNotifications.Add(notificationKey);
-        //                //    set.Add(new { data = item });
-        //                //    await SendNotifications(item.FCMToken, "Theatre Assigned", "Hello");
-
-        //                //}
+            return Ok(theatresNames);
 
 
 
 
-        //            }
-        //        }
+            //var agent = _context.Agents.FirstOrDefault(a => a.AgentId == AgentId);
+            //if (agent != null)
+            //{
+            //    var theatrenames = agent.TheatreName.Split(',').Select(t => t.Trim()).ToList();
+
+            //    foreach (var theatre in theatrenames)
+            //    {
+            //        var backupAgents = _context.Agents
+            //            .Where(a => !a.IsDeleted && a.Agentrole == "Backup")
+            //            .AsEnumerable()
+            //            .Where(a => a.TheatreName.Split(',').Select(t => t.Trim()).Contains(theatre, StringComparer.OrdinalIgnoreCase))
+            //            .ToList();
 
 
-        //    }
-        //    else
-        //    {
+            //        foreach (var bkAgent in backupAgents)
+            //        {
+            //            var fcm = _context.PushNotifications.Where(a => a.AgentId == bkAgent.AgentId).Select(z => z.FCMToken).FirstOrDefault();
 
-        //    }
+            //            var backupAg = _context.Agents.FirstOrDefault();
+            //            backupAg.NotificationSent = true;
+            //            var 
+
+            //            _context.SaveChanges();
 
 
-        //    var backupagents = _context.Agents.Where(a => a.TheatreName == TheaterName && a.Agentrole == "Backup").ToList();
+            //            //var notificationKey = $"{item.DeviceId}_{item.IMEINumber}_{item.FCMToken}";
+            //            //if (!uniqueNotifications.Contains(notificationKey))
+            //            //{
+            //            //    uniqueNotifications.Add(notificationKey);
+            //            //    set.Add(new { data = item });
+            //            //    await SendNotifications(item.FCMToken, "Theatre Assigned", "Hello");
+
+            //            //}
+
+            //            await SendNotifications(fcm, "Theatre Assigned", "Hello");
 
 
-        //}
+            //        }
+            //    }
+            //}
+            //else
+            //{
 
+            //}
+
+
+            ////var backupagents = _context.Agents.Where(a => a.TheatreName == TheaterName && a.Agentrole == "Backup").ToList();
+            //var backupagents = _context.Agents.Where(a => a.TheatreName == TheaterName && a.Agentrole == "Backup").ToList();
+
+
+            //return Ok();
+        }
+
+        [HttpGet]
+        public IActionResult ReSendNotificationToUnsendPrimaryAgents()
+        {
+            var unsendAgents = _context.Agents.Where(u => u.NotificationSent == false && u.Agentrole == "Primary");
+            return Ok(unsendAgents);
+        }
 
         [HttpGet]
         public async Task<IActionResult> PrimaryAgentNoResponseBackupAgentAssign()
