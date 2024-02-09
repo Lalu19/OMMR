@@ -17,7 +17,7 @@ namespace AdminApi.Models.App.Agent
         public DateTime? NotifiedOn { get; set; }
         public bool IsTimeExpired { get; set; }
         public int CreatedBy { get; set; }
-        public DateTime? CreatedOn { get; set; }
+        public DateTime CreatedOn { get; set; }
         public int? UpdatedBy { get; set; }
         public DateTime? UpdatedOn { get; set; }
         public bool IsDeleted { get; set; }

@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using AdminApi.Repository;
 using Hangfire;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.Logging;
 
 namespace AdminApi.Controllers
 {
@@ -1359,14 +1360,52 @@ namespace AdminApi.Controllers
             }
         }
 
-        [HttpGet]
-        public ActionResult AgentTaskInspection()
+        //[HttpGet]
+        //public ActionResult AgentTaskInspection()
+        //{
+        //    try
+        //    {
+        //        var list = (from u in _context.AgentMappings
+        //                    join s in _context.States on u.StateId equals s.StateId
+                           
+        //                    select new
+        //                    {
+        //                        u.AgentId,
+        //                        u.StateId,
+        //                        s.StateName,
+        //                        u.TheatreName,
+        //                        u.AgentName,
+        //                        u.Agentrole,
+        //                        u.AgentPhoneNumber,
+        //                        u.EmailId,
+        //                        u.NotifiedOn,
+        //                        u.TaskAccepted,
+        //                        u.TaskRejected,
+        //                        u.CreatedBy,
+        //                        u.IsDeleted
+        //                    }).Where(x => x.IsDeleted == false).ToList();
+
+
+        //        int totalRecords = list.Count();
+
+
+        //        return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+        //    }
+        //}
+
+        [HttpGet("{fromDate}/{toDate}")]
+        public ActionResult AgentTaskInspection(DateTime fromDate, DateTime toDate)
         {
             try
             {
                 var list = (from u in _context.AgentMappings
                             join s in _context.States on u.StateId equals s.StateId
-                           
+                            where u.IsDeleted == false && u.CreatedOn.Date >= fromDate.Date && u.CreatedOn.Date <= toDate.Date
+
                             select new
                             {
                                 u.AgentId,
@@ -1382,7 +1421,7 @@ namespace AdminApi.Controllers
                                 u.TaskRejected,
                                 u.CreatedBy,
                                 u.IsDeleted
-                            }).Where(x => x.IsDeleted == false).ToList();
+                            }).Where(x => x.IsDeleted == false).OrderByDescending(t => t.AgentId);
 
 
                 int totalRecords = list.Count();
@@ -1396,15 +1435,56 @@ namespace AdminApi.Controllers
             }
         }
 
-        [HttpGet("{UserId}")]
-        public ActionResult AgentTaskInspectionbyUserId(int UserId)
+
+        //[HttpGet("{UserId}")]
+        //public ActionResult AgentTaskInspectionbyUserId(int UserId)
+        //{
+        //    try
+        //    {
+        //        var list = (from u in _context.AgentMappings
+        //                    join s in _context.States on u.StateId equals s.StateId
+        //                    join p in _context.StateUser on u.StateId equals p.StateId
+
+        //                    select new
+        //                    {
+        //                        u.AgentId,
+        //                        u.StateId,
+        //                        s.StateName,
+        //                        u.TheatreName,
+        //                        u.AgentName,
+        //                        u.Agentrole,
+        //                        u.AgentPhoneNumber,
+        //                        u.EmailId,
+        //                        u.NotifiedOn,
+        //                        u.TaskAccepted,
+        //                        u.TaskRejected,
+        //                        p.UserId,
+        //                        u.CreatedBy,
+        //                        p.IsDeleted,
+        //                    }).Where(x => x.IsDeleted == false && x.UserId == UserId).ToList();
+
+
+        //        int totalRecords = list.Count();
+
+
+        //        return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+        //    }
+        //}
+
+        [HttpGet("{fromDate}/{toDate}/{UserId}")]
+        public ActionResult AgentTaskInspectionbyUserId(DateTime fromDate, DateTime toDate, int UserId)
         {
             try
             {
                 var list = (from u in _context.AgentMappings
                             join s in _context.States on u.StateId equals s.StateId
                             join p in _context.StateUser on u.StateId equals p.StateId
-
+                           // where !p.IsDeleted && p.UserId == UserId && u.CreatedOn >= fromDate && u.CreatedOn <= toDate
+                            where p.IsDeleted == false && p.UserId == UserId && u.CreatedOn.Date >= fromDate.Date && u.CreatedOn.Date <= toDate.Date
                             select new
                             {
                                 u.AgentId,
@@ -1421,7 +1501,7 @@ namespace AdminApi.Controllers
                                 p.UserId,
                                 u.CreatedBy,
                                 p.IsDeleted,
-                            }).Where(x => x.IsDeleted == false && x.UserId == UserId).ToList();
+                            }).ToList();
 
 
                 int totalRecords = list.Count();
