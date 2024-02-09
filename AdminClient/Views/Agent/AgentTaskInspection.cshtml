@@ -6,14 +6,41 @@
     ViewBag.Title = "Agent Task Inspection";
     string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
 }
-<!-- PAGE-HEADER -->
-<div class="page-header">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="#"><i class="fe fe-file-text mr-1"></i>Admin Console</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Agent Task Inspection</li>
-    </ol>
-</div>
 
+
+<div class="row">
+    <div class="col-md">
+        <div class="card overflow-hidden">
+            <div class="card-header">
+                <h3 class="card-title">Agent Task Inspection for Admin Report</h3>
+            </div>
+            <div class="card-body">
+                <form action="#" role="form" class="validate" id="formPost">
+                    <div class="row">
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">From Date&nbsp;</label>
+                                <input type="date" class="form-control" id="FromDate">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">To Date&nbsp;</label>
+                                <input type="date" class="form-control" id="ToDate">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" id="btnSearch" class="btn btn-radius btn-success">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-md-12 col-lg-12">
         <div class="card">
@@ -44,10 +71,13 @@
 
 @section scripts{
     <script>
-
-        //List
-        loadAgent()
-        async function loadAgent() {
+        $(document).ready(function () {
+            $("#btnSearch").click(function () {
+                var fromDate = $("#FromDate").val();
+                var toDate = $("#ToDate").val();
+                //List
+                loadAgent()
+                async function loadAgent() {
             var table = $('#Agent_Tb').DataTable();
             table.destroy();
             table = $('#Agent_Tb').dataTable({
@@ -59,7 +89,8 @@
                 "sort": true,
                 "info": true,
                 "ajax": {
-                    "url": '@apiUrl/api/Agent/AgentTaskInspectionbyUserId/' + @Context.Session.GetInt32("UserId"),
+                    //"url": '@apiUrl/api/Agent/AgentTaskInspectionbyUserId/' + @Context.Session.GetInt32("UserId"),
+                            "url": '@apiUrl/api/Agent/AgentTaskInspectionbyUserId/' + fromDate + '/' + toDate + '/' + @Context.Session.GetInt32("UserId"),
                     "type": "GET",
                     "dataType": "json",
                     "headers": {
@@ -109,5 +140,7 @@
             });
         }
 
+            });
+        });
     </script>
 }
