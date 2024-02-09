@@ -23,6 +23,7 @@ using AdminApi.Repository;
 using Hangfire;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
+using OfficeOpenXml.ConditionalFormatting.Contracts;
 
 namespace AdminApi.Controllers
 {
@@ -957,6 +958,106 @@ namespace AdminApi.Controllers
             }
         }
 
+
+        [HttpGet("{AgentId}")]
+        public IActionResult PrimaryAgentMovieTheatres(int AgentId)
+        {
+            try
+            {
+                var agent = _context.Agents.FirstOrDefault(a => a.AgentId == AgentId);
+
+                if (agent.NotificationSent == false)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    var theatreNames = _context.AgentMappings.Where(z => z.AgentId == AgentId && z.Agentrole == "Primary").Select(q => q.TheatreName).ToList();
+                    return Ok(theatreNames);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+            }
+        }
+
+        [HttpGet("{AgentId}")]
+        public async Task<IActionResult> PrimaryAgentNoResponse(int AgentId)
+        {
+            var agentService = new AgentRepository(_context);
+
+            var priAgent = _context.AgentMappings.FirstOrDefault(q=> q.AgentId == AgentId);
+            priAgent.IsTimeExpired = false;
+            _context.SaveChanges();
+
+            var theatreNames = _context.AgentMappings.Where(a => a.AgentId == AgentId && a.Agentrole == "Primary").Select(s=> s.TheatreName).ToList();
+
+            List<string> backUpAgentsTheatres = new List<string>();
+
+            foreach(var theatre in theatreNames)
+            {
+                var backAgent = _context.AgentMappings.Where(a => a.TheatreName == theatre && a.Agentrole == "Backup").FirstOrDefault();
+
+                backUpAgentsTheatres.Add(backAgent.TheatreName);
+
+                var fcm = _context.PushNotifications.Where(w => w.AgentId == backAgent.AgentId).Select(q => q.FCMToken).FirstOrDefault();
+                await SendNotifications(fcm, "Theatre Assigned", "Hello");
+                backAgent.NotifiedOn = DateTime.Now;
+                _context.SaveChanges();
+
+
+                var mailTo = backAgent.EmailId;
+                string subject = "Important Notice: Non-Responsive Auto-Generated Email";
+                string body = "Dear Recipient,\r\n\r\nThis auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.\r\n\r\nThank you for your understanding.\r\n\r\nBest regards,\r\n Ommr";
+
+                await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
+            }
+
+            //var backUpAgents = _context.AgentMappings.FirstOrDefault(q => q.TheatreName == TheaterName && q.Agentrole == "Backup");
+
+
+            return Ok();
+        }
+
+        [HttpGet("{AgentId}/{TheaterName}")]
+        public async Task<IActionResult> RejectedTheatreNotificationToBackup(int AgentId, string TheaterName)
+        {
+            var agentService = new AgentRepository(_context);
+
+            var priAgent = _context.AgentMappings.FirstOrDefault(a => a.AgentId == AgentId);
+            priAgent.TaskRejected = true;
+            _context.SaveChanges();
+
+            var backUpAgents = _context.AgentMappings.FirstOrDefault(q => q.TheatreName == TheaterName && q.Agentrole == "Backup");
+
+            if (backUpAgents != null)
+            {
+                var fcm = _context.PushNotifications.Where(w => w.AgentId == backUpAgents.AgentId).Select(q => q.FCMToken).FirstOrDefault();
+                await SendNotifications(fcm, "Theatre Assigned", "Hello");
+                backUpAgents.NotifiedOn = DateTime.Now;
+                _context.SaveChanges();
+
+                var mailTo = backUpAgents.EmailId;
+                string subject = "Important Notice: Non-Responsive Auto-Generated Email";
+                string body = "Dear Recipient,\r\n\r\nThis auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.\r\n\r\nThank you for your understanding.\r\n\r\nBest regards,\r\n Ommr";
+
+                await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
+            }
+            else
+            {
+                Ok("No Backup Agent is assigned to this Theatre");
+            }
+
+            var theatresNames = _context.AgentMappings.Where(z => z.AgentId == AgentId && z.TaskRejected == false && z.Agentrole == "Primary").Select(a => a.TheatreName).ToList();
+
+            return Ok(theatresNames);
+
+        }
+
+
+
+
         [HttpGet("{AgentId}")]
         public async Task<IActionResult> PrimaryAgentRejectNotificationToBackup(int AgentId)
         {
@@ -1043,94 +1144,19 @@ namespace AdminApi.Controllers
         }
 
 
-        [HttpGet("{AgentId}/{TheaterName}")]
-        public async Task<IActionResult> RejectedTheatreNotificationToBackup(int AgentId, string TheaterName)
+        
+
+        [HttpGet("{AgentId}")]
+        public IActionResult PrimaryAgentSingleTheatreAccept(int agentId)
         {
-            var agentService = new AgentRepository(_context);
-
-            var priAgent = _context.AgentMappings.FirstOrDefault(a => a.AgentId == AgentId);
-            priAgent.TaskRejected = true;
-            _context.SaveChanges();
-
-            var backUpAgents = _context.AgentMappings.FirstOrDefault(q => q.TheatreName == TheaterName && q.Agentrole == "Backup");
-
-            if (backUpAgents != null)
-            {                
-                var fcm = _context.PushNotifications.Where(w => w.AgentId == backUpAgents.AgentId).Select(q=> q.FCMToken).FirstOrDefault();
-                await SendNotifications(fcm, "Theatre Assigned", "Hello");
-                backUpAgents.NotifiedOn = DateTime.Now;
-                _context.SaveChanges();
-
-                var mailTo = backUpAgents.EmailId;
-                string subject = "Important Notice: Non-Responsive Auto-Generated Email";
-                string body = "Dear Recipient,\r\n\r\nThis auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.\r\n\r\nThank you for your understanding.\r\n\r\nBest regards,\r\n Ommr";
-
-                await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
-            }
-            else
-            {
-                Ok("No Backup Agent is assigned to this Theatre");
-            }
-
-            var theatresNames = _context.AgentMappings.Where(z => z.AgentId == AgentId && z.TaskRejected == false && z.Agentrole == "Primary").Select(a=> a.TheatreName).ToList();
-
-            return Ok(theatresNames);
 
 
 
 
-            //var agent = _context.Agents.FirstOrDefault(a => a.AgentId == AgentId);
-            //if (agent != null)
-            //{
-            //    var theatrenames = agent.TheatreName.Split(',').Select(t => t.Trim()).ToList();
-
-            //    foreach (var theatre in theatrenames)
-            //    {
-            //        var backupAgents = _context.Agents
-            //            .Where(a => !a.IsDeleted && a.Agentrole == "Backup")
-            //            .AsEnumerable()
-            //            .Where(a => a.TheatreName.Split(',').Select(t => t.Trim()).Contains(theatre, StringComparer.OrdinalIgnoreCase))
-            //            .ToList();
-
-
-            //        foreach (var bkAgent in backupAgents)
-            //        {
-            //            var fcm = _context.PushNotifications.Where(a => a.AgentId == bkAgent.AgentId).Select(z => z.FCMToken).FirstOrDefault();
-
-            //            var backupAg = _context.Agents.FirstOrDefault();
-            //            backupAg.NotificationSent = true;
-            //            var 
-
-            //            _context.SaveChanges();
-
-
-            //            //var notificationKey = $"{item.DeviceId}_{item.IMEINumber}_{item.FCMToken}";
-            //            //if (!uniqueNotifications.Contains(notificationKey))
-            //            //{
-            //            //    uniqueNotifications.Add(notificationKey);
-            //            //    set.Add(new { data = item });
-            //            //    await SendNotifications(item.FCMToken, "Theatre Assigned", "Hello");
-
-            //            //}
-
-            //            await SendNotifications(fcm, "Theatre Assigned", "Hello");
-
-
-            //        }
-            //    }
-            //}
-            //else
-            //{
-
-            //}
-
-
-            ////var backupagents = _context.Agents.Where(a => a.TheatreName == TheaterName && a.Agentrole == "Backup").ToList();
-            //var backupagents = _context.Agents.Where(a => a.TheatreName == TheaterName && a.Agentrole == "Backup").ToList();
-
-
-            //return Ok();
+            return Ok();
         }
+
+
 
         [HttpGet]
         public IActionResult ReSendNotificationToUnsendPrimaryAgents()
