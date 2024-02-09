@@ -1064,7 +1064,7 @@ namespace AdminApi.Controllers
             var agentService = new AgentRepository(_context);
 
             var priAgent = _context.AgentMappings.FirstOrDefault(a => a.AgentId == AgentId);
-            priAgent.TaskAccepted = true;            
+            priAgent.TaskRejected = true;
             _context.SaveChanges();
 
             var backUpAgents = _context.AgentMappings.FirstOrDefault(q => q.TheatreName == TheaterName && q.Agentrole == "Backup");
@@ -1074,6 +1074,7 @@ namespace AdminApi.Controllers
                 var fcm = _context.PushNotifications.Where(w => w.AgentId == backUpAgents.AgentId).Select(q=> q.FCMToken).FirstOrDefault();
                 await SendNotifications(fcm, "Theatre Assigned", "Hello");
                 backUpAgents.NotifiedOn = DateTime.Now;
+                _context.SaveChanges();
 
                 var mailTo = backUpAgents.EmailId;
                 string subject = "Important Notice: Non-Responsive Auto-Generated Email";
@@ -1086,7 +1087,7 @@ namespace AdminApi.Controllers
                 Ok("No Backup Agent is assigned to this Theatre");
             }
 
-            var theatresNames = _context.AgentMappings.Where(z => z.AgentId == AgentId && z.TaskAccepted == false && z.Agentrole == "Primary").Select(a=> a.TheatreName).ToList();
+            var theatresNames = _context.AgentMappings.Where(z => z.AgentId == AgentId && z.TaskRejected == false && z.Agentrole == "Primary").Select(a=> a.TheatreName).ToList();
 
             return Ok(theatresNames);
 
