@@ -783,18 +783,15 @@ namespace AdminApi.Controllers
                     {
                         data.Add(result);
 
-
                         var notification = (dynamic)result;
                         var fcmToken = notification.FCMToken;
                         //var mailTo = notification.Mail;
                         var mailTo = notification.EmailId;
                         string subject = "Important Notice: Non-Responsive Auto-Generated Email";
-                        string body = "Dear Recipient,\r\n\r\nThis auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.\r\n\r\nThank you for your understanding.\r\n\r\nBest regards,\r\n Ommr";
+                        string body = "Dear Recipient,<br><br>This auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.<br><br>Thank you for your understanding.<br><br>Best regards,<br> Ommr";
 
                         await SendNotifications(fcmToken, "Theatre Assigned", "Hello");
                         await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
-
-
                     }
                 }
 
@@ -987,35 +984,36 @@ namespace AdminApi.Controllers
         {
             var agentService = new AgentRepository(_context);
 
-            var priAgent = _context.AgentMappings.FirstOrDefault(q=> q.AgentId == AgentId);
-            priAgent.IsTimeExpired = false;
-            _context.SaveChanges();
+            var priAgent = _context.AgentMappings.Where(q=> q.AgentId == AgentId).ToList();
+
+            foreach(var agent in priAgent)
+            {
+                agent.IsTimeExpired = true;
+                _context.SaveChanges();
+            }
 
             var theatreNames = _context.AgentMappings.Where(a => a.AgentId == AgentId && a.Agentrole == "Primary").Select(s=> s.TheatreName).ToList();
 
-            List<string> backUpAgentsTheatres = new List<string>();
+            //List<string> backUpAgentsTheatres = new List<string>();
 
             foreach(var theatre in theatreNames)
             {
                 var backAgent = _context.AgentMappings.Where(a => a.TheatreName == theatre && a.Agentrole == "Backup").FirstOrDefault();
 
-                backUpAgentsTheatres.Add(backAgent.TheatreName);
+                //backUpAgentsTheatres.Add(backAgent.TheatreName);
 
                 var fcm = _context.PushNotifications.Where(w => w.AgentId == backAgent.AgentId).Select(q => q.FCMToken).FirstOrDefault();
-                await SendNotifications(fcm, "Theatre Assigned", "Hello");
+                await SendNotifications(fcm, $"{backAgent.TheatreName} assigned", "Hello");
                 backAgent.NotifiedOn = DateTime.Now;
                 _context.SaveChanges();
 
-
                 var mailTo = backAgent.EmailId;
                 string subject = "Important Notice: Non-Responsive Auto-Generated Email";
-                string body = "Dear Recipient,\r\n\r\nThis auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.\r\n\r\nThank you for your understanding.\r\n\r\nBest regards,\r\n Ommr";
+                string body = $"Dear {backAgent.AgentName},<br><br>{backAgent.TheatreName} theatre is assigned to you.<br><br> This auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.<br><br>Thank you for your understanding.<br><br>Best regards,<br>Ommr";
+
 
                 await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
             }
-
-            //var backUpAgents = _context.AgentMappings.FirstOrDefault(q => q.TheatreName == TheaterName && q.Agentrole == "Backup");
-
 
             return Ok();
         }
