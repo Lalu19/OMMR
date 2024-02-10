@@ -1524,6 +1524,31 @@ namespace AdminApi.Controllers
                 return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
         }
+
+        [HttpGet]
+        public IActionResult ForgotPassword(string email)
+        {
+
+            var agentService = new AgentRepository(_context);
+            var user = _context.Users.Where(z => z.Email == email).FirstOrDefault();
+
+            if (user != null)
+            {
+
+                var mailTo = user.Email;
+                string subject = "Important Notice: Password Retrieval Request";
+                string body = $"Dear {user.FullName},\r\n\r\nThis auto-generated email serves the purpose of providing you with your forgotten password.\r\n\r\n Password: {user.Password} \r\n\r\nBest regards,\r\n Ommr";
+
+                agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
+
+            }
+            else
+            {
+                return Ok("This E-mail is not registered");
+            }
+            return Ok("Your Password is sent to your registered email");
+        }
     }
+}
 
 }
