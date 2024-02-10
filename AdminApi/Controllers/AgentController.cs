@@ -1144,19 +1144,6 @@ namespace AdminApi.Controllers
         }
 
 
-        
-
-        [HttpGet("{AgentId}")]
-        public IActionResult PrimaryAgentSingleTheatreAccept(int agentId)
-        {
-
-
-
-
-            return Ok();
-        }
-
-
 
         [HttpGet]
         public IActionResult ReSendNotificationToUnsendPrimaryAgents()
@@ -1530,27 +1517,25 @@ namespace AdminApi.Controllers
         [HttpGet]
         public IActionResult ForgotPassword(string email)
         {
-
             var agentService = new AgentRepository(_context);
-            var user = _context.Users.Where(z => z.Email == email).FirstOrDefault();
+            var user = _context.Users.FirstOrDefault(z => z.Email == email);
 
             if (user != null)
             {
-
                 var mailTo = user.Email;
                 string subject = "Important Notice: Password Retrieval Request";
-                string body = $"Dear {user.FullName},\r\n\r\nThis auto-generated email serves the purpose of providing you with your forgotten password.\r\n\r\n Password: {user.Password} \r\n\r\nBest regards,\r\n Ommr";
+                string body = $"Dear {user.FullName},<br><br>This auto-generated email serves the purpose of providing you with your forgotten password.<br><br>Your Old Password is: {user.Password}<br><br>Best regards,<br>Ommr";
+
 
                 agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
-
             }
             else
             {
                 return Ok("This E-mail is not registered");
             }
+
             return Ok("Your Password is sent to your registered email");
         }
-    }
-}
 
+    }
 }
