@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AdminApi.Data
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231013104554_BipzuzsL")]
-    partial class BipzuzsL
+    [Migration("20240212074318_Agentmaptssteddd")]
+    partial class Agentmaptssteddd
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -121,16 +121,31 @@ namespace AdminApi.Data
                     b.Property<string>("AdsSequenceStatusRemark")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("AdsVariantStatusNotOk")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("AdsVariantStatusOk")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AdsVariantStatusRemark")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("AgentId")
                         .HasColumnType("int");
+
+                    b.Property<string>("AgentSelfie")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("CreatedOn")
+                    b.Property<DateTime>("CreatedOn")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("getdate()");
+
+                    b.Property<string>("FeedbackStatus")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit")
@@ -205,7 +220,7 @@ namespace AdminApi.Data
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("CreatedOn")
+                    b.Property<DateTime>("CreatedOn")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("getdate()");
@@ -220,6 +235,15 @@ namespace AdminApi.Data
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
+                    b.Property<bool>("IsTimeExpired")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("NotificationSent")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("NotifiedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("PassWord")
                         .HasColumnType("nvarchar(max)");
 
@@ -229,8 +253,8 @@ namespace AdminApi.Data
                     b.Property<int>("StateId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Statename")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("TaskAccepted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("TheatreName")
                         .HasColumnType("nvarchar(max)");
@@ -246,6 +270,180 @@ namespace AdminApi.Data
                     b.ToTable("Agents");
                 });
 
+            modelBuilder.Entity("AdminApi.Models.App.Agent.AgentMapping", b =>
+                {
+                    b.Property<int>("AgentMappingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AgentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AgentName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AgentPhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Agentrole")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<string>("EmailId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsTimeExpired")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("NotificationSent")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("NotifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("StateId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("TaskAccepted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("TaskRejected")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("TheatreName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("AgentMappingId");
+
+                    b.ToTable("AgentMappings");
+                });
+
+            modelBuilder.Entity("AdminApi.Models.App.AnswerTable", b =>
+                {
+                    b.Property<int>("AnswerTableId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Answers")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int?>("OptionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuestionTableId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("AnswerTableId");
+
+                    b.ToTable("AnswerTable");
+                });
+
+            modelBuilder.Entity("AdminApi.Models.App.ClientSearch", b =>
+                {
+                    b.Property<int>("ClientSearchId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<string>("District")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Media")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NoofSeats")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Rate")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Region")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SEC")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Screen")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("State")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StateId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TheatreCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TheatreName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TheatreRating")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ClientSearchId");
+
+                    b.ToTable("ClientSearch");
+                });
+
             modelBuilder.Entity("AdminApi.Models.App.HallPass", b =>
                 {
                     b.Property<int>("HallPassId")
@@ -253,7 +451,7 @@ namespace AdminApi.Data
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Cityname")
+                    b.Property<string>("AdsName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("CreatedBy")
@@ -270,15 +468,6 @@ namespace AdminApi.Data
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
-
-                    b.Property<int>("StateId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Statename")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TheatreName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("UpdatedBy")
                         .HasColumnType("int");
@@ -324,6 +513,117 @@ namespace AdminApi.Data
                     b.ToTable("States");
                 });
 
+            modelBuilder.Entity("AdminApi.Models.App.Options", b =>
+                {
+                    b.Property<int?>("OptionsId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Option")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("OptionsId");
+
+                    b.ToTable("Options");
+                });
+
+            modelBuilder.Entity("AdminApi.Models.App.PushNotification", b =>
+                {
+                    b.Property<int>("PushNotificationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AgentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<int?>("DeviceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FCMToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IMEINumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("PushNotificationId");
+
+                    b.ToTable("PushNotifications");
+                });
+
+            modelBuilder.Entity("AdminApi.Models.App.QuestionTable", b =>
+                {
+                    b.Property<int>("QuestionTableId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Questions")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("QuestionTableId");
+
+                    b.ToTable("QuestionTable");
+                });
+
             modelBuilder.Entity("AdminApi.Models.App.ScreenList", b =>
                 {
                     b.Property<int>("ScreenListId")
@@ -349,6 +649,12 @@ namespace AdminApi.Data
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
+                    b.Property<string>("Latitude")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Longitude")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Media")
                         .HasColumnType("nvarchar(max)");
 
@@ -359,6 +665,9 @@ namespace AdminApi.Data
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Region")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SEC")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Screen")
@@ -400,10 +709,13 @@ namespace AdminApi.Data
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("CreatedOn")
+                    b.Property<DateTime>("CreatedOn")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("getdate()");
+
+                    b.Property<bool>("DeleteRequested")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit")
@@ -424,6 +736,87 @@ namespace AdminApi.Data
                     b.HasKey("StateUserId");
 
                     b.ToTable("StateUser");
+                });
+
+            modelBuilder.Entity("AdminApi.Models.App.UpComingMovieListforClient", b =>
+                {
+                    b.Property<int>("UpComingMovieListforClientId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<string>("Director")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("MovieName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Producer")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReleaseDate")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StarCast")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("UpComingMovieListforClientId");
+
+                    b.ToTable("UpComingMovieListforClient");
+                });
+
+            modelBuilder.Entity("AdminApi.Models.App.UpcomingMovie", b =>
+                {
+                    b.Property<int>("UpcomingMovieId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("MoviePoster")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TeaserLink")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("UpcomingMovieId");
+
+                    b.ToTable("UpcomingMovie");
                 });
 
             modelBuilder.Entity("AdminApi.Models.Menu.AppMenu", b =>
@@ -482,7 +875,7 @@ namespace AdminApi.Data
                         {
                             MenuID = 1,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 301, DateTimeKind.Local).AddTicks(498),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 542, DateTimeKind.Local).AddTicks(8039),
                             IconClass = "fas fa-home",
                             IsActive = true,
                             IsMigrationData = true,
@@ -496,7 +889,7 @@ namespace AdminApi.Data
                         {
                             MenuID = 2,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 301, DateTimeKind.Local).AddTicks(841),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 542, DateTimeKind.Local).AddTicks(8383),
                             IconClass = "fas fa-ellipsis-v",
                             IsActive = true,
                             IsMigrationData = true,
@@ -510,7 +903,7 @@ namespace AdminApi.Data
                         {
                             MenuID = 3,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 301, DateTimeKind.Local).AddTicks(844),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 542, DateTimeKind.Local).AddTicks(8386),
                             IconClass = "",
                             IsActive = true,
                             IsMigrationData = true,
@@ -524,7 +917,7 @@ namespace AdminApi.Data
                         {
                             MenuID = 4,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 301, DateTimeKind.Local).AddTicks(846),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 542, DateTimeKind.Local).AddTicks(8388),
                             IconClass = "",
                             IsActive = true,
                             IsMigrationData = true,
@@ -538,7 +931,7 @@ namespace AdminApi.Data
                         {
                             MenuID = 5,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 301, DateTimeKind.Local).AddTicks(848),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 542, DateTimeKind.Local).AddTicks(8390),
                             IconClass = "fas fa-user",
                             IsActive = true,
                             IsMigrationData = true,
@@ -552,7 +945,7 @@ namespace AdminApi.Data
                         {
                             MenuID = 6,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 301, DateTimeKind.Local).AddTicks(850),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 542, DateTimeKind.Local).AddTicks(8392),
                             IconClass = "",
                             IsActive = true,
                             IsMigrationData = true,
@@ -566,7 +959,7 @@ namespace AdminApi.Data
                         {
                             MenuID = 7,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 301, DateTimeKind.Local).AddTicks(852),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 542, DateTimeKind.Local).AddTicks(8394),
                             IconClass = "",
                             IsActive = true,
                             IsMigrationData = true,
@@ -580,7 +973,7 @@ namespace AdminApi.Data
                         {
                             MenuID = 8,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 301, DateTimeKind.Local).AddTicks(854),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 542, DateTimeKind.Local).AddTicks(8396),
                             IconClass = "",
                             IsActive = true,
                             IsMigrationData = true,
@@ -594,7 +987,7 @@ namespace AdminApi.Data
                         {
                             MenuID = 9,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 301, DateTimeKind.Local).AddTicks(855),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 542, DateTimeKind.Local).AddTicks(8397),
                             IconClass = "fas fa-wrench",
                             IsActive = true,
                             IsMigrationData = true,
@@ -608,7 +1001,7 @@ namespace AdminApi.Data
                         {
                             MenuID = 10,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 301, DateTimeKind.Local).AddTicks(857),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 542, DateTimeKind.Local).AddTicks(8399),
                             IconClass = "",
                             IsActive = true,
                             IsMigrationData = true,
@@ -660,7 +1053,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupID = 1,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 297, DateTimeKind.Local).AddTicks(2713),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 539, DateTimeKind.Local).AddTicks(3718),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupName = "Super Admin Group"
@@ -669,7 +1062,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupID = 2,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 298, DateTimeKind.Local).AddTicks(3085),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 540, DateTimeKind.Local).AddTicks(1217),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupName = "User Group"
@@ -711,7 +1104,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupWiseMenuMappingId = 1,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 301, DateTimeKind.Local).AddTicks(6667),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 543, DateTimeKind.Local).AddTicks(4459),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 1,
@@ -721,7 +1114,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupWiseMenuMappingId = 2,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 301, DateTimeKind.Local).AddTicks(7020),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 543, DateTimeKind.Local).AddTicks(4801),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 1,
@@ -731,7 +1124,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupWiseMenuMappingId = 3,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 301, DateTimeKind.Local).AddTicks(7023),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 543, DateTimeKind.Local).AddTicks(4804),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 1,
@@ -741,7 +1134,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupWiseMenuMappingId = 4,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 301, DateTimeKind.Local).AddTicks(7024),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 543, DateTimeKind.Local).AddTicks(4836),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 1,
@@ -751,7 +1144,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupWiseMenuMappingId = 5,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 301, DateTimeKind.Local).AddTicks(7025),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 543, DateTimeKind.Local).AddTicks(4837),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 1,
@@ -761,7 +1154,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupWiseMenuMappingId = 6,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 301, DateTimeKind.Local).AddTicks(7027),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 543, DateTimeKind.Local).AddTicks(4838),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 1,
@@ -771,7 +1164,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupWiseMenuMappingId = 7,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 301, DateTimeKind.Local).AddTicks(7028),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 543, DateTimeKind.Local).AddTicks(4839),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 1,
@@ -781,7 +1174,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupWiseMenuMappingId = 8,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 301, DateTimeKind.Local).AddTicks(7030),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 543, DateTimeKind.Local).AddTicks(4840),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 2,
@@ -791,7 +1184,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupWiseMenuMappingId = 9,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 301, DateTimeKind.Local).AddTicks(7031),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 543, DateTimeKind.Local).AddTicks(4842),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 2,
@@ -801,7 +1194,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupWiseMenuMappingId = 10,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 301, DateTimeKind.Local).AddTicks(7033),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 543, DateTimeKind.Local).AddTicks(4843),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 2,
@@ -883,7 +1276,7 @@ namespace AdminApi.Data
                         {
                             UserRoleId = 1,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 299, DateTimeKind.Local).AddTicks(4962),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 541, DateTimeKind.Local).AddTicks(3660),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 1,
@@ -893,7 +1286,7 @@ namespace AdminApi.Data
                         {
                             UserRoleId = 2,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 299, DateTimeKind.Local).AddTicks(5271),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 541, DateTimeKind.Local).AddTicks(3986),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 2,
@@ -923,6 +1316,9 @@ namespace AdminApi.Data
 
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("DeleteRequested")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(100)")
@@ -973,6 +1369,9 @@ namespace AdminApi.Data
                     b.Property<string>("StateName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("SuperAdminDeletionResponse")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasColumnType("nvarchar(50)")
@@ -990,7 +1389,8 @@ namespace AdminApi.Data
                         {
                             UserId = 1,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 300, DateTimeKind.Local).AddTicks(2179),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 541, DateTimeKind.Local).AddTicks(9626),
+                            DeleteRequested = false,
                             FullName = "Appman",
                             IsActive = true,
                             IsMigrationData = true,
@@ -1004,7 +1404,8 @@ namespace AdminApi.Data
                         {
                             UserId = 2,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2023, 10, 13, 16, 15, 54, 300, DateTimeKind.Local).AddTicks(2663),
+                            DateAdded = new DateTime(2024, 2, 12, 13, 13, 18, 542, DateTimeKind.Local).AddTicks(97),
+                            DeleteRequested = false,
                             FullName = "Helen Smith",
                             IsActive = true,
                             IsMigrationData = true,

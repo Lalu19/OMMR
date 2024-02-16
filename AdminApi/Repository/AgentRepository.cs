@@ -23,13 +23,12 @@ namespace AdminApi.Repository
             _context = context;
         }
 
-
         public async Task<List<object>> RunAgentProcessing()
         {
             try
             {
                 var distinctTheatreNames = _context.AdScreen.Select(a => a.TheatreName).Distinct().ToList();
-                var result = await ProcessAgentsFromTheaterName(distinctTheatreNames);
+                var result = await ProcessAgentsFromTheaterName1(distinctTheatreNames);
                 //return new List<object> { result };
                 return result;
 
@@ -42,16 +41,34 @@ namespace AdminApi.Repository
             }
         }
 
-        public async Task<List<object>> ProcessAgentsFromTheaterName(List<string> distinctTheatreNames)
+        public async Task<List<object>> RunAgentProcessing2()
         {
             try
             {
-                var agents = _context.Agents.Where(u => u.IsDeleted == false && u.Agentrole == "Primary").ToList();
+                var distinctTheatreNames = _context.AdScreen.Select(a => a.TheatreName).Distinct().ToList();
+                var result = await ProcessAgentsFromTheaterName2(distinctTheatreNames);
+                //return new List<object> { result };
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                // Log the exception details
+                //Console.WriteLine("Error occurred: " + ex.Message);
+                return new List<object> { new { Status = "error", ResponseMsg = "An error occurred while processing agents." } };
+            }
+        }
+
+        public async Task<List<object>> ProcessAgentsFromTheaterName1(List<string> distinctTheatreNames)
+        {
+            try
+            {
+                var agents = _context.AgentMappings.Where(u => u.IsDeleted == false && u.Agentrole == "Primary").ToList();
                 var resultList = new List<object>();
 
                 foreach (var agent in agents)
                 {
-                    var primaryAgentTheatreNames = agent.TheatreName.Split(',').Select(t => t.Trim()).ToList();
+                    var primaryAgentTheatreNames = new List<string> { agent.TheatreName.Trim() };
 
                     // Check if any of the theater names assigned to the primary agent are present in AdScreen table
                     var theatersAssignedToAgent = distinctTheatreNames.Where(theatre => primaryAgentTheatreNames.Contains(theatre)).ToList();
@@ -65,19 +82,19 @@ namespace AdminApi.Repository
                             {
                                 agent.AgentId,
                                 notification.FCMToken,
-                                body = "Theatre Assigned",
-                                title = "Hello",
-                                agent.EmailId
+                                //body = "Theatre Assigned",
+                                //title = "Hello",
+                                agent.EmailId,
+                                agent.AgentName,
+                                agent.TheatreName
                             };
                             resultList.Add(result);
+                            agent.NotificationSent = true;
+                            agent.NotifiedOn = DateTime.Now;
+                            await _context.SaveChangesAsync();
                         }
-                        agent.NotificationSent = true;
-                        agent.NotifiedOn = DateTime.Now;
                     }
                 }
-
-                await _context.SaveChangesAsync();
-
                 return resultList;
             }
             catch (Exception ex)
@@ -86,19 +103,64 @@ namespace AdminApi.Repository
             }
         }
 
+        public async Task<List<object>> ProcessAgentsFromTheaterName2(List<string> distinctTheatreNames)
+        {
+            try
+            {
+                var agents = _context.AgentMappings.Where(u => u.IsDeleted == false && u.Agentrole == "Primary" && u.NotificationSent == false).ToList();
+                var resultList = new List<object>();
+
+                foreach (var agent in agents)
+                {
+                    var primaryAgentTheatreNames = new List<string> { agent.TheatreName.Trim() };
+
+                    // Check if any of the theater names assigned to the primary agent are present in AdScreen table
+                    var theatersAssignedToAgent = distinctTheatreNames.Where(theatre => primaryAgentTheatreNames.Contains(theatre)).ToList();
+
+                    if (theatersAssignedToAgent.Any())
+                    {
+                        var pushNotifications = _context.PushNotifications.Where(p => p.AgentId == agent.AgentId).ToList();
+                        foreach (var notification in pushNotifications)
+                        {
+                            var result = new
+                            {
+                                agent.AgentId,
+                                notification.FCMToken,
+                                //body = "Theatre Assigned",
+                                //title = "Hello",
+                                agent.EmailId,
+                                agent.AgentName,
+                                agent.TheatreName
+                            };
+                            resultList.Add(result);
+                            agent.NotificationSent = true;
+                            agent.NotifiedOn = DateTime.Now;
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+                }
+                return resultList;
+            }
+            catch (Exception ex)
+            {
+                return new List<object> { new { Status = "error", ResponseMsg = "An error occurred while processing agents." } };
+            }
+        }
         //public async Task<List<object>> ProcessAgentsFromTheaterName(List<string> distinctTheatreNames)
         //{
         //    try
         //    {
         //        var agents = _context.Agents.Where(u => u.IsDeleted == false && u.Agentrole == "Primary").ToList();
-
         //        var resultList = new List<object>();
 
         //        foreach (var agent in agents)
         //        {
         //            var primaryAgentTheatreNames = agent.TheatreName.Split(',').Select(t => t.Trim()).ToList();
 
-        //            if (distinctTheatreNames.Any(theatre => primaryAgentTheatreNames.Contains(theatre)))
+        //            // Check if any of the theater names assigned to the primary agent are present in AdScreen table
+        //            var theatersAssignedToAgent = distinctTheatreNames.Where(theatre => primaryAgentTheatreNames.Contains(theatre)).ToList();
+
+        //            if (theatersAssignedToAgent.Any())
         //            {
         //                var pushNotifications = _context.PushNotifications.Where(p => p.AgentId == agent.AgentId).ToList();
         //                foreach (var notification in pushNotifications)
@@ -106,9 +168,6 @@ namespace AdminApi.Repository
         //                    var result = new
         //                    {
         //                        agent.AgentId,
-        //                        //agent.TheatreName,
-        //                        //notification.DeviceId,
-        //                        //notification.IMEINumber,
         //                        notification.FCMToken,
         //                        body = "Theatre Assigned",
         //                        title = "Hello",
@@ -127,12 +186,11 @@ namespace AdminApi.Repository
         //    }
         //    catch (Exception ex)
         //    {
-        //        // Log the exception details
-        //        //Console.WriteLine("Error occurred: " + ex.Message);
         //        return new List<object> { new { Status = "error", ResponseMsg = "An error occurred while processing agents." } };
         //    }
         //}
 
+       
         public async Task<string> SendEmail(string from, string to, string subject, string msgBody)
         {
             try

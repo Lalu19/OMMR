@@ -46,16 +46,11 @@
                             <tr>
                                 <th>Notified</th>
                                 <th>State Name</th>
-                                <th>City Name</th>
                                 <th>Theatre Name</th>
                                 <th>Agent Name</th>
                                 <th>Agent Role</th>
                                 <th>Phone Number</th>
                                 <th>Email Id</th>
-                                <th>Address</th>
-                                <th>Agent User Id</th>
-                                <th>Agent Password</th>
-                                <th>Profile Image</th>
                             </tr>
                         </thead>
                     </table>
@@ -140,39 +135,11 @@
                         }
                     },
                     { "data": "stateName", "orderable": true, "visible": true },
-                    { "data": "cityname", "orderable": true, "visible": true },
-                    //{ "data": "theatreName", "orderable": true, "visible": true },
-                    {
-                        "render": function (data, type, row) {
-                            if (row.theatreName === '') {
-                                return '';
-                            } else {
-                                // Split the theatre names into an array and join them with <br> tags
-                                var theatreNames = row.theatreName.split(',');
-                                var formattedTheatreNames = theatreNames.map(function (name) {
-                                    return name.trim();
-                                }).join('<br>');
-
-                                return formattedTheatreNames;
-                            }
-                        }
-                    },
+                    { "data": "theatreName", "orderable": true, "visible": true },
                     { "data": "agentName", "orderable": true, "visible": true },
                     { "data": "agentrole", "orderable": true, "visible": true },
                     { "data": "agentPhoneNumber", "orderable": true, "visible": true },
                     { "data": "emailId", "orderable": true, "visible": true },
-                    { "data": "address", "orderable": true, "visible": true },
-                    { "data": "agentuserId", "orderable": true, "visible": true },
-                    { "data": "passWord", "orderable": true, "visible": true },
-                    {
-                        "render": function (data, type, row) {
-                            if (row.profilePhoto === '')
-                                return '';
-                            else
-                                return '<a href="#" data-toggle="modal" data-target="#photoModal" data-photo="' + row.profilePhoto + '"><img style="margin-left: 28px;" class="avatar avatar-md rounded-circle" src="' + row.profilePhoto + '"/></a>'
-                        }
-                    },
-                  
                 ]
             });
         }

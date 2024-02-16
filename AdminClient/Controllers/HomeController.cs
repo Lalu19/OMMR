@@ -54,6 +54,11 @@ namespace AdminClient.Controllers
             return View();
         }
 
+        public IActionResult Forgotpassword()
+        {
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> Login(string username, string password)
         {

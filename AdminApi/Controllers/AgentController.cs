@@ -24,6 +24,7 @@ using Hangfire;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using OfficeOpenXml.ConditionalFormatting.Contracts;
+using Org.BouncyCastle.Asn1.Mozilla;
 
 namespace AdminApi.Controllers
 {
@@ -234,6 +235,7 @@ namespace AdminApi.Controllers
                             TheatreName = theaterName,
                             TaskAccepted = false, 
                             TaskRejected = false, 
+                            NotificationSent = false, 
                             IsTimeExpired = false, // or set based on your requirement
                             CreatedBy = AgentCreateDTO.CreatedBy,
                             CreatedOn = System.DateTime.Now
@@ -256,8 +258,6 @@ namespace AdminApi.Controllers
                 return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
         }
-
-
 
         //[HttpPost]
         //public IActionResult AgentCreate(AgentCreateDTO AgentCreateDTO)
@@ -349,7 +349,6 @@ namespace AdminApi.Controllers
                 return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
         }
-
 
         [HttpGet]
         public ActionResult GetAgentList()
@@ -483,36 +482,6 @@ namespace AdminApi.Controllers
             }
         }
 
-        //[HttpGet("{userId}")]
-        //public ActionResult GetCityListbyuserId(int userId)
-        //{
-        //    try
-        //    {
-        //        var list = (from u in _context.Citys
-        //                    join a in _context.Users on u.StateId equals a.StateId
-
-        //                    select new
-        //                    {
-        //                        u.CityId,
-        //                        u.CityName,
-        //                        a.StateId,
-        //                        u.CreatedBy,
-        //                        u.IsDeleted
-        //                    }).Where(x => x.IsDeleted == false && x.StateId == userId).ToList();
-
-        //        int totalRecords = list.Count();
-
-        //        return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
-        //    }
-
-        //    catch (Exception ex)
-        //    {
-        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
-        //    }
-        //}
-
-        //single list
-
         [HttpGet("{AgentId}")]
         public ActionResult GetSingleAgent(int AgentId)
         {
@@ -527,49 +496,82 @@ namespace AdminApi.Controllers
             }
         }
 
-        //update
+        ////update
+        //[HttpPost]
+        //public ActionResult updateAgent(AgentUpdateDTO AgentUpdateDTO)
+        //{
+
+        //    var objcheck = _context.Agents.SingleOrDefault(opt => opt.AgentuserId == AgentUpdateDTO.AgentuserId && opt.IsDeleted == false);
+
+        //    var existingAgents = _context.Agents.Where(opt => opt.IsDeleted == false).ToList();
+
+
+        //    foreach (var agent in existingAgents)
+        //    {
+        //        if (agent.AgentuserId == AgentUpdateDTO.AgentuserId)
+        //        {
+        //            continue;
+        //        }
+
+        //        var theaterNames = agent.TheatreName.Split(',').Select(x => x.Trim()).ToList();
+        //        var newTheaterNames = AgentUpdateDTO.TheatreName.Split(',').Select(x => x.Trim()).ToList();
+
+
+        //        foreach (var newTheaterName in newTheaterNames)
+        //        {
+        //            foreach (var theaterName in theaterNames)
+        //            {
+        //                if (theaterName.Equals(newTheaterName, StringComparison.OrdinalIgnoreCase))
+        //                {
+        //                    if (agent.Agentrole.Equals("Primary", StringComparison.OrdinalIgnoreCase) && AgentUpdateDTO.Agentrole.Equals("Primary", StringComparison.OrdinalIgnoreCase))
+        //                    {
+        //                        return Accepted(new Confirmation { Status = "AlreadyExist", ResponseMsg = "A 'Primary' agent with the same TheatreName already exists!" });
+        //                    }
+        //                    else if (agent.Agentrole.Equals("Backup", StringComparison.OrdinalIgnoreCase) && AgentUpdateDTO.Agentrole.Equals("Backup", StringComparison.OrdinalIgnoreCase))
+        //                    {
+        //                        return Accepted(new Confirmation { Status = "AlreadyExist", ResponseMsg = "A 'Backup' agent with the same TheatreName already exists!" });
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //    try
+        //    {
+        //        var objAgent = _context.Agents.SingleOrDefault(opt => opt.AgentId == AgentUpdateDTO.AgentId);
+        //        objAgent.AgentName = AgentUpdateDTO.AgentName;
+        //        objAgent.Agentrole = AgentUpdateDTO.Agentrole;
+        //        objAgent.Cityname = AgentUpdateDTO.Cityname;
+        //        objAgent.TheatreName = AgentUpdateDTO.TheatreName;
+        //        objAgent.AgentPhoneNumber = AgentUpdateDTO.AgentPhoneNumber;
+        //        objAgent.Address = AgentUpdateDTO.Address;
+        //        objAgent.EmailId = AgentUpdateDTO.EmailId;
+        //        objAgent.ProfilePhoto = AgentUpdateDTO.ProfilePhoto;
+        //        objAgent.AgentuserId = AgentUpdateDTO.AgentuserId;
+        //        objAgent.PassWord = AgentUpdateDTO.PassWord;
+        //        //objAgent.PassWord = EncryptPassword(AgentUpdateDTO.PassWord);
+        //        objAgent.UpdatedBy = AgentUpdateDTO.UpdatedBy;
+        //        objAgent.UpdatedOn = System.DateTime.Now;
+        //        var obj = _AgentRepo.Update(objAgent);
+        //        return Ok(obj);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+        //    }
+        //}
+
         [HttpPost]
         public ActionResult updateAgent(AgentUpdateDTO AgentUpdateDTO)
         {
-
-            var objcheck = _context.Agents.SingleOrDefault(opt => opt.AgentuserId == AgentUpdateDTO.AgentuserId && opt.IsDeleted == false);
-
-            var existingAgents = _context.Agents.Where(opt => opt.IsDeleted == false).ToList();
-
-
-            foreach (var agent in existingAgents)
-            {
-                if (agent.AgentuserId == AgentUpdateDTO.AgentuserId)
-                {
-                    continue;
-                }
-
-                var theaterNames = agent.TheatreName.Split(',').Select(x => x.Trim()).ToList();
-                var newTheaterNames = AgentUpdateDTO.TheatreName.Split(',').Select(x => x.Trim()).ToList();
-
-
-                foreach (var newTheaterName in newTheaterNames)
-                {
-                    foreach (var theaterName in theaterNames)
-                    {
-                        if (theaterName.Equals(newTheaterName, StringComparison.OrdinalIgnoreCase))
-                        {
-                            if (agent.Agentrole.Equals("Primary", StringComparison.OrdinalIgnoreCase) && AgentUpdateDTO.Agentrole.Equals("Primary", StringComparison.OrdinalIgnoreCase))
-                            {
-                                return Accepted(new Confirmation { Status = "AlreadyExist", ResponseMsg = "A 'Primary' agent with the same TheatreName already exists!" });
-                            }
-                            else if (agent.Agentrole.Equals("Backup", StringComparison.OrdinalIgnoreCase) && AgentUpdateDTO.Agentrole.Equals("Backup", StringComparison.OrdinalIgnoreCase))
-                            {
-                                return Accepted(new Confirmation { Status = "AlreadyExist", ResponseMsg = "A 'Backup' agent with the same TheatreName already exists!" });
-                            }
-                        }
-                    }
-                }
-            }
-
             try
             {
                 var objAgent = _context.Agents.SingleOrDefault(opt => opt.AgentId == AgentUpdateDTO.AgentId);
+                if (objAgent == null)
+                {
+                    return NotFound(new Confirmation { Status = "error", ResponseMsg = "Agent not found" });
+                }
+
+                // Update the agent details
                 objAgent.AgentName = AgentUpdateDTO.AgentName;
                 objAgent.Agentrole = AgentUpdateDTO.Agentrole;
                 objAgent.Cityname = AgentUpdateDTO.Cityname;
@@ -580,15 +582,29 @@ namespace AdminApi.Controllers
                 objAgent.ProfilePhoto = AgentUpdateDTO.ProfilePhoto;
                 objAgent.AgentuserId = AgentUpdateDTO.AgentuserId;
                 objAgent.PassWord = AgentUpdateDTO.PassWord;
-                //objAgent.PassWord = EncryptPassword(AgentUpdateDTO.PassWord);
                 objAgent.UpdatedBy = AgentUpdateDTO.UpdatedBy;
-                objAgent.UpdatedOn = System.DateTime.Now;
-                var obj = _AgentRepo.Update(objAgent);
-                return Ok(obj);
+                objAgent.UpdatedOn = DateTime.Now;
+
+                // Update the corresponding AgentMapping record
+                var agentMapping = _context.AgentMappings.SingleOrDefault(am => am.AgentId == AgentUpdateDTO.AgentId);
+                if (agentMapping != null)
+                {
+                    agentMapping.AgentName = AgentUpdateDTO.AgentName;
+                    agentMapping.Agentrole = AgentUpdateDTO.Agentrole;
+                    agentMapping.AgentPhoneNumber = AgentUpdateDTO.AgentPhoneNumber;
+                    agentMapping.EmailId = AgentUpdateDTO.EmailId;
+                    agentMapping.TheatreName = AgentUpdateDTO.TheatreName;
+                    agentMapping.UpdatedBy = AgentUpdateDTO.UpdatedBy;
+                    agentMapping.UpdatedOn = DateTime.Now;
+                }
+
+                _context.SaveChanges();
+
+                return Ok(new Confirmation { Status = "success", ResponseMsg = "Agent updated successfully" });
             }
             catch (Exception ex)
             {
-                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+                return StatusCode(500, new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
         }
 
@@ -734,13 +750,19 @@ namespace AdminApi.Controllers
 
         //                var notification = (dynamic)result;
         //                var fcmToken = notification.FCMToken;
+        //                //var mailTo = notification.Mail;
+        //                var mailTo = notification.EmailId;
+        //                string subject = "Important Notice: Non-Responsive Auto-Generated Email";
+        //                string body = "Dear Recipient,<br><br>This auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.<br><br>Thank you for your understanding.<br><br>Best regards,<br> Ommr";
 
         //                await SendNotifications(fcmToken, "Theatre Assigned", "Hello");
-
+        //                await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
         //            }
         //        }
 
-        //        BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromHours(24));
+        //        //BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromHours(24));
+        //       // BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromMinutes(2));
+        //        BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromMinutes(2));
 
         //        var response = new
         //        {
@@ -755,9 +777,6 @@ namespace AdminApi.Controllers
         //    }
         //}
 
-
-
-
         [HttpGet]
         public async Task<IActionResult> PrimaryAgentsForPushNotification()
         {
@@ -765,13 +784,10 @@ namespace AdminApi.Controllers
             {
                 var agentService = new AgentRepository(_context);
 
-
                 var resultList = await agentService.RunAgentProcessing();
-
 
                 List<object> data = new List<object>();
                 List<object> errorMessages = new List<object>();
-
 
                 foreach (var result in resultList)
                 {
@@ -787,16 +803,20 @@ namespace AdminApi.Controllers
                         var fcmToken = notification.FCMToken;
                         //var mailTo = notification.Mail;
                         var mailTo = notification.EmailId;
+                        var theatre = notification.TheatreName;
+                        var agentName = notification.AgentName;
+                        //string subject = "Important Notice: Non-Responsive Auto-Generated Email";
                         string subject = "Important Notice: Non-Responsive Auto-Generated Email";
-                        string body = "Dear Recipient,<br><br>This auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.<br><br>Thank you for your understanding.<br><br>Best regards,<br> Ommr";
+                        string body = $"Dear {agentName},<br><br>{theatre} theatre is assigned to you.<br><br>This auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.<br><br>Thank you for your understanding.<br><br>Best regards,<br> Ommr";
 
-                        await SendNotifications(fcmToken, "Theatre Assigned", "Hello");
+                        await SendNotifications(fcmToken, $"{theatre} Assigned", "Hello");
                         await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
                     }
                 }
 
                 //BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromHours(24));
-                BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromMinutes(2));
+                //BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromMinutes(2));
+                BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromMinutes(2));
 
 
                 var response = new
@@ -811,6 +831,30 @@ namespace AdminApi.Controllers
                 return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
         }
+
+        //[HttpGet("{AgentId}")]
+        //public IActionResult Activate(int AgentId)
+        //{
+        //    try
+        //    {
+        //        var agent = _context.Agents.FirstOrDefault(u => u.AgentId == AgentId && u.IsDeleted == false);
+
+        //        if (agent == null)
+        //        {
+        //            return Accepted(new Confirmation { Status = "error", ResponseMsg = "Agent not found for the specified AgentId." });
+        //        }
+
+        //        agent.TaskAccepted = true;
+        //        _context.SaveChanges();
+
+        //        return Ok(new Confirmation { Status = "success", ResponseMsg = "Task for the agent has been activated successfully." });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+        //    }
+        //}
+
 
         //[HttpGet("{AgentId}")]
         //public IActionResult AllAgentAccept(int AgentId)
@@ -829,34 +873,42 @@ namespace AdminApi.Controllers
         //            return Accepted(new Confirmation { Status = "error", ResponseMsg = "You didn't give any response in the first 30 minutes." });
         //        }
 
-        //        if (!agent.TaskAccepted)
+        //        if (!agent.NotificationSent)
+        //        {
+        //            // If NotificationSent is false, return no data.
+        //            return Ok(new { data = new List<object>(), recordsTotal = 0, recordsFiltered = 0 });
+        //        }
+
+        //        // If TaskAccepted is true, include theater names.
+        //        if (agent.TaskAccepted)
+        //        {
+        //            agent.NotificationSent = true;
+        //            _context.SaveChanges();
+
+        //            var theatreNames = agent.TheatreName.Split(',').Select(t => t.Trim()).ToList();
+
+        //            var list = _context.AdScreen
+        //                .Where(u => theatreNames.Contains(u.TheatreName) && !u.IsDeleted)
+        //                .Select(u => new
+        //                {
+        //                    u.StateId,
+        //                    u.State,
+        //                    u.TheatreName,
+        //                    //u.Screen,
+        //                    AgentId,
+        //                    agent.AgentName
+        //                })
+        //                .Distinct()
+        //                .ToList();
+
+        //            int totalRecords = list.Count;
+        //            return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+        //        }
+        //        else
         //        {
         //            // If TaskAccepted is false, return no data.
         //            return Ok(new { data = new List<object>(), recordsTotal = 0, recordsFiltered = 0 });
         //        }
-
-        //        // Continue with your existing logic to fetch and return data.
-        //        agent.NotificationSent = true;
-        //        _context.SaveChanges();
-
-        //        var theatreNames = agent.TheatreName.Split(',').Select(t => t.Trim()).ToList();
-
-        //        var list = _context.AdScreen
-        //             .Where(u => theatreNames.Contains(u.TheatreName) && !u.IsDeleted)
-        //             .Select(u => new
-        //             {
-        //                 u.StateId,
-        //                 u.State,
-        //                 u.TheatreName,
-        //                 //u.Screen,
-        //                 AgentId,
-        //                 agent.AgentName
-        //             })
-        //             .Distinct()
-        //             .ToList();
-
-        //        int totalRecords = list.Count;
-        //        return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
         //    }
         //    catch (Exception ex)
         //    {
@@ -865,25 +917,124 @@ namespace AdminApi.Controllers
         //}
 
         /// <summary>
-        /// Accept Button API
+        ///After Flutter login API
         /// </summary>
+        /// 
 
         [HttpGet("{AgentId}")]
-        public IActionResult Activate(int AgentId)
+        public IActionResult PrimaryAgentMovieTheatres(int AgentId)
         {
             try
             {
-                var agent = _context.Agents.FirstOrDefault(u => u.AgentId == AgentId && u.IsDeleted == false);
+                var agent = _context.AgentMappings.FirstOrDefault(a => a.AgentId == AgentId);
 
-                if (agent == null)
+                if (agent.NotificationSent == false)
                 {
-                    return Accepted(new Confirmation { Status = "error", ResponseMsg = "Agent not found for the specified AgentId." });
+                    return Ok(new string[0]);
+                }
+                else
+                {
+                    var theatreNames = _context.AgentMappings.Where(z => z.AgentId == AgentId && z.TaskRejected == false && z.Agentrole == "Primary" && z.IsTimeExpired == false).Select(a => new { AgentId, TheatreName = a.TheatreName, StateId = a.StateId, TaskAccepted = a.TaskAccepted }).ToArray();
+                    //return Ok(theatreNames);
+                    return Ok(new { data = theatreNames, recordsTotal = theatreNames.Length, recordsFiltered = theatreNames.Length });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+            }
+        }
+
+        [HttpGet("{AgentId}")]
+        public IActionResult PrimaryAgentMovieTheatres1(int AgentId)
+        {
+            try
+            {
+                var agents = _context.AgentMappings.Where(a => a.AgentId == AgentId && a.NotificationSent == true).ToList();
+
+
+                List<object> theatreData = new List<object>();
+
+
+                foreach (var agent in agents)
+                {
+                    var theatreNames = _context.AgentMappings
+                        .Where(z => z.TaskRejected == false && z.IsTimeExpired == false)
+                        .Select(a => new { AgentId = agent.AgentId, TheatreName = a.TheatreName, StateId = a.StateId }).Distinct()
+                        .ToArray();
+
+
+                    theatreData.AddRange(theatreNames);
                 }
 
-                agent.TaskAccepted = true;
-                _context.SaveChanges();
 
-                return Ok(new Confirmation { Status = "success", ResponseMsg = "Task for the agent has been activated successfully." });
+                return Ok(new { data = theatreData, recordsTotal = theatreData.Count, recordsFiltered = theatreData.Count });
+            }
+            catch (Exception ex)
+            {
+                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> PrimaryAgentNoResponse()
+        {
+            try
+            {
+
+                var primaryAgents = _context.AgentMappings.Where(a => a.IsDeleted == false && a.NotificationSent == true && a.TaskAccepted == false && a.TaskRejected == false && a.Agentrole == "Primary").ToList();
+
+                var agentService = new AgentRepository(_context);
+
+                //var priAgent = _context.AgentMappings.Where(q => q.AgentId == AgentId).ToList();
+
+                foreach (var mapping in primaryAgents)
+                {
+                    mapping.IsTimeExpired = true;
+                }
+                await _context.SaveChangesAsync();
+
+                List<string> theatres = new List<string>();
+                theatres = primaryAgents.Select(a => a.TheatreName).ToList();
+
+
+                foreach (var theatre in theatres)
+                {
+                    var backAgent = _context.AgentMappings
+                        .Where(a => a.TheatreName == theatre && a.Agentrole == "Backup")
+                        .FirstOrDefault();
+
+                    if (backAgent != null)
+                    {
+                        var fcm = backAgent != null
+                            ? _context.PushNotifications
+                                .Where(w => w.AgentId == backAgent.AgentId)
+                                .Select(q => q.FCMToken)
+                                .FirstOrDefault()
+                            : null;
+
+                        if (fcm != null)
+                        {
+                            await SendNotifications(fcm, $"{backAgent.TheatreName} assigned", "Hello");
+                        }
+
+
+                        backAgent.NotificationSent = true;
+                        backAgent.NotifiedOn = DateTime.Now;
+                        _context.SaveChanges();
+
+                        if (backAgent.EmailId != null)
+                        {
+                            var mailTo = backAgent.EmailId;
+                            string subject = "Important Notice: Non-Responsive Auto-Generated Email";
+                            string body = $"Dear {backAgent.AgentName},<br><br>{backAgent.TheatreName} theatre is assigned to you.<br><br> This auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.<br><br>Thank you for your understanding.<br><br>Best regards,<br>Ommr";
+
+                            await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
+                        }
+                    }
+                }
+
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -892,169 +1043,82 @@ namespace AdminApi.Controllers
         }
 
         /// <summary>
-        ///After Flutter login API
+        ///Primary agent reject notification to backup
         /// </summary>
         /// 
-        [HttpGet("{AgentId}")]
-        public IActionResult AllAgentAccept(int AgentId)
-        {
-            try
-            {
-                var agent = _context.Agents.FirstOrDefault(u => u.AgentId == AgentId && u.IsDeleted == false);
-
-                if (agent == null)
-                {
-                    return Accepted(new Confirmation { Status = "error", ResponseMsg = "Primary agent not found for the specified AgentId." });
-                }
-
-                if (agent.IsTimeExpired == true)
-                {
-                    return Accepted(new Confirmation { Status = "error", ResponseMsg = "You didn't give any response in the first 30 minutes." });
-                }
-
-                if (!agent.NotificationSent)
-                {
-                    // If NotificationSent is false, return no data.
-                    return Ok(new { data = new List<object>(), recordsTotal = 0, recordsFiltered = 0 });
-                }
-
-                // If TaskAccepted is true, include theater names.
-                if (agent.TaskAccepted)
-                {
-                    agent.NotificationSent = true;
-                    _context.SaveChanges();
-
-                    var theatreNames = agent.TheatreName.Split(',').Select(t => t.Trim()).ToList();
-
-                    var list = _context.AdScreen
-                        .Where(u => theatreNames.Contains(u.TheatreName) && !u.IsDeleted)
-                        .Select(u => new
-                        {
-                            u.StateId,
-                            u.State,
-                            u.TheatreName,
-                            //u.Screen,
-                            AgentId,
-                            agent.AgentName
-                        })
-                        .Distinct()
-                        .ToList();
-
-                    int totalRecords = list.Count;
-                    return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
-                }
-                else
-                {
-                    // If TaskAccepted is false, return no data.
-                    return Ok(new { data = new List<object>(), recordsTotal = 0, recordsFiltered = 0 });
-                }
-            }
-            catch (Exception ex)
-            {
-                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
-            }
-        }
-
-
-        [HttpGet("{AgentId}")]
-        public IActionResult PrimaryAgentMovieTheatres(int AgentId)
-        {
-            try
-            {
-                var agent = _context.Agents.FirstOrDefault(a => a.AgentId == AgentId);
-
-                if (agent.NotificationSent == false)
-                {
-                    return Ok();
-                }
-                else
-                {
-                    var theatreNames = _context.AgentMappings.Where(z => z.AgentId == AgentId && z.Agentrole == "Primary").Select(q => q.TheatreName).ToList();
-                    return Ok(theatreNames);
-                }
-            }
-            catch (Exception ex)
-            {
-                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
-            }
-        }
-
-        [HttpGet("{AgentId}")]
-        public async Task<IActionResult> PrimaryAgentNoResponse(int AgentId)
-        {
-            var agentService = new AgentRepository(_context);
-
-            var priAgent = _context.AgentMappings.Where(q=> q.AgentId == AgentId).ToList();
-
-            foreach(var agent in priAgent)
-            {
-                agent.IsTimeExpired = true;
-                _context.SaveChanges();
-            }
-
-            var theatreNames = _context.AgentMappings.Where(a => a.AgentId == AgentId && a.Agentrole == "Primary").Select(s=> s.TheatreName).ToList();
-
-            //List<string> backUpAgentsTheatres = new List<string>();
-
-            foreach(var theatre in theatreNames)
-            {
-                var backAgent = _context.AgentMappings.Where(a => a.TheatreName == theatre && a.Agentrole == "Backup").FirstOrDefault();
-
-                //backUpAgentsTheatres.Add(backAgent.TheatreName);
-
-                var fcm = _context.PushNotifications.Where(w => w.AgentId == backAgent.AgentId).Select(q => q.FCMToken).FirstOrDefault();
-                await SendNotifications(fcm, $"{backAgent.TheatreName} assigned", "Hello");
-                backAgent.NotifiedOn = DateTime.Now;
-                _context.SaveChanges();
-
-                var mailTo = backAgent.EmailId;
-                string subject = "Important Notice: Non-Responsive Auto-Generated Email";
-                string body = $"Dear {backAgent.AgentName},<br><br>{backAgent.TheatreName} theatre is assigned to you.<br><br> This auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.<br><br>Thank you for your understanding.<br><br>Best regards,<br>Ommr";
-
-
-                await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
-            }
-
-            return Ok();
-        }
 
         [HttpGet("{AgentId}/{TheaterName}")]
         public async Task<IActionResult> RejectedTheatreNotificationToBackup(int AgentId, string TheaterName)
         {
-            var agentService = new AgentRepository(_context);
-
-            var priAgent = _context.AgentMappings.FirstOrDefault(a => a.AgentId == AgentId);
-            priAgent.TaskRejected = true;
-            _context.SaveChanges();
-
-            var backUpAgents = _context.AgentMappings.FirstOrDefault(q => q.TheatreName == TheaterName && q.Agentrole == "Backup");
-
-            if (backUpAgents != null)
+            try
             {
-                var fcm = _context.PushNotifications.Where(w => w.AgentId == backUpAgents.AgentId).Select(q => q.FCMToken).FirstOrDefault();
-                await SendNotifications(fcm, "Theatre Assigned", "Hello");
-                backUpAgents.NotifiedOn = DateTime.Now;
+                var agentService = new AgentRepository(_context);
+
+
+                var priAgent = _context.AgentMappings.FirstOrDefault(a => a.AgentId == AgentId && a.TheatreName == TheaterName);
+                priAgent.TaskRejected = true;
                 _context.SaveChanges();
 
-                var mailTo = backUpAgents.EmailId;
-                string subject = "Important Notice: Non-Responsive Auto-Generated Email";
-                string body = "Dear Recipient,\r\n\r\nThis auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.\r\n\r\nThank you for your understanding.\r\n\r\nBest regards,\r\n Ommr";
 
-                await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
+                if (priAgent.Agentrole == "Primary")
+                {
+                    var backUpAgents = _context.AgentMappings.FirstOrDefault(q => q.TheatreName == TheaterName && q.Agentrole == "Backup");
+
+
+                    if (backUpAgents != null)
+                    {
+                        var fcm = _context.PushNotifications.Where(w => w.AgentId == backUpAgents.AgentId).Select(q => q.FCMToken).FirstOrDefault();
+                        await SendNotifications(fcm, $"{backUpAgents.TheatreName} assigned", "Hello");
+                        backUpAgents.NotifiedOn = DateTime.Now;
+                        backUpAgents.NotificationSent = true;
+                        _context.SaveChanges();
+
+
+                        var mailTo = backUpAgents.EmailId;
+                        string subject = "Important Notice: Non-Responsive Auto-Generated Email";
+                        string body = $"Dear {backUpAgents.AgentName},<br><br> {backUpAgents.TheatreName} theatre is assigned to you. <br><br>This auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.<br><br>Thank you for your understanding.<br><br>Best regards,<br> Ommr";
+
+
+                        await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
+                    }
+                    else
+                    {
+                        Ok("No Backup Agent is assigned to this Theatre");
+                    }
+
+
+                    //var theatresNames = _context.AgentMappings.Where(z => z.AgentId == AgentId && z.TaskRejected == false && z.Agentrole == "Primary").Select(a => a.TheatreName).ToList();
+
+
+                    //return Ok(theatresNames);
+                    //return Ok(new { });
+
+
+                    var theatresData = _context.AgentMappings
+                     .Where(z => z.AgentId == AgentId && z.TaskRejected == false && z.Agentrole == "Primary")
+                     .Select(a => new { TheatreName = a.TheatreName })
+                     .ToArray();
+
+
+                    return Ok(new { data = theatresData, recordsTotal = theatresData.Length, recordsFiltered = theatresData.Length });
+
+
+                }
+
+
+                else if (priAgent.Agentrole == "Backup")
+                {
+                    return Ok(new string[0]);
+                }
+
+
+                return Ok(new string[0]);
             }
-            else
+            catch (Exception ex)
             {
-                Ok("No Backup Agent is assigned to this Theatre");
+                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
-
-            var theatresNames = _context.AgentMappings.Where(z => z.AgentId == AgentId && z.TaskRejected == false && z.Agentrole == "Primary").Select(a => a.TheatreName).ToList();
-
-            return Ok(theatresNames);
-
         }
-
-
-
 
         [HttpGet("{AgentId}")]
         public async Task<IActionResult> PrimaryAgentRejectNotificationToBackup(int AgentId)
@@ -1141,102 +1205,54 @@ namespace AdminApi.Controllers
             }
         }
 
-
-
         [HttpGet]
-        public IActionResult ReSendNotificationToUnsendPrimaryAgents()
-        {
-            var unsendAgents = _context.Agents.Where(u => u.NotificationSent == false && u.Agentrole == "Primary");
-            return Ok(unsendAgents);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> PrimaryAgentNoResponseBackupAgentAssign()
+        public async Task<IActionResult> ReSendNotificationToUnsendPrimaryAgents()
         {
             try
             {
-                var agents = _context.Agents.Where(u => u.IsDeleted == false && u.NotificationSent == true && u.TaskAccepted == false && u.Agentrole == "Primary")
-                                .ToList();
-
-
                 var agentService = new AgentRepository(_context);
-                var resultList = new List<object>();
 
+                var resultList = await agentService.RunAgentProcessing2();
 
-                // Initialize the HashSet for unique email addresses
-                var emailSet = new HashSet<string>();
+                List<object> data = new List<object>();
+                List<object> errorMessages = new List<object>();
 
-
-                foreach (var agent in agents)
+                foreach (var result in resultList)
                 {
-                    agent.IsTimeExpired = true;
-                    agent.UpdatedOn = DateTime.Now;
-                    _context.SaveChanges();
-
-
-                    var primaryAgentTheatreNames = agent.TheatreName.Split(',')
-                                                      .Select(t => t.Trim())
-                                                      .ToList();
-
-
-                    foreach (var theatreName in primaryAgentTheatreNames)
+                    if (result.GetType().GetProperty("Status") != null && result.GetType().GetProperty("ResponseMsg") != null)
                     {
-                        var pushNotifications = _context.PushNotifications
-                            .Where(u => !u.IsDeleted)
-                            .ToList();
+                        errorMessages.Add(result);
+                    }
+                    else
+                    {
+                        data.Add(result);
 
+                        var notification = (dynamic)result;
+                        var fcmToken = notification.FCMToken;
+                        //var mailTo = notification.Mail;
+                        var mailTo = notification.EmailId;
+                        var theatre = notification.TheatreName;
+                        var agentName = notification.AgentName;
+                        //string subject = "Important Notice: Non-Responsive Auto-Generated Email";
+                        string subject = "Important Notice: Non-Responsive Auto-Generated Email";
+                        string body = $"Dear {agentName},<br><br>{theatre} theatre is assigned to you.<br><br>This auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.<br><br>Thank you for your understanding.<br><br>Best regards,<br> Ommr";
 
-                        var backupAgents = _context.Agents
-                              .Where(u => !u.IsDeleted
-                                  && u.Agentrole == "Backup")
-                              .AsEnumerable()
-                              .Where(u => u.TheatreName.Split(',').Select(t => t.Trim()).Contains(theatreName, StringComparer.OrdinalIgnoreCase))
-                              .ToList();
-
-
-                        var filteredNotifications = pushNotifications
-                              .Join(backupAgents,
-                                  p => p.AgentId,
-                                  a => a.AgentId,
-                                  (p, a) => new
-                                  {
-                                      p.AgentId,
-                                      p.DeviceId,
-                                      p.IMEINumber,
-                                      p.FCMToken,
-                                      a.EmailId,
-                                  })
-                              .ToList();
-
-
-                        foreach (var item in filteredNotifications)
-                        {
-                            if (emailSet.Add(item.EmailId))
-                            {
-                                await SendNotifications(item.FCMToken, "Theatre Assigned", "Hello");
-                                var backupAg = _context.Agents.FirstOrDefault(z => z.EmailId == item.EmailId);
-                                backupAg.NotificationSent = true;
-                                backupAg.NotifiedOn = DateTime.Now;
-                                _context.SaveChanges();
-
-
-                                var mailTo = item.EmailId;
-                                string subject = "Important Notice: Non-Responsive Auto-Generated Email";
-                                string body = "Dear Recipient,\r\n\r\nThis auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.\r\n\r\nThank you for your understanding.\r\n\r\nBest regards,\r\n Ommr";
-
-
-                                await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
-
-
-                                // Add the processed data to resultList
-                                resultList.Add(new { data = item });
-                            }
-                        }
+                        await SendNotifications(fcmToken, $"{theatre} Assigned", "Hello");
+                        await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
                     }
                 }
 
+                //BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromHours(24));
+                //BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromMinutes(2));
+                BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromMinutes(2));
 
-                return Ok(resultList);
+
+                var response = new
+                {
+                    Data = data,
+                    //ErrorMessages = errorMessages
+                };
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -1252,9 +1268,11 @@ namespace AdminApi.Controllers
         //        var agents = _context.Agents.Where(u => u.IsDeleted == false && u.NotificationSent == true && u.TaskAccepted == false && u.Agentrole == "Primary")
         //                        .ToList();
 
-
+        //        var agentService = new AgentRepository(_context);
         //        var resultList = new List<object>();
 
+        //        // Initialize the HashSet for unique email addresses
+        //        var emailSet = new HashSet<string>();
 
         //        foreach (var agent in agents)
         //        {
@@ -1262,12 +1280,9 @@ namespace AdminApi.Controllers
         //            agent.UpdatedOn = DateTime.Now;
         //            _context.SaveChanges();
 
-        //            //BackgroundJob.Schedule(() => BackupAgentNoResponse(), TimeSpan.FromMinutes(1));
-
         //            var primaryAgentTheatreNames = agent.TheatreName.Split(',')
-        //                                             .Select(t => t.Trim())
-        //                                             .ToList();
-
+        //                                              .Select(t => t.Trim())
+        //                                              .ToList();
 
         //            foreach (var theatreName in primaryAgentTheatreNames)
         //            {
@@ -1275,39 +1290,49 @@ namespace AdminApi.Controllers
         //                    .Where(u => !u.IsDeleted)
         //                    .ToList();
 
-
         //                var backupAgents = _context.Agents
-        //                     .Where(u => !u.IsDeleted
-        //                         && u.Agentrole == "Backup")
-        //                     .AsEnumerable()
-        //                     .Where(u => u.TheatreName.Split(',').Select(t => t.Trim()).Contains(theatreName, StringComparer.OrdinalIgnoreCase))
-        //                     .ToList();
-
+        //                      .Where(u => !u.IsDeleted
+        //                          && u.Agentrole == "Backup")
+        //                      .AsEnumerable()
+        //                      .Where(u => u.TheatreName.Split(',').Select(t => t.Trim()).Contains(theatreName, StringComparer.OrdinalIgnoreCase))
+        //                      .ToList();
 
         //                var filteredNotifications = pushNotifications
-        //                     .Join(backupAgents,
-        //                         p => p.AgentId,
-        //                         a => a.AgentId,
-        //                         (p, a) => new
-        //                         {
-        //                             p.AgentId,
-        //                             p.DeviceId,
-        //                             p.IMEINumber,
-        //                             p.FCMToken
-        //                         })
-        //                     .ToList();
+        //                      .Join(backupAgents,
+        //                          p => p.AgentId,
+        //                          a => a.AgentId,
+        //                          (p, a) => new
+        //                          {
+        //                              p.AgentId,
+        //                              p.DeviceId,
+        //                              p.IMEINumber,
+        //                              p.FCMToken,
+        //                              a.EmailId,
+        //                          })
+        //                      .ToList();
 
-
-        //                var set = new HashSet<object>(resultList);
         //                foreach (var item in filteredNotifications)
         //                {
-        //                    set.Add(new { data = item });
-        //                    await SendNotifications(item.FCMToken, "Your message here", "Your title here");
+        //                    if (emailSet.Add(item.EmailId))
+        //                    {
+        //                        await SendNotifications(item.FCMToken, "Theatre Assigned", "Hello");
+        //                        var backupAg = _context.Agents.FirstOrDefault(z => z.EmailId == item.EmailId);
+        //                        backupAg.NotificationSent = true;
+        //                        backupAg.NotifiedOn = DateTime.Now;
+        //                        _context.SaveChanges();
+
+        //                        var mailTo = item.EmailId;
+        //                        string subject = "Important Notice: Non-Responsive Auto-Generated Email";
+        //                        string body = "Dear Recipient,\r\n\r\nThis auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.\r\n\r\nThank you for your understanding.\r\n\r\nBest regards,\r\n Ommr";
+
+        //                        await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
+
+        //                        // Add the processed data to resultList
+        //                        resultList.Add(new { data = item });
+        //                    }
         //                }
-        //                resultList = set.ToList();
         //            }
         //        }
-
 
         //        return Ok(resultList);
         //    }
@@ -1357,14 +1382,53 @@ namespace AdminApi.Controllers
             }
         }
 
-        //[HttpGet]
-        //public ActionResult AgentTaskInspection()
+        [HttpGet]
+        public ActionResult AgentTaskInspection()
+        {
+            try
+            {
+                var list = (from u in _context.AgentMappings
+                            join s in _context.States on u.StateId equals s.StateId
+
+                            select new
+                            {
+                                u.AgentId,
+                                u.StateId,
+                                s.StateName,
+                                u.TheatreName,
+                                u.AgentName,
+                                u.Agentrole,
+                                u.AgentPhoneNumber,
+                                u.EmailId,
+                                u.NotificationSent,
+                                u.NotifiedOn,
+                                u.TaskAccepted,
+                                u.TaskRejected,
+                                u.CreatedBy,
+                                u.IsDeleted
+                            }).Where(x => x.IsDeleted == false).ToList();
+
+
+                int totalRecords = list.Count();
+
+
+                return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+            }
+            catch (Exception ex)
+            {
+                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+            }
+        }
+
+        //[HttpGet("{fromDate}/{toDate}")]
+        //public ActionResult AgentTaskInspection(DateTime fromDate, DateTime toDate)
         //{
         //    try
         //    {
         //        var list = (from u in _context.AgentMappings
         //                    join s in _context.States on u.StateId equals s.StateId
-                           
+        //                    where u.IsDeleted == false && u.CreatedOn.Date >= fromDate.Date && u.CreatedOn.Date <= toDate.Date
+
         //                    select new
         //                    {
         //                        u.AgentId,
@@ -1380,7 +1444,7 @@ namespace AdminApi.Controllers
         //                        u.TaskRejected,
         //                        u.CreatedBy,
         //                        u.IsDeleted
-        //                    }).Where(x => x.IsDeleted == false).ToList();
+        //                    }).Where(x => x.IsDeleted == false).OrderByDescending(t => t.AgentId);
 
 
         //        int totalRecords = list.Count();
@@ -1394,14 +1458,15 @@ namespace AdminApi.Controllers
         //    }
         //}
 
-        [HttpGet("{fromDate}/{toDate}")]
-        public ActionResult AgentTaskInspection(DateTime fromDate, DateTime toDate)
+
+        [HttpGet("{UserId}")]
+        public ActionResult AgentTaskInspectionbyUserId(int UserId)
         {
             try
             {
                 var list = (from u in _context.AgentMappings
                             join s in _context.States on u.StateId equals s.StateId
-                            where u.IsDeleted == false && u.CreatedOn.Date >= fromDate.Date && u.CreatedOn.Date <= toDate.Date
+                            join p in _context.StateUser on u.StateId equals p.StateId
 
                             select new
                             {
@@ -1413,12 +1478,14 @@ namespace AdminApi.Controllers
                                 u.Agentrole,
                                 u.AgentPhoneNumber,
                                 u.EmailId,
+                                u.NotificationSent,
                                 u.NotifiedOn,
                                 u.TaskAccepted,
                                 u.TaskRejected,
+                                p.UserId,
                                 u.CreatedBy,
-                                u.IsDeleted
-                            }).Where(x => x.IsDeleted == false).OrderByDescending(t => t.AgentId);
+                                p.IsDeleted,
+                            }).Where(x => x.IsDeleted == false && x.UserId == UserId).ToList();
 
 
                 int totalRecords = list.Count();
@@ -1432,16 +1499,16 @@ namespace AdminApi.Controllers
             }
         }
 
-
-        //[HttpGet("{UserId}")]
-        //public ActionResult AgentTaskInspectionbyUserId(int UserId)
+        //[HttpGet("{fromDate}/{toDate}/{UserId}")]
+        //public ActionResult AgentTaskInspectionbyUserId(DateTime fromDate, DateTime toDate, int UserId)
         //{
         //    try
         //    {
         //        var list = (from u in _context.AgentMappings
         //                    join s in _context.States on u.StateId equals s.StateId
         //                    join p in _context.StateUser on u.StateId equals p.StateId
-
+        //                   // where !p.IsDeleted && p.UserId == UserId && u.CreatedOn >= fromDate && u.CreatedOn <= toDate
+        //                    where p.IsDeleted == false && p.UserId == UserId && u.CreatedOn.Date >= fromDate.Date && u.CreatedOn.Date <= toDate.Date
         //                    select new
         //                    {
         //                        u.AgentId,
@@ -1458,7 +1525,7 @@ namespace AdminApi.Controllers
         //                        p.UserId,
         //                        u.CreatedBy,
         //                        p.IsDeleted,
-        //                    }).Where(x => x.IsDeleted == false && x.UserId == UserId).ToList();
+        //                    }).ToList();
 
 
         //        int totalRecords = list.Count();
@@ -1472,47 +1539,7 @@ namespace AdminApi.Controllers
         //    }
         //}
 
-        [HttpGet("{fromDate}/{toDate}/{UserId}")]
-        public ActionResult AgentTaskInspectionbyUserId(DateTime fromDate, DateTime toDate, int UserId)
-        {
-            try
-            {
-                var list = (from u in _context.AgentMappings
-                            join s in _context.States on u.StateId equals s.StateId
-                            join p in _context.StateUser on u.StateId equals p.StateId
-                           // where !p.IsDeleted && p.UserId == UserId && u.CreatedOn >= fromDate && u.CreatedOn <= toDate
-                            where p.IsDeleted == false && p.UserId == UserId && u.CreatedOn.Date >= fromDate.Date && u.CreatedOn.Date <= toDate.Date
-                            select new
-                            {
-                                u.AgentId,
-                                u.StateId,
-                                s.StateName,
-                                u.TheatreName,
-                                u.AgentName,
-                                u.Agentrole,
-                                u.AgentPhoneNumber,
-                                u.EmailId,
-                                u.NotifiedOn,
-                                u.TaskAccepted,
-                                u.TaskRejected,
-                                p.UserId,
-                                u.CreatedBy,
-                                p.IsDeleted,
-                            }).ToList();
-
-
-                int totalRecords = list.Count();
-
-
-                return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
-            }
-            catch (Exception ex)
-            {
-                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
-            }
-        }
-
-        [HttpGet]
+        [HttpGet("{email}")]
         public IActionResult ForgotPassword(string email)
         {
             var agentService = new AgentRepository(_context);
@@ -1533,6 +1560,23 @@ namespace AdminApi.Controllers
             }
 
             return Ok("Your Password is sent to your registered email");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult>RefreshBooleans()
+        {
+            var agents = _context.AgentMappings.Where(a => a.Agentrole == "Primary" && a.Agentrole == "Backup").ToList();
+            
+            foreach (var agent in agents)
+            {
+                agent.IsTimeExpired = false;
+                agent.TaskAccepted = false;
+                agent.TaskRejected = false;
+                agent.NotificationSent = false;
+                await _context.SaveChangesAsync();
+            }
+
+            return Ok();
         }
 
     }

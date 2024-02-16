@@ -138,7 +138,7 @@
                                 </div>
                             </div>
                             <div>
-                                <span class="backto-link font-default content-color text-decoration-none">Don't have an account ? <a class="text-decoration-underline theme-color signn" href="/Home/SignUpForClient"> Signup  </a> </span>
+                                <span class="backto-link font-default content-color text-decoration-none">Don't have an account ? <a class="text-decoration-underline theme-color signn" href="/Home/SignUpForClient"> Signup  </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a class="text-decoration-underline theme-color signn" href="/Home/Forgotpassword"> Forgot Password  </a> </span>
                             </div>
                         </form>
 
@@ -164,7 +164,11 @@
 
         </div>
     </div>
-
+        <script>
+            document.getElementById("btnForgotPassword").addEventListener("click", function () {
+                window.location.href = "/Home/SignUpForClient";
+            });
+        </script>
     <!-- BACKGROUND-IMAGE CLOSED -->
     <!-- JQUERY SCRIPTS JS-->
     <script src="~/js/vendors/jquery-3.2.1.min.js"></script>

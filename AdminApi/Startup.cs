@@ -42,24 +42,29 @@ namespace AdminApi
         {
             //For Hallpass and Client expiry
 
-            //services.AddHostedService<HallPassCleanUpService>();
-            //services.AddHostedService<ClientCleanUpService>();
-            //services.AddHostedService<ResetAgentsService>();
+            services.AddHostedService<HallPassCleanUpService>();
+            services.AddHostedService<ClientCleanUpService>();
+            services.AddHostedService<ResetAgentsService>();
 
 
             //services.AddHostedService<Adscreen30DaysCleanUp>();
 
-          // services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=DESKTOP-8AP7SAV\SQLEXPRESS;Database=OMMR;Trusted_Connection=True;")));
+            // services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=DESKTOP-8AP7SAV\SQLEXPRESS;Database=OMMR;Trusted_Connection=True;")));
 
-           // services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=103.145.37.246,10230;Database=OMMR;User Id=sa;Password=Software@2016;TrustServerCertificate=True;")));
+             //services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=103.145.37.246,10230;Database=OMMR;User Id=sa;Password=Software@2016;TrustServerCertificate=True;")));
 
-            services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=103.145.37.246,10230;Database=OMMR_Local;User Id=sa;Password=Software@2016;TrustServerCertificate=True;")));
+             //services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=.\SQLEXPRESS;Database=OMMR;user id=sa;Password=Software@2016;TrustServerCertificate=True;")));
             services.AddHangfireServer();
+            // services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=192.168.29.55,10230;Database=OMMR;User Id=sa;Password=Appman@250319;TrustServerCertificate=True;")));
+
+             services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=192.168.29.55,10230;Database=OMMR_Local;User Id=sa;Password=Appman@250319;TrustServerCertificate=True;")));
+
+
 
 
             //Sql Server Connection String
-            /* services.AddDbContextPool<AppDbContext>(opt => opt.UseSqlServer
-            (Configuration.GetConnectionString("ApiConnStringMssql"))); */
+            services.AddDbContextPool<AppDbContext>(opt => opt.UseSqlServer
+           (Configuration.GetConnectionString("ApiConnStringMssql")));
 
             //Mysql Connection String
             //services.AddDbContextPool<AppDbContext>(opt=>opt.UseMySql
@@ -70,8 +75,8 @@ namespace AdminApi
             (Configuration.GetConnectionString("ApiConnStringSqlite"))); */
 
             //PostgreSql Connection String
-            services.AddDbContextPool<AppDbContext>(opt => opt.UseSqlServer
-         (Configuration.GetConnectionString("ApiConnStringMssql")));
+         //   services.AddDbContextPool<AppDbContext>(opt => opt.UseSqlServer
+         //(Configuration.GetConnectionString("ApiConnStringMssql")));
 
             //Oracle Connection String
             /* services.AddDbContextPool<AppDbContext>(opt=>opt.UseOracle

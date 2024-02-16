@@ -6,13 +6,69 @@
     ViewBag.Title = "Agent Notification Inspection";
     string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
 }
+
+<style>
+    #preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #fff;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+</style>
+
+<style>
+    .btndesign {
+        border-radius: 10px;
+    }
+</style>
+
 <!-- PAGE-HEADER -->
 <div class="page-header">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="#"><i class="fe fe-file-text mr-1"></i>Admin Console</a></li>
         <li class="breadcrumb-item active" aria-current="page">Agent Notification Inspection</li>
     </ol>
+
+  @*  <div class="col-md-10 text-right">
+        <!-- Added column for the button -->
+        <button type="button" id="Resendnotification" class="btn btn-info btn-icon btn-lg text-white btndesign">
+            <span>
+                <i class="fa fa-bell"></i>
+            </span> Resend Notification
+        </button>
+    </div>*@
     <div class="ml-auto">
+        <button type="button" id="Resendnotification" class="btn btn-info btn-icon btn-sm text-white btndesign">
+            <span>
+                <i class="fa fa-bell"></i>
+            </span> Resend Notification
+        </button>
         <button id="acceptButton" class="btn btn-success btn-icon btn-sm text-white mr-2">
             <span>
                 <i class="fe fe-check"></i>
@@ -26,6 +82,9 @@
     </div>
 </div>
 
+<div id="preloader" class="d-none">
+    <div class="spinner"></div>
+</div>
 <div class="row">
     <div class="col-md-12 col-lg-12">
         <div class="card">
@@ -39,16 +98,11 @@
                             <tr>
                                 <th>Notified</th>
                                 <th>State Name</th>
-                                <th>City Name</th>
                                 <th>Theatre Name</th>
                                 <th>Agent Name</th>
                                 <th>Agent Role</th>
                                 <th>Phone Number</th>
                                 <th>Email Id</th>
-                                <th>Address</th>
-                                <th>Agent User Id</th>
-                                <th>Agent Password</th>
-                                <th>Profile Image</th>
                             </tr>
                         </thead>
                     </table>
@@ -57,7 +111,8 @@
         </div>
     </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 @section scripts{
     <script>
         $('#acceptButton').click(function () {
@@ -101,7 +156,7 @@
                 "sort": true,
                 "info": true,
                 "ajax": {
-                    "url": '@apiUrl/api/Agent/GetAgentList',
+                    "url": '@apiUrl/api/Agent/AgentTaskInspection',
                     "type": "GET",
                     "dataType": "json",
                     "headers": {
@@ -130,66 +185,54 @@
                         }
                     },
                     { "data": "stateName", "orderable": true, "visible": true },
-                    { "data": "cityname", "orderable": true, "visible": true },
-                    //{ "data": "theatreName", "orderable": true, "visible": true },
-                    {
-                        "render": function (data, type, row) {
-                            if (row.theatreName === '') {
-                                return '';
-                            } else {
-                                // Split the theatre names into an array and join them with <br> tags
-                                var theatreNames = row.theatreName.split(',');
-                                var formattedTheatreNames = theatreNames.map(function (name) {
-                                    return name.trim();
-                                }).join('<br>');
-
-                                return formattedTheatreNames;
-                            }
-                        }
-                    },
-
+                    { "data": "theatreName", "orderable": true, "visible": true },
                     { "data": "agentName", "orderable": true, "visible": true },
                     { "data": "agentrole", "orderable": true, "visible": true },
                     { "data": "agentPhoneNumber", "orderable": true, "visible": true },
                     { "data": "emailId", "orderable": true, "visible": true },
-                    { "data": "address", "orderable": true, "visible": true },
-                    { "data": "agentuserId", "orderable": true, "visible": true },
-                    { "data": "passWord", "orderable": true, "visible": true },
-                    {
-                        "render": function (data, type, row) {
-                            if (row.profilePhoto === '')
-                                return '';
-                            else
-                                return '<a href="#" data-toggle="modal" data-target="#photoModal" data-photo="' + row.profilePhoto + '"><img style="margin-left: 28px;" class="avatar avatar-md rounded-circle" src="' + row.profilePhoto + '"/></a>'
-                        }
-                    },
-                   
                 ]
             });
         }
 
-        // JavaScript function for opening profile photo in a modal
-        $(document).on('click', 'a[data-toggle="modal"]', function () {
-            var photoUrl = $(this).data('photo');
-            $('#profilePhotoModal').attr('src', photoUrl);
+      
+        $("#Resendnotification").click(function () {
+           
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/Agent/ReSendNotificationToUnsendPrimaryAgents",
+                contentType: "application/json",
+                headers: {
+                    "Authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                success: function (data, statusText, xhr) {
+                    if (xhr.status === 200) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Notification sent to Primary Agents",
+                            text: "Successfully initiated!",
+                        }).then(function () {
+                            location.reload(); // Refresh the page or perform other actions
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "warning",
+                            title: "Notification Alert!",
+                            text: "Something unexpected happened!",
+                        });
+                    }
+                    preloader.addClass("d-none");
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    // Handle errors in the API call for notification
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Notification Alert!",
+                        text: "Error in the API call for notification: " + errorThrown,
+                    });
+                    preloader.addClass("d-none");
+                }
+            });
         });
     </script>
-}
 
-<!-- Modal for displaying profile photo -->
-<div id="photoModal" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-md" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Profile Photo</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body text-center">
-                <!-- Center the content -->
-                <img id="profilePhotoModal" class="img-fluid mx-auto" src="" alt="Profile Photo">
-            </div>
-        </div>
-    </div>
-</div>
+}

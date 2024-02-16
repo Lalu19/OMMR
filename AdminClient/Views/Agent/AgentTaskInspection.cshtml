@@ -7,7 +7,7 @@
     string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
 }
 
-
+@*
 <div class="row">
     <div class="col-md">
         <div class="card overflow-hidden">
@@ -40,7 +40,7 @@
             </div>
         </div>
     </div>
-</div>
+</div>*@
 <div class="row">
     <div class="col-md-12 col-lg-12">
         <div class="card">
@@ -71,11 +71,11 @@
 
 @section scripts{
     <script>
-        $(document).ready(function () {
-            $("#btnSearch").click(function () {
-                var fromDate = $("#FromDate").val();
-                var toDate = $("#ToDate").val();
-                //List
+        //$(document).ready(function () {
+        //    $("#btnSearch").click(function () {
+        //        var fromDate = $("#FromDate").val();
+        //        var toDate = $("#ToDate").val();
+              
                 loadAgent()
                 async function loadAgent() {
             var table = $('#Agent_Tb').DataTable();
@@ -89,8 +89,8 @@
                 "sort": true,
                 "info": true,
                 "ajax": {
-                    //"url": '@apiUrl/api/Agent/AgentTaskInspectionbyUserId/' + @Context.Session.GetInt32("UserId"),
-                            "url": '@apiUrl/api/Agent/AgentTaskInspectionbyUserId/' + fromDate + '/' + toDate + '/' + @Context.Session.GetInt32("UserId"),
+                       "url": '@apiUrl/api/Agent/AgentTaskInspectionbyUserId/' + @Context.Session.GetInt32("UserId"),
+                     //"url": '@apiUrl/api/Agent/AgentTaskInspectionbyUserId/' + fromDate + '/' + toDate + '/' + @Context.Session.GetInt32("UserId"),
                     "type": "GET",
                     "dataType": "json",
                     "headers": {
@@ -140,7 +140,7 @@
             });
         }
 
-            });
-        });
+        //    });
+        //});
     </script>
 }

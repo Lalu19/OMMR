@@ -7,7 +7,7 @@
     string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
 }
 
-<div class="row">
+@*<div class="row">
     <div class="col-md">
         <div class="card overflow-hidden">
             <div class="card-header">
@@ -39,7 +39,8 @@
             </div>
         </div>
     </div>
-</div>
+</div>*@
+
 <div class="row">
     <div class="col-md-12 col-lg-12">
         <div class="card">
@@ -71,10 +72,10 @@
 @section scripts{
     <script>
 
-        $(document).ready(function () {
-            $("#btnSearch").click(function () {
-                var fromDate = $("#FromDate").val();
-                var toDate = $("#ToDate").val();
+        //$(document).ready(function () {
+        //    $("#btnSearch").click(function () {
+        //        var fromDate = $("#FromDate").val();
+        //        var toDate = $("#ToDate").val();
                 //List
                 loadAgent()
                 async function loadAgent() {
@@ -89,7 +90,8 @@
                 "sort": true,
                 "info": true,
                 "ajax": {
-                    "url": '@apiUrl/api/Agent/AgentTaskInspection/' + fromDate + '/' + toDate,
+                    //"url": '@apiUrl/api/Agent/AgentTaskInspection/' + fromDate + '/' + toDate,
+                    "url": '@apiUrl/api/Agent/AgentTaskInspection',
                     "type": "GET",
                     "dataType": "json",
                     "headers": {
@@ -139,7 +141,7 @@
             });
         }
 
-            });
-        });
+        //    });
+        //});
     </script>
 }
