@@ -561,71 +561,194 @@ namespace AdminApi.Controllers
         //}
 
         [HttpPost]
-        public ActionResult updateAgent(AgentUpdateDTO AgentUpdateDTO)
+        public ActionResult UpdateAgent(AgentUpdateDTO agentUpdateDTO)
         {
             try
             {
-                var objAgent = _context.Agents.SingleOrDefault(opt => opt.AgentId == AgentUpdateDTO.AgentId);
-                if (objAgent == null)
+                // Retrieve the agent to be updated
+                var agent = _context.Agents.SingleOrDefault(opt => opt.AgentId == agentUpdateDTO.AgentId && !opt.IsDeleted);
+                if (agent == null)
                 {
-                    return NotFound(new Confirmation { Status = "error", ResponseMsg = "Agent not found" });
+                    return NotFound(new Confirmation { Status = "Not Found", ResponseMsg = "Agent not found!" });
                 }
 
-                // Update the agent details
-                objAgent.AgentName = AgentUpdateDTO.AgentName;
-                objAgent.Agentrole = AgentUpdateDTO.Agentrole;
-                objAgent.Cityname = AgentUpdateDTO.Cityname;
-                objAgent.TheatreName = AgentUpdateDTO.TheatreName;
-                objAgent.AgentPhoneNumber = AgentUpdateDTO.AgentPhoneNumber;
-                objAgent.Address = AgentUpdateDTO.Address;
-                objAgent.EmailId = AgentUpdateDTO.EmailId;
-                objAgent.ProfilePhoto = AgentUpdateDTO.ProfilePhoto;
-                objAgent.AgentuserId = AgentUpdateDTO.AgentuserId;
-                objAgent.PassWord = AgentUpdateDTO.PassWord;
-                objAgent.UpdatedBy = AgentUpdateDTO.UpdatedBy;
-                objAgent.UpdatedOn = DateTime.Now;
-
-                // Update the corresponding AgentMapping record
-                var agentMapping = _context.AgentMappings.SingleOrDefault(am => am.AgentId == AgentUpdateDTO.AgentId);
-                if (agentMapping != null)
+                // Check for duplicate user id
+                var existingAgent = _context.Agents.FirstOrDefault(opt => opt.AgentuserId == agentUpdateDTO.AgentuserId && opt.AgentId != agent.AgentId && !opt.IsDeleted);
+                if (existingAgent != null)
                 {
-                    agentMapping.AgentName = AgentUpdateDTO.AgentName;
-                    agentMapping.Agentrole = AgentUpdateDTO.Agentrole;
-                    agentMapping.AgentPhoneNumber = AgentUpdateDTO.AgentPhoneNumber;
-                    agentMapping.EmailId = AgentUpdateDTO.EmailId;
-                    agentMapping.TheatreName = AgentUpdateDTO.TheatreName;
-                    agentMapping.UpdatedBy = AgentUpdateDTO.UpdatedBy;
-                    agentMapping.UpdatedOn = DateTime.Now;
+                    return Accepted(new Confirmation { Status = "Duplicate", ResponseMsg = "Duplicate User Id..!" });
+                }
+
+                // Check for duplicate theater names
+                // Check for duplicate theater names
+                var existingAgents = _context.Agents.Where(opt => opt.IsDeleted == false).ToList();
+                foreach (var existingAgentEntry in existingAgents)
+                {
+                    if (existingAgentEntry.AgentuserId == agentUpdateDTO.AgentuserId)
+                    {
+                        continue;
+                    }
+
+                    var theaterNames = existingAgentEntry.TheatreName.Split(',').Select(x => x.Trim()).ToList();
+                    var newTheaterNames = agentUpdateDTO.TheatreName.Split(',').Select(x => x.Trim()).ToList();
+
+                    foreach (var newTheaterName in newTheaterNames)
+                    {
+                        foreach (var theaterName in theaterNames)
+                        {
+                            if (theaterName.Equals(newTheaterName, StringComparison.OrdinalIgnoreCase))
+                            {
+                                if (existingAgentEntry.Agentrole.Equals("Primary", StringComparison.OrdinalIgnoreCase) && agentUpdateDTO.Agentrole.Equals("Primary", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    return Accepted(new Confirmation { Status = "AlreadyExist", ResponseMsg = $"A 'Primary' agent with the same TheatreName '{newTheaterName}' already exists!" });
+                                }
+                                else if (existingAgentEntry.Agentrole.Equals("Backup", StringComparison.OrdinalIgnoreCase) && agentUpdateDTO.Agentrole.Equals("Backup", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    return Accepted(new Confirmation { Status = "AlreadyExist", ResponseMsg = $"A 'Backup' agent with the same TheatreName '{newTheaterName}' already exists!" });
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Update Agent table
+                agent.AgentName = agentUpdateDTO.AgentName;
+                agent.Agentrole = agentUpdateDTO.Agentrole;
+                agent.Cityname = agentUpdateDTO.Cityname;
+                agent.TheatreName = agentUpdateDTO.TheatreName;
+                agent.AgentPhoneNumber = agentUpdateDTO.AgentPhoneNumber;
+                agent.Address = agentUpdateDTO.Address;
+                agent.EmailId = agentUpdateDTO.EmailId;
+                agent.ProfilePhoto = agentUpdateDTO.ProfilePhoto;
+                agent.AgentuserId = agentUpdateDTO.AgentuserId;
+                agent.PassWord = agentUpdateDTO.PassWord;
+                agent.UpdatedBy = agentUpdateDTO.UpdatedBy;
+                agent.UpdatedOn = DateTime.Now;
+
+                // Update AgentMapping table
+                var agentMappings = _context.AgentMappings.Where(mapping => mapping.AgentId == agent.AgentId).ToList();
+                _context.AgentMappings.RemoveRange(agentMappings);
+
+                foreach (var theaterName in agentUpdateDTO.TheatreName.Split(',').Select(x => x.Trim()))
+                {
+                    var agentMapping = new AgentMapping
+                    {
+                        AgentId = agent.AgentId,
+                        StateId = agentUpdateDTO.StateId,
+                        AgentName = agentUpdateDTO.AgentName,
+                        Agentrole = agentUpdateDTO.Agentrole,
+                        AgentPhoneNumber = agentUpdateDTO.AgentPhoneNumber,
+                        EmailId = agentUpdateDTO.EmailId,
+                        TheatreName = theaterName,
+                        TaskAccepted = false,
+                        TaskRejected = false,
+                        NotificationSent = false,
+                        IsTimeExpired = false,
+                        CreatedBy = (int)agentUpdateDTO.UpdatedBy, // Assuming this should be UpdatedBy
+                        CreatedOn = DateTime.Now
+                    };
+                    _context.AgentMappings.Add(agentMapping);
                 }
 
                 _context.SaveChanges();
 
-                return Ok(new Confirmation { Status = "success", ResponseMsg = "Agent updated successfully" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new Confirmation { Status = "error", ResponseMsg = ex.Message });
-            }
-        }
-
-
-        [HttpGet("{Id}/{DeletedBy}")]
-        public ActionResult DeleteAgent(int Id, int DeletedBy)
-        {
-            try
-            {
-                var objabout = _context.Agents.SingleOrDefault(opt => opt.AgentId == Id);
-                objabout.IsDeleted = true;
-                objabout.UpdatedBy = DeletedBy;
-                objabout.UpdatedOn = System.DateTime.Now;
-                _context.SaveChanges();
-                return Ok(objabout);
+                return Ok(agent);
             }
             catch (Exception ex)
             {
                 return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
         }
+
+        //public ActionResult DeleteAgent(int Id, int DeletedBy)
+        //{
+        //    try
+        //    {
+        //        var objabout = _context.Agents.SingleOrDefault(opt => opt.AgentId == Id);
+        //        objabout.IsDeleted = true;
+        //        objabout.UpdatedBy = DeletedBy;
+        //        objabout.UpdatedOn = System.DateTime.Now;
+        //        _context.SaveChanges();
+        //        return Ok(objabout);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+        //    }
+        //}
+
+        [HttpGet("{Id}/{DeletedBy}")]
+        public ActionResult DeleteAgent(int Id, int DeletedBy)
+        {
+            try
+            {
+                var agentToDelete = _context.Agents.SingleOrDefault(opt => opt.AgentId == Id);
+                if (agentToDelete == null)
+                {
+                    return NotFound(new Confirmation { Status = "Not Found", ResponseMsg = "Agent not found!" });
+                }
+
+                agentToDelete.IsDeleted = true;
+                agentToDelete.UpdatedBy = DeletedBy;
+                agentToDelete.UpdatedOn = DateTime.Now;
+
+                _context.SaveChanges();
+                var agentMappingsToDelete = _context.AgentMappings.Where(mapping => mapping.AgentId == Id).ToList();
+                foreach (var agentMapping in agentMappingsToDelete)
+                {
+                    agentMapping.IsDeleted = true;
+                    agentMapping.UpdatedBy = DeletedBy;
+                    agentMapping.UpdatedOn = DateTime.Now;
+                }
+
+                _context.SaveChanges();
+
+                return Ok(agentToDelete);
+            }
+            catch (Exception ex)
+            {
+                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+            }
+        }
+
+        //[HttpGet("{Id}/{DeletedBy}")]
+        //public IActionResult SetDeleteRequest(int Id, int DeletedBy)
+        //{
+        //    try
+        //    {
+        //        // Find the agent to be updated
+        //        var agentToUpdate = _context.Agents.SingleOrDefault(u => u.AgentId == Id);
+        //        if (agentToUpdate == null)
+        //        {
+        //            return NotFound(new Confirmation { Status = "Not Found", ResponseMsg = "Agent not found!" });
+        //        }
+
+        //        // Update Agent table to set delete request
+        //        agentToUpdate.DeleteRequested = true;
+        //        agentToUpdate.UpdatedOn = DateTime.Now;
+        //        agentToUpdate.UpdatedBy = DeletedBy;
+        //        _context.SaveChanges();
+
+        //        // Find and mark related records in AgentMapping table as delete requested
+        //        var agentMappingsToUpdate = _context.AgentMappings.Where(mapping => mapping.AgentId == Id).ToList();
+        //        foreach (var agentMapping in agentMappingsToUpdate)
+        //        {
+        //            agentMapping.DeleteRequested = true;
+        //            agentMapping.UpdatedBy = DeletedBy;
+        //            agentMapping.UpdatedOn = DateTime.Now;
+        //        }
+
+        //        // Save changes to AgentMapping table
+        //        _context.SaveChanges();
+
+        //        return Ok(agentToUpdate);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+        //    }
+        //}
+
 
         [HttpGet("{Id}/{DeletedBy}")]
         public IActionResult SetDeleteRequest(int Id, int DeletedBy)
@@ -926,55 +1049,54 @@ namespace AdminApi.Controllers
         {
             try
             {
-                var agent = _context.AgentMappings.FirstOrDefault(a => a.AgentId == AgentId);
+                var agents = _context.AgentMappings.Where(a => a.AgentId == AgentId).ToList();
 
-                if (agent.NotificationSent == false)
+
+                if (agents.Any())
                 {
-                    return Ok(new string[0]);
-                }
-                else
-                {
-                    var theatreNames = _context.AgentMappings.Where(z => z.AgentId == AgentId && z.TaskRejected == false && z.Agentrole == "Primary" && z.IsTimeExpired == false).Select(a => new { AgentId, TheatreName = a.TheatreName, StateId = a.StateId, TaskAccepted = a.TaskAccepted }).ToArray();
-                    //return Ok(theatreNames);
-                    return Ok(new { data = theatreNames, recordsTotal = theatreNames.Length, recordsFiltered = theatreNames.Length });
-                }
-            }
-            catch (Exception ex)
-            {
-                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
-            }
-        }
-
-        [HttpGet("{AgentId}")]
-        public IActionResult PrimaryAgentMovieTheatres1(int AgentId)
-        {
-            try
-            {
-                var agents = _context.AgentMappings.Where(a => a.AgentId == AgentId && a.NotificationSent == true).ToList();
-
-
-                List<object> theatreData = new List<object>();
-
-
-                foreach (var agent in agents)
-                {
-                    var theatreNames = _context.AgentMappings
-                        .Where(z => z.TaskRejected == false && z.IsTimeExpired == false)
-                        .Select(a => new { AgentId = agent.AgentId, TheatreName = a.TheatreName, StateId = a.StateId }).Distinct()
+                    var theatreNames = agents
+                        .Where(z => z.TaskRejected == false && z.IsTimeExpired == false && z.NotificationSent == true)
+                        .Select(a => new { AgentId, TheatreName = a.TheatreName, StateId = a.StateId, TaskAccepted = a.TaskAccepted })
                         .ToArray();
 
 
-                    theatreData.AddRange(theatreNames);
+                    return Ok(new { data = theatreNames, recordsTotal = theatreNames.Length, recordsFiltered = theatreNames.Length });
                 }
-
-
-                return Ok(new { data = theatreData, recordsTotal = theatreData.Count, recordsFiltered = theatreData.Count });
+                else
+                {
+                    // Handle case when no agents with the given AgentId are found
+                    return NotFound($"No agents found with AgentId: {AgentId}");
+                }
             }
             catch (Exception ex)
             {
                 return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
         }
+
+        //[HttpGet("{AgentId}")]
+        //public IActionResult PrimaryAgentMovieTheatres(int AgentId)
+        //{
+        //    try
+        //    {
+        //        var agent = _context.AgentMappings.FirstOrDefault(a => a.AgentId == AgentId);
+
+        //        if (agent.NotificationSent == false)
+        //        {
+        //            return Ok(new string[0]);
+        //        }
+        //        else
+        //        {
+        //            var theatreNames = _context.AgentMappings.Where(z => z.AgentId == AgentId && z.TaskRejected == false && z.Agentrole == "Primary" && z.IsTimeExpired == false).Select(a => new { AgentId, TheatreName = a.TheatreName, StateId = a.StateId, TaskAccepted = a.TaskAccepted }).ToArray();
+        //            //return Ok(theatreNames);
+        //            return Ok(new { data = theatreNames, recordsTotal = theatreNames.Length, recordsFiltered = theatreNames.Length });
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+        //    }
+        //}
 
         [HttpGet]
         public async Task<IActionResult> PrimaryAgentNoResponse()
@@ -1563,9 +1685,9 @@ namespace AdminApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult>RefreshBooleans()
+        public IActionResult RefreshBooleans()
         {
-            var agents = _context.AgentMappings.Where(a => a.Agentrole == "Primary" && a.Agentrole == "Backup").ToList();
+            var agents = _context.AgentMappings.Where(a => a.Agentrole == "Primary" || a.Agentrole == "Backup").ToList();
             
             foreach (var agent in agents)
             {
@@ -1573,7 +1695,7 @@ namespace AdminApi.Controllers
                 agent.TaskAccepted = false;
                 agent.TaskRejected = false;
                 agent.NotificationSent = false;
-                await _context.SaveChangesAsync();
+                _context.SaveChanges();
             }
 
             return Ok();
