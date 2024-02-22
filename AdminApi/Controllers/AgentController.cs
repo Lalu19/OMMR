@@ -937,9 +937,9 @@ namespace AdminApi.Controllers
                     }
                 }
 
-                //BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromHours(24));
-                //BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromMinutes(2));
+                //BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromHours(24));
                 BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromMinutes(2));
+                //BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromMinutes(10));
 
 
                 var response = new
@@ -1055,7 +1055,7 @@ namespace AdminApi.Controllers
                 if (agents.Any())
                 {
                     var theatreNames = agents
-                        .Where(z => z.TaskRejected == false && z.IsTimeExpired == false && z.NotificationSent == true)
+                        .Where(z => z.TaskRejected == false && z.IsTimeExpired == false && z.NotificationSent == true && z.IsDeleted == false)
                         .Select(a => new { AgentId, TheatreName = a.TheatreName, StateId = a.StateId, TaskAccepted = a.TaskAccepted })
                         .ToArray();
 
@@ -1184,7 +1184,7 @@ namespace AdminApi.Controllers
 
                 if (priAgent.Agentrole == "Primary")
                 {
-                    var backUpAgents = _context.AgentMappings.FirstOrDefault(q => q.TheatreName == TheaterName && q.Agentrole == "Backup");
+                    var backUpAgents = _context.AgentMappings.FirstOrDefault(q => q.TheatreName == TheaterName && q.Agentrole == "Backup" && q.IsDeleted == false);
 
 
                     if (backUpAgents != null)
@@ -1242,90 +1242,90 @@ namespace AdminApi.Controllers
             }
         }
 
-        [HttpGet("{AgentId}")]
-        public async Task<IActionResult> PrimaryAgentRejectNotificationToBackup(int AgentId)
-        {
-            try
-            {
-                var agentService = new AgentRepository(_context);
-                var agent = _context.Agents.FirstOrDefault(u => u.AgentId == AgentId);
+        //[HttpGet("{AgentId}")]
+        //public async Task<IActionResult> PrimaryAgentRejectNotificationToBackup(int AgentId)
+        //{
+        //    try
+        //    {
+        //        var agentService = new AgentRepository(_context);
+        //        var agent = _context.Agents.FirstOrDefault(u => u.AgentId == AgentId);
 
-                if (agent == null)
-                {
-                    return Accepted(new Confirmation { Status = "error", ResponseMsg = "No Primary Agent Present!." });
-                }
+        //        if (agent == null)
+        //        {
+        //            return Accepted(new Confirmation { Status = "error", ResponseMsg = "No Primary Agent Present!." });
+        //        }
 
-                var uniqueNotifications = new HashSet<string>(); // Using HashSet to keep track of unique notifications
-                var resultList = new List<object>();
+        //        var uniqueNotifications = new HashSet<string>(); // Using HashSet to keep track of unique notifications
+        //        var resultList = new List<object>();
 
-                var primaryAgentTheatreNames = agent.TheatreName.Split(',')
-                                                     .Select(t => t.Trim())
-                                                     .ToList();
+        //        var primaryAgentTheatreNames = agent.TheatreName.Split(',')
+        //                                             .Select(t => t.Trim())
+        //                                             .ToList();
 
-                foreach (var theatreName in primaryAgentTheatreNames)
-                {
-                    var pushNotifications = _context.PushNotifications
-                        .Where(u => !u.IsDeleted)
-                        .ToList();
+        //        foreach (var theatreName in primaryAgentTheatreNames)
+        //        {
+        //            var pushNotifications = _context.PushNotifications
+        //                .Where(u => !u.IsDeleted)
+        //                .ToList();
 
-                    var backupAgents = _context.Agents
-                         .Where(a => !a.IsDeleted && a.Agentrole == "Backup")
-                         .AsEnumerable()
-                         .Where(a => a.TheatreName.Split(',').Select(t => t.Trim()).Contains(theatreName, StringComparer.OrdinalIgnoreCase))
-                         .ToList();
+        //            var backupAgents = _context.Agents
+        //                 .Where(a => !a.IsDeleted && a.Agentrole == "Backup")
+        //                 .AsEnumerable()
+        //                 .Where(a => a.TheatreName.Split(',').Select(t => t.Trim()).Contains(theatreName, StringComparer.OrdinalIgnoreCase))
+        //                 .ToList();
 
-                    var filteredNotifications = pushNotifications
-                         .Join(backupAgents,
-                             p => p.AgentId,
-                             a => a.AgentId,
-                             (p, a) => new
-                             {
-                                 p.AgentId,
-                                 p.DeviceId,
-                                 p.IMEINumber,
-                                 p.FCMToken,
-                                 a.EmailId
-                             })
-                         .ToList();
+        //            var filteredNotifications = pushNotifications
+        //                 .Join(backupAgents,
+        //                     p => p.AgentId,
+        //                     a => a.AgentId,
+        //                     (p, a) => new
+        //                     {
+        //                         p.AgentId,
+        //                         p.DeviceId,
+        //                         p.IMEINumber,
+        //                         p.FCMToken,
+        //                         a.EmailId
+        //                     })
+        //                 .ToList();
 
-                    var set = new HashSet<object>(resultList);
+        //            var set = new HashSet<object>(resultList);
                    
-                    foreach (var item in filteredNotifications)
-                    {
+        //            foreach (var item in filteredNotifications)
+        //            {
 
 
-                        var backupAg = _context.Agents.FirstOrDefault(z => z.EmailId == item.EmailId);
-                        backupAg.NotificationSent = true;
-                        _context.SaveChanges();
+        //                var backupAg = _context.Agents.FirstOrDefault(z => z.EmailId == item.EmailId);
+        //                backupAg.NotificationSent = true;
+        //                _context.SaveChanges();
 
 
-                        var notificationKey = $"{item.DeviceId}_{item.IMEINumber}_{item.FCMToken}";
-                        if (!uniqueNotifications.Contains(notificationKey))
-                        {
-                            uniqueNotifications.Add(notificationKey);
-                            set.Add(new { data = item });
-                            await SendNotifications(item.FCMToken, "Theatre Assigned", "Hello");
+        //                var notificationKey = $"{item.DeviceId}_{item.IMEINumber}_{item.FCMToken}";
+        //                if (!uniqueNotifications.Contains(notificationKey))
+        //                {
+        //                    uniqueNotifications.Add(notificationKey);
+        //                    set.Add(new { data = item });
+        //                    await SendNotifications(item.FCMToken, "Theatre Assigned", "Hello");
 
 
-                            var mailTo = item.EmailId;
-                            string subject = "Important Notice: Non-Responsive Auto-Generated Email";
-                            string body = "Dear Recipient,\r\n\r\nThis auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.\r\n\r\nThank you for your understanding.\r\n\r\nBest regards,\r\n Ommr";
+        //                    var mailTo = item.EmailId;
+        //                    string subject = "Important Notice: Non-Responsive Auto-Generated Email";
+        //                    string body = "Dear Recipient,\r\n\r\nThis auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.\r\n\r\nThank you for your understanding.\r\n\r\nBest regards,\r\n Ommr";
 
 
-                            await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
-                        }
-                    }
+        //                    await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
+        //                }
+        //            }
 
-                    resultList = set.ToList();
-                }
+        //            resultList = set.ToList();
+        //        }
 
-                return Ok(resultList);
-            }
-            catch (Exception ex)
-            {
-                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
-            }
-        }
+        //        return Ok(resultList);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+        //    }
+        //}
 
         [HttpGet]
         public async Task<IActionResult> ReSendNotificationToUnsendPrimaryAgents()
@@ -1469,7 +1469,7 @@ namespace AdminApi.Controllers
         {
             try
             {
-                var agents = _context.Agents.Where(u => u.IsDeleted == false && u.NotificationSent == true && u.TaskAccepted == false && u.Agentrole == "Backup")
+                var agents = _context.AgentMappings.Where(u => u.IsDeleted == false && u.NotificationSent == true && u.TaskAccepted == false && u.Agentrole == "Backup")
                                 .ToList();
 
 

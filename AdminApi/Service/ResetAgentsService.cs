@@ -35,7 +35,8 @@ namespace AdminApi.Services
 
 
                         var now = DateTime.Now;
-                        var twentyFourHoursAgo = now.AddMinutes(-4);
+                       // var twentyFourHoursAgo = now.AddMinutes(-10);
+                         var twentyFourHoursAgo = now.AddHours(-1);
                         // var twentyFourHoursAgo = now.AddHours(-25);
 
 

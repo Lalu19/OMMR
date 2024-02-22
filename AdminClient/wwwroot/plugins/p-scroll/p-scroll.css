@@ -33,6 +33,7 @@
   right: 0;
   /* please don't change 'position' */
   position: absolute;
+  width:10px;
 }
 
 .ps--active-x > .ps__rail-x,
@@ -96,7 +97,7 @@
 .ps__rail-y:focus > .ps__thumb-y,
 .ps__rail-y.ps--clicking .ps__thumb-y {
 	background-color: rgba(0, 0, 0, 0.1);
-	width: 3px;
+	width: 7px;
 }
 
 /* MS supports */

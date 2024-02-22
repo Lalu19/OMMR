@@ -6,19 +6,43 @@
     ViewBag.Title = "Screen List";
     string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
 }
+
+<style>
+    /* CSS for loader */
+    .loader {
+        border: 8px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 8px solid #3498db;
+        width: 50px;
+        height: 50px;
+        -webkit-animation: spin 1s linear infinite; /* Safari */
+        animation: spin 1s linear infinite;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 9999;
+        display: none; /* Initially hide loader */
+    }
+
+    @@-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+<div id="loader" class="loader"></div>
+
 <!-- PAGE-HEADER -->
 <div class="page-header">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="#"><i class="fe fe-file-text mr-1"></i>Admin Console</a></li>
         <li class="breadcrumb-item active" aria-current="page">Screen List View</li>
     </ol>
-   @* <div class="ml-auto">
-        <a href="~/ScreenList/UploadScreenList" class="btn btn-primary btn-icon btn-sm text-white mr-2">
-            <span>
-                <i class="fe fe-plus"></i>
-            </span> UploadScreenList
-        </a>
-    </div>*@
 </div>
 
 <div class="row">
@@ -116,14 +140,14 @@
         </div>
     </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.4/dist/xlsx.full.min.js"></script>
 
 
 @section scripts{
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.4/dist/xlsx.full.min.js"></script> <!-- Include the xlsx library script reference -->
-
+   
     <script>
-
         var selectedState = [];
         var selectedCity = [];
 
@@ -313,6 +337,15 @@
         var table;
 
         $(document).ready(function () {
+            // Show loader when the page is loaded
+            $("#loader").show();
+
+            // Hide loader after 5 seconds
+            setTimeout(function () {
+                $("#loader").hide();
+
+                // Display the data or perform any other actions
+            }, 5000);
             table = $('#Agent_Tb').DataTable({
                 "dom": 'Bfrtip',
                // "buttons": ['excel'],
@@ -391,7 +424,10 @@
                 });
             }
 
-        
+            //$('#Agent_Tb').on('init.dt', function () {
+            //    $('#loader').hide();
+            //});
+
             $("#selectStates").change(function () {
                 var selectedStates = $(this).val();
                 var selectedCities = $("#selectcity").val();

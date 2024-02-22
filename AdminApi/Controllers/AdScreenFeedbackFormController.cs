@@ -637,6 +637,7 @@ namespace AdminApi.Controllers
                                 m.AgentName,
                                 m.Cityname,
                                 n.TheatreName,
+                                n.AdsName,
                                 u.IsDeleted
                             }).Where(x => x.IsDeleted == false && x.AgentId == agentId).OrderByDescending(t => t.AdScreenFeedbackFormId);
 

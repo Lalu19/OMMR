@@ -123,25 +123,17 @@
             filterTable('No');
         });
 
-        //function filterTable(notificationStatus) {
-        //    var table = $('#Agent_Tb').DataTable();
-        //    table.columns(0).search(notificationStatus).draw();
-        //}
         function filterTable(notificationStatus) {
             var table = $('#Agent_Tb').DataTable();
 
+            // Clear any previous search filters
+            table.search('').columns().search('').draw();
             table.column(0).search(notificationStatus);
-
-            if (notificationStatus === 'Yes') {
-                table.column(5).search('Primary');
-            } else if (notificationStatus === 'No') {
-                table.column(5).search('Primary');
-            } else {
-                table.column(5).search('');
-            }
+            table.column(4).search('Primary');
 
             table.draw();
         }
+
         //List
         loadAgent()
         async function loadAgent() {

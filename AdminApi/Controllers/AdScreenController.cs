@@ -174,8 +174,6 @@ namespace AdminApi.Controllers
             }
         }
 
-
-
         [HttpGet]
         public ActionResult GetallList()
         {
