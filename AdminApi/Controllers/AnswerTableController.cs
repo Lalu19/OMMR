@@ -102,6 +102,11 @@ namespace AdminApi.Controllers
                     ans.QuestionTableId = answerTableMasterDTO.AnswerTableDTOs[i].QuestionTableId;
                     ans.OptionId = answerTableMasterDTO.AnswerTableDTOs[i].OptionId;
                     ans.Answers = answerTableMasterDTO.AnswerTableDTOs[i].Answers;
+                    ans.StateId = answerTableMasterDTO.AnswerTableDTOs[i].StateId;
+                    ans.AgentId = answerTableMasterDTO.AnswerTableDTOs[i].AgentId;
+                    ans.AgentName = answerTableMasterDTO.AnswerTableDTOs[i].AgentName;
+                    ans.Agentrole = answerTableMasterDTO.AnswerTableDTOs[i].Agentrole;
+                    ans.TheatreName = answerTableMasterDTO.AnswerTableDTOs[i].TheatreName;
                     ans.CreatedBy = answerTableMasterDTO.AnswerTableDTOs[i].CreatedBy;
                     _AnswerRepo.Insert(ans);
                 }
@@ -127,6 +132,11 @@ namespace AdminApi.Controllers
                                 u.QuestionTableId,
                                 u.OptionId,
                                 u.Answers,
+                                u.StateId,
+                                u.AgentId,
+                                u.AgentName,
+                                u.Agentrole,
+                                u.TheatreName,
                                 u.IsDeleted
                             }).Where(x => x.IsDeleted == false).ToList();
 
@@ -149,7 +159,6 @@ namespace AdminApi.Controllers
                 var list = (from u in _context.AnswerTable
                             join p in _context.QuestionTable on u.QuestionTableId equals p.QuestionTableId
                             join q in _context.Options on u.QuestionTableId equals q.QuestionId
-
                             select new
                             {
                                 p.QuestionTableId,
@@ -157,6 +166,10 @@ namespace AdminApi.Controllers
                                 u.AnswerTableId,
                                 u.OptionId,
                                 q.Option,
+                                u.AgentName,
+                                u.Agentrole,
+                                u.TheatreName,
+                                u.CreatedOn,
                                 u.Answers,
                                 u.IsDeleted
                             }).Where(x => x.IsDeleted == false).ToList();
@@ -172,7 +185,45 @@ namespace AdminApi.Controllers
             }
         }
 
+        //[HttpGet]
+        //public ActionResult GetAnswerListFromQuestion()
+        //{
+        //    try
+        //    {
+        //        var list = (from u in _context.AnswerTable
+        //                    join p in _context.QuestionTable on u.QuestionTableId equals p.QuestionTableId
+        //                    join q in _context.Options on u.QuestionTableId equals q.QuestionId
+        //                    join w in _context.AgentMappings on u.AgentId equals w.AgentId
+        //                    //join w in _context.AgentMappings on u.AgentId equals w.AgentId
+
+        //                    select new
+        //                    {
+        //                        p.QuestionTableId,
+        //                        p.Questions,
+        //                        u.AnswerTableId,
+        //                        u.OptionId,
+        //                        q.Option,
+        //                        u.Answers,
+        //                        w.AgentName,
+        //                        u.TheatreName,
+        //                        w.Agentrole,
+        //                        u.CreatedOn,
+        //                        u.IsDeleted
+        //                    }).Where(x => x.IsDeleted == false).ToList();
+
+        //        int totalRecords = list.Count();
+
+        //        return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+        //    }
+
+        //    catch (Exception ex)
+        //    {
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+        //    }
+        //}
+
         //single Id
+
         [HttpGet("{answerTableId}")]
         public ActionResult GetSingleAnswer(int answerTableId)
         {
@@ -196,6 +247,11 @@ namespace AdminApi.Controllers
                 var objState = _context.AnswerTable.SingleOrDefault(opt => opt.AnswerTableId == updateAnswerTableDTO.AnswerTableId);
                 objState.QuestionTableId = updateAnswerTableDTO.QuestionTableId;
                 objState.Answers = updateAnswerTableDTO.Answers;
+                objState.StateId = updateAnswerTableDTO.StateId;
+                objState.AgentId = updateAnswerTableDTO.AgentId;
+                objState.AgentName = updateAnswerTableDTO.AgentName;
+                objState.Agentrole = updateAnswerTableDTO.Agentrole;
+                objState.TheatreName = updateAnswerTableDTO.TheatreName;
                 objState.UpdatedBy = updateAnswerTableDTO.UpdatedBy;
                 objState.UpdatedOn = System.DateTime.Now;
                 _context.SaveChanges();
@@ -225,5 +281,25 @@ namespace AdminApi.Controllers
             }
         }
 
+        [HttpPost]
+        public IActionResult DeleteSelectedAnswers([FromBody] int[] idsToDelete, int deletedBy)
+        {
+            try
+            {
+                var answersToDelete = _context.AnswerTable.Where(opt => idsToDelete.Contains(opt.AnswerTableId));
+                foreach (var answer in answersToDelete)
+                {
+                    answer.IsDeleted = true;
+                    answer.UpdatedBy = deletedBy;
+                    answer.UpdatedOn = System.DateTime.Now;
+                }
+                _context.SaveChanges();
+                return Ok(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+            }
+        }
     }
 }
