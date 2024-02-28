@@ -132,8 +132,8 @@ namespace AdminApi.Controllers
                     // Delete all records from the AdScreen table
                     _context.Database.ExecuteSqlRaw("DELETE FROM AdScreen");
 
-                    // Reset the identity column seed for AdScreenId
-                    _context.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('AdScreen', RESEED, 0)");
+                    //// Reset the identity column seed for AdScreenId
+                    //_context.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('AdScreen', RESEED, 0)");
 
                     for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
                     {
@@ -1041,6 +1041,83 @@ namespace AdminApi.Controllers
         /// After Clicking Accept Btn in TheaterName
         /// </summary>
 
+        //[HttpGet("{TheaterName}/{Stateid}/{AgentId}")]
+        //public ActionResult GetScreenListbyTheaterName(string TheaterName, int Stateid, int AgentId)
+        //{
+        //    try
+        //    {
+        //        var feedbackAdScreenIds = _context.AdScreenFeedbackForm
+        //            .Where(feedback => feedback.IsDeleted == false)
+        //            .Select(feedback => feedback.AdScreenId)
+        //            .Distinct()
+        //            .ToList();
+
+        //        var adsList = _context.AdScreen
+        //            .Where(u => u.IsDeleted == false && u.TheatreName == TheaterName && u.StateId == Stateid
+        //                        && !feedbackAdScreenIds.Contains(u.AdScreenId))
+        //            .ToList();
+
+        //        var groupedAds = adsList
+        //            .GroupBy(u => new { u.StateId, u.TheatreName, u.Screen, u.AdsPlaytime })
+        //            .Select(group => new
+        //            {
+        //                StateId = group.Key.StateId,
+        //                TheatreName = group.Key.TheatreName,
+        //                Screen = group.Key.Screen,
+        //                AdsPlaytime = group.Key.AdsPlaytime,
+        //                AdsNames = group.Select(u => u.AdsName).ToArray(),
+        //                /* AdsPlaytime = group.Select(u => u.AdsPlaytime).FirstOrDefault(),*/
+        //                AdScreenId = group.Select(u => u.AdScreenId).ToArray(),
+        //                AdsYoutubeLink = group.Select(u => u.AdsYoutubeLink).ToArray(),
+        //                AdsSequence = group.Select(u => u.AdsSequence).ToArray(),
+        //                AdsDuration = group.Select(u => u.AdsDuration).ToArray(),
+        //                AdsLanguage = group.Select(u => u.AdsLanguage).ToArray(),
+        //                IsDeleted = group.Select(u => u.IsDeleted).FirstOrDefault(),
+        //            })
+        //            .ToList();
+
+        //        int totalRecords = groupedAds.Count();
+        //        // Update AgentMapping table
+        //        var agentMappingsToUpdate = _context.AgentMappings
+        //            .Where(mapping => mapping.StateId == Stateid && mapping.AgentId == AgentId && mapping.TheatreName == TheaterName)
+        //            .ToList();
+
+        //        foreach (var mapping in agentMappingsToUpdate)
+        //        {
+        //            mapping.TaskAccepted = true; // Set TaskAccepted to true in AgentMappings table
+
+        //            // Check conditions in AgentReport table
+        //            var agentReportRecord = _context.AgentReports.FirstOrDefault(
+        //                ar => ar.StateId == Stateid
+        //                && ar.AgentId == AgentId
+        //                && ar.TheatreName == TheaterName
+        //                && ar.NotificationSent);
+        //            // && DateTime.UtcNow.Subtract((DateTime)ar.NotifiedOn).TotalHours <= 24);
+
+        //            if (agentReportRecord != null)
+        //            {
+        //                agentReportRecord.TaskAccepted = true; // Set TaskAccepted to true in AgentReport table
+        //            }
+        //            else
+        //            {
+        //                // No record meeting conditions or NotifiedOn time exceeded 24 hours
+        //                agentReportRecord.TaskAccepted = false;
+        //            }
+        //        }
+
+        //        //_context.SaveChanges();
+
+
+        //        _context.SaveChanges();
+        //        return Ok(new { data = groupedAds, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+        //    }
+        //}
+
+
         [HttpGet("{TheaterName}/{Stateid}/{AgentId}")]
         public ActionResult GetScreenListbyTheaterName(string TheaterName, int Stateid, int AgentId)
         {
@@ -1098,50 +1175,51 @@ namespace AdminApi.Controllers
 
 
 
-        //[HttpGet("{TheaterName}/{Stateid}")]
-        //public ActionResult GetScreenListbyTheaterName(string TheaterName, int Stateid)
-        //{
-        //    try
-        //    {
-        //        var feedbackAdScreenIds = _context.AdScreenFeedbackForm
-        //            .Where(feedback => feedback.IsDeleted == false)
-        //            .Select(feedback => feedback.AdScreenId)
-        //            .Distinct()
-        //            .ToList();
 
-        //        var adsList = _context.AdScreen
-        //            .Where(u => u.IsDeleted == false && u.TheatreName == TheaterName && u.StateId == Stateid
-        //                        && !feedbackAdScreenIds.Contains(u.AdScreenId))
-        //            .ToList();
+        [HttpGet("{TheaterName}/{Stateid}")]
+        public ActionResult GetScreenListbyTheaterName(string TheaterName, int Stateid)
+        {
+            try
+            {
+                var feedbackAdScreenIds = _context.AdScreenFeedbackForm
+                    .Where(feedback => feedback.IsDeleted == false)
+                    .Select(feedback => feedback.AdScreenId)
+                    .Distinct()
+                    .ToList();
 
-        //        var groupedAds = adsList
-        //            .GroupBy(u => new { u.StateId, u.TheatreName, u.Screen, u.AdsPlaytime })
-        //            .Select(group => new
-        //            {
-        //                StateId = group.Key.StateId,
-        //                TheatreName = group.Key.TheatreName,
-        //                Screen = group.Key.Screen,
-        //                AdsPlaytime = group.Key.AdsPlaytime,
-        //                AdsNames = group.Select(u => u.AdsName).ToArray(),
-        //                /* AdsPlaytime = group.Select(u => u.AdsPlaytime).FirstOrDefault(),*/
-        //                AdScreenId = group.Select(u => u.AdScreenId).ToArray(),
-        //                AdsYoutubeLink = group.Select(u => u.AdsYoutubeLink).ToArray(),
-        //                AdsSequence = group.Select(u => u.AdsSequence).ToArray(),
-        //                AdsDuration = group.Select(u => u.AdsDuration).ToArray(),
-        //                AdsLanguage = group.Select(u => u.AdsLanguage).ToArray(),
-        //                IsDeleted = group.Select(u => u.IsDeleted).FirstOrDefault(),
-        //            })
-        //            .ToList();
+                var adsList = _context.AdScreen
+                    .Where(u => u.IsDeleted == false && u.TheatreName == TheaterName && u.StateId == Stateid
+                                && !feedbackAdScreenIds.Contains(u.AdScreenId))
+                    .ToList();
 
-        //        int totalRecords = groupedAds.Count();
+                var groupedAds = adsList
+                    .GroupBy(u => new { u.StateId, u.TheatreName, u.Screen, u.AdsPlaytime })
+                    .Select(group => new
+                    {
+                        StateId = group.Key.StateId,
+                        TheatreName = group.Key.TheatreName,
+                        Screen = group.Key.Screen,
+                        AdsPlaytime = group.Key.AdsPlaytime,
+                        AdsNames = group.Select(u => u.AdsName).ToArray(),
+                        /* AdsPlaytime = group.Select(u => u.AdsPlaytime).FirstOrDefault(),*/
+                        AdScreenId = group.Select(u => u.AdScreenId).ToArray(),
+                        AdsYoutubeLink = group.Select(u => u.AdsYoutubeLink).ToArray(),
+                        AdsSequence = group.Select(u => u.AdsSequence).ToArray(),
+                        AdsDuration = group.Select(u => u.AdsDuration).ToArray(),
+                        AdsLanguage = group.Select(u => u.AdsLanguage).ToArray(),
+                        IsDeleted = group.Select(u => u.IsDeleted).FirstOrDefault(),
+                    })
+                    .ToList();
 
-        //        return Ok(new { data = groupedAds, recordsTotal = totalRecords, recordsFiltered = totalRecords });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
-        //    }
-        //}
+                int totalRecords = groupedAds.Count();
+
+                return Ok(new { data = groupedAds, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+            }
+            catch (Exception ex)
+            {
+                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+            }
+        }
 
         [HttpGet("{TheaterName}/{Stateid}/{Screen}/{AdsPlaytime}")]
         public ActionResult GetAdsListbyScreenNo(int Stateid,string TheaterName, string Screen, string AdsPlaytime)

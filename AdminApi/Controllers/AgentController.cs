@@ -174,6 +174,24 @@ namespace AdminApi.Controllers
         {
             var objcheck = _context.Agents.SingleOrDefault(opt => opt.AgentuserId == AgentCreateDTO.AgentuserId && opt.IsDeleted == false);
 
+            var existingAgentByPhoneNumber = _context.Agents.FirstOrDefault(opt => opt.AgentPhoneNumber == AgentCreateDTO.AgentPhoneNumber && opt.IsDeleted == false);
+            var existingAgentByUserId = _context.Agents.FirstOrDefault(opt => opt.AgentuserId == AgentCreateDTO.AgentuserId && opt.IsDeleted == false);
+            var existingAgentByEmail = _context.Agents.FirstOrDefault(opt => opt.EmailId == AgentCreateDTO.EmailId && opt.IsDeleted == false);
+
+            if (existingAgentByPhoneNumber != null)
+            {
+                return Accepted(new Confirmation { Status = "AlreadyExist", ResponseMsg = "An agent with the same phone number already exists!" });
+            }
+
+            if (existingAgentByUserId != null)
+            {
+                return Accepted(new Confirmation { Status = "AlreadyExist", ResponseMsg = "An agent with the same user ID already exists!" });
+            }
+            if (existingAgentByEmail != null)
+            {
+                return Accepted(new Confirmation { Status = "AlreadyExist", ResponseMsg = "An agent with the same Emailid already exists!" });
+            }
+
             var existingAgents = _context.Agents.Where(opt => opt.IsDeleted == false).ToList();
 
             foreach (var agent in existingAgents)
@@ -243,7 +261,29 @@ namespace AdminApi.Controllers
                         _context.AgentMappings.Add(agentMapping);
                     }
 
+                    // _context.SaveChanges();
+                    foreach (var theaterName in AgentCreateDTO.TheatreName.Split(',').Select(x => x.Trim()))
+                    {
+                      AgentReport agentReport = new AgentReport
+                      {
+                          AgentId = insertedAgent.AgentId,
+                          StateId = AgentCreateDTO.StateId,
+                          AgentName = AgentCreateDTO.AgentName,
+                          Agentrole = AgentCreateDTO.Agentrole,
+                          AgentPhoneNumber = AgentCreateDTO.AgentPhoneNumber,
+                          EmailId = AgentCreateDTO.EmailId,
+                          TheatreName = theaterName,
+                          TaskAccepted = false,
+                          TaskRejected = false,
+                          NotificationSent = false,
+                          CreatedOn = DateTime.Now
+                      };
+                        _context.AgentReports.Add(agentReport);
+                    }
+
+
                     _context.SaveChanges();
+
 
                     return Ok(insertedAgent);
                 }
@@ -929,8 +969,8 @@ namespace AdminApi.Controllers
                         var theatre = notification.TheatreName;
                         var agentName = notification.AgentName;
                         //string subject = "Important Notice: Non-Responsive Auto-Generated Email";
-                        string subject = "Important Notice: Non-Responsive Auto-Generated Email";
-                        string body = $"Dear {agentName},<br><br>{theatre} theatre is assigned to you.<br><br>This auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.<br><br>Thank you for your understanding.<br><br>Best regards,<br> Ommr";
+                        string subject = "URGENT: Immediate Action Required-New Task Assignment";
+                        string body = $"Hi  {agentName},<br><br>{theatre} theatre is assigned to you.<br><br>I hope this message grabs your immediate attention.A critical task demands your prompt action.Rush to the mobile app now for detailed instructions-time is of the esscence.<br><br>Complete the assignment within 72 hours of receiving it on the app.Your swift response is crucial for successful execution.<br><br>Act urgently,and thank you for your commitment.<br><br>Best regards,<br>Team OMMR";
 
                         await SendNotifications(fcmToken, $"{theatre} Assigned", "Hello");
                         await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
@@ -1148,8 +1188,11 @@ namespace AdminApi.Controllers
                         if (backAgent.EmailId != null)
                         {
                             var mailTo = backAgent.EmailId;
-                            string subject = "Important Notice: Non-Responsive Auto-Generated Email";
-                            string body = $"Dear {backAgent.AgentName},<br><br>{backAgent.TheatreName} theatre is assigned to you.<br><br> This auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.<br><br>Thank you for your understanding.<br><br>Best regards,<br>Ommr";
+                            //string subject = "Important Notice: Non-Responsive Auto-Generated Email";
+                            //string body = $"Dear {backAgent.AgentName},<br><br>{backAgent.TheatreName} theatre is assigned to you.<br><br> This auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.<br><br>Thank you for your understanding.<br><br>Best regards,<br>Ommr";
+                            string subject = "URGENT: Immediate Action Required-New Task Assignment";
+                            string body = $"Hi  {backAgent.AgentName},<br><br>{backAgent.TheatreName} theatre is assigned to you.<br><br>I hope this message grabs your immediate attention.A critical task demands your prompt action.Rush to the mobile app now for detailed instructions-time is of the esscence.<br><br>Complete the assignment within 72 hours of receiving it on the app.Your swift response is crucial for successful execution.<br><br>Act urgently,and thank you for your commitment.<br><br>Best regards,<br>Team OMMR";
+
 
                             await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
                         }
@@ -1197,9 +1240,10 @@ namespace AdminApi.Controllers
 
 
                         var mailTo = backUpAgents.EmailId;
-                        string subject = "Important Notice: Non-Responsive Auto-Generated Email";
-                        string body = $"Dear {backUpAgents.AgentName},<br><br> {backUpAgents.TheatreName} theatre is assigned to you. <br><br>This auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.<br><br>Thank you for your understanding.<br><br>Best regards,<br> Ommr";
-
+                        //string subject = "Important Notice: Non-Responsive Auto-Generated Email";
+                        //string body = $"Dear {backUpAgents.AgentName},<br><br> {backUpAgents.TheatreName} theatre is assigned to you. <br><br>This auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.<br><br>Thank you for your understanding.<br><br>Best regards,<br> Ommr";
+                        string subject = "URGENT: Immediate Action Required-New Task Assignment";
+                        string body = $"Hi  {backUpAgents.AgentName},<br><br>{backUpAgents.TheatreName} theatre is assigned to you.<br><br>I hope this message grabs your immediate attention.A critical task demands your prompt action.Rush to the mobile app now for detailed instructions-time is of the esscence.<br><br>Complete the assignment within 72 hours of receiving it on the app.Your swift response is crucial for successful execution.<br><br>Act urgently,and thank you for your commitment.<br><br>Best regards,<br>Team OMMR";
 
                         await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
                     }
@@ -1356,8 +1400,10 @@ namespace AdminApi.Controllers
                         var theatre = notification.TheatreName;
                         var agentName = notification.AgentName;
                         //string subject = "Important Notice: Non-Responsive Auto-Generated Email";
-                        string subject = "Important Notice: Non-Responsive Auto-Generated Email";
-                        string body = $"Dear {agentName},<br><br>{theatre} theatre is assigned to you.<br><br>This auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.<br><br>Thank you for your understanding.<br><br>Best regards,<br> Ommr";
+                        //string subject = "Important Notice: Non-Responsive Auto-Generated Email";
+                        //string body = $"Dear {agentName},<br><br>{theatre} theatre is assigned to you.<br><br>This auto-generated email serves the sole purpose of maintaining records and tracking information. Kindly refrain from replying to this message, as responses will not be monitored or processed.<br><br>Thank you for your understanding.<br><br>Best regards,<br> Ommr";
+                        string subject = "URGENT: Immediate Action Required-New Task Assignment";
+                        string body = $"Hi  {agentName},<br><br>{theatre} theatre is assigned to you.<br><br>I hope this message grabs your immediate attention.A critical task demands your prompt action.Rush to the mobile app now for detailed instructions-time is of the esscence.<br><br>Complete the assignment within 72 hours of receiving it on the app.Your swift response is crucial for successful execution.<br><br>Act urgently,and thank you for your commitment.<br><br>Best regards,<br>Team OMMR";
 
                         await SendNotifications(fcmToken, $"{theatre} Assigned", "Hello");
                         await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);

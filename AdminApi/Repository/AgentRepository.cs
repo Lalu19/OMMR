@@ -13,6 +13,8 @@ using NPOI.XWPF.UserModel;
 using Amazon;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
+using AdminApi.Models.App.Agent;
+
 namespace AdminApi.Repository
 {
     public class AgentRepository
@@ -82,8 +84,6 @@ namespace AdminApi.Repository
                             {
                                 agent.AgentId,
                                 notification.FCMToken,
-                                //body = "Theatre Assigned",
-                                //title = "Hello",
                                 agent.EmailId,
                                 agent.AgentName,
                                 agent.TheatreName
@@ -102,6 +102,69 @@ namespace AdminApi.Repository
                 return new List<object> { new { Status = "error", ResponseMsg = "An error occurred while processing agents." } };
             }
         }
+
+        //public async Task<List<object>> ProcessAgentsFromTheaterName1(List<string> distinctTheatreNames)
+        //{
+        //    try
+        //    {
+        //        var agents = _context.AgentMappings.Where(u => u.IsDeleted == false && u.Agentrole == "Primary").ToList();
+        //        var resultList = new List<object>();
+
+        //        foreach (var agent in agents)
+        //        {
+        //            var primaryAgentTheatreNames = new List<string> { agent.TheatreName.Trim() };
+
+        //            // Check if any of the theater names assigned to the primary agent are present in AdScreen table
+        //            var theatersAssignedToAgent = distinctTheatreNames.Where(theatre => primaryAgentTheatreNames.Contains(theatre)).ToList();
+
+        //            if (theatersAssignedToAgent.Any())
+        //            {
+        //                var pushNotifications = _context.PushNotifications.Where(p => p.AgentId == agent.AgentId).ToList();
+        //                foreach (var notification in pushNotifications)
+        //                {
+        //                    var result = new
+        //                    {
+        //                        agent.AgentId,
+        //                        notification.FCMToken,
+        //                        agent.EmailId,
+        //                        agent.AgentName,
+        //                        agent.TheatreName
+        //                    };
+        //                    resultList.Add(result);
+
+        //                    // Update AgentMappings table
+        //                    agent.NotificationSent = true;
+        //                    agent.NotifiedOn = DateTime.Now;
+
+        //                    // Insert into AgentReport table
+        //                    var newAgentReport = new AgentReport
+        //                    {
+        //                        AgentId = agent.AgentId,
+        //                        StateId = agent.StateId,
+        //                        AgentName = agent.AgentName,
+        //                        Agentrole = agent.Agentrole,
+        //                        AgentPhoneNumber = agent.AgentPhoneNumber,
+        //                        EmailId = agent.EmailId,
+        //                        TheatreName = agent.TheatreName,
+        //                        TaskAccepted = false,
+        //                        TaskRejected = false,
+        //                        NotificationSent = true,
+        //                        NotifiedOn = DateTime.Now,
+        //                        IsTimeExpired = false,
+        //                        CreatedOn = DateTime.Now
+        //                    };
+        //                    _context.AgentReports.Add(newAgentReport);
+        //                }
+        //                await _context.SaveChangesAsync();
+        //            }
+        //        }
+        //        return resultList;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new List<object> { new { Status = "error", ResponseMsg = "An error occurred while processing agents." } };
+        //    }
+        //}
 
         public async Task<List<object>> ProcessAgentsFromTheaterName2(List<string> distinctTheatreNames)
         {

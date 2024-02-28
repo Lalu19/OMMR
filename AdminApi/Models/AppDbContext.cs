@@ -45,6 +45,8 @@ namespace AdminApi.Models
         public virtual DbSet<Options> Options { get; set; }
         public virtual DbSet<UpcomingMovie> UpcomingMovie { get; set; }
         public virtual DbSet<UpComingMovieListforClient> UpComingMovieListforClient { get; set; }
+        public virtual DbSet<AgentReport> AgentReports { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {   

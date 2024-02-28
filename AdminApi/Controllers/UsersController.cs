@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AdminApi.DTO.App.AgentDTO;
 using AdminApi.Models;
 using AdminApi.Models.Helper;
 using AdminApi.Models.User;
@@ -522,6 +523,22 @@ namespace AdminApi.Controllers
         //public ActionResult CreateUser(Users model)
         //{
         //    var objCheck = _context.Users.SingleOrDefault(opt => opt.AdvertiseName == model.AdvertiseName);
+        //    var existingAgentByPhoneNumber = _context.Users.FirstOrDefault(opt => opt.Mobile == model.Mobile && opt.IsActive == true);
+        //    var existingAgentByUserId = _context.Users.FirstOrDefault(opt => opt.Email == model.Email && opt.IsActive == true);
+        //    var existingAgentByEmail = _context.Users.FirstOrDefault(opt => opt.UserName == model.UserName && opt.IsActive == true);
+
+        //    if (existingAgentByPhoneNumber != null)
+        //    {
+        //        return Accepted(new Confirmation { Status = "AlreadyExist", ResponseMsg = "An User with the same phone number already exists!" });
+        //    }
+        //    if (existingAgentByUserId != null)
+        //    {
+        //        return Accepted(new Confirmation { Status = "AlreadyExist", ResponseMsg = "An User with the same user ID already exists!" });
+        //    }
+        //    if (existingAgentByEmail != null)
+        //    {
+        //        return Accepted(new Confirmation { Status = "AlreadyExist", ResponseMsg = "An User with the same Emailid already exists!" });
+        //    }
         //    try
         //    {
         //        if (objCheck == null)
