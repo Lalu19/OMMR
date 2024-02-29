@@ -7,6 +7,7 @@ namespace AdminApi.Models.App
     {        
         public int QuestionTableId { get; set; }
         public string Questions { get; set; }
+        public string AdsName { get; set; }
         public int CreatedBy { get; set; }
         public DateTime? CreatedOn { get; set; }
         public int? UpdatedBy { get; set; }

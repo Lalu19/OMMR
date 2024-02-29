@@ -163,6 +163,7 @@ namespace AdminApi.Controllers
                             {
                                 p.QuestionTableId,
                                 p.Questions,
+                                p.AdsName,
                                 u.AnswerTableId,
                                 u.OptionId,
                                 q.Option,

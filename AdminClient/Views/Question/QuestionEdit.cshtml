@@ -30,6 +30,15 @@
             <div class="card-body">
                 <form action="#" role="form" class="validate" id="formPost">
                     <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">Ads Name &nbsp;<span style="color: red;"><b>*</b></span></label>
+                                <div class="input-box">
+                                    <select class="form-control" id="selectads">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-md-8">
                             <div class="form-group">
                                 <label class="form-label">Questions &nbsp;<span style="color: red;"><b>*</b></span></label>
@@ -51,6 +60,42 @@
 
 @section scripts{
     <script>
+        GetAds()
+        function GetAds(Id) {
+            var opt = '';
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/AdScreen/GetAdvertiseList",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (res) {
+                    console.log(res)
+                    var options = [];
+                    options.push('<option value="">Please Select </option>');
+                    for (var i = 0; i < res.data.length; i++) {
+                        //if (Id == res.data[i].stateId) {
+                        //    opt = 'selected'
+                        //} else {
+                        //    opt = '';
+                        //}
+                        options.push('<option value="' + res.data[i].adsName + '" ' + opt + '>' + res.data[i].adsName + '</option>');
+                    }
+                    $("#selectads").html(options.join(''));
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
+    </script>
+    <script>
         var questionTableId = @ViewBag.questionTableId
             loadSinglestate()
         function loadSinglestate() {
@@ -64,8 +109,8 @@
                 dataType: "json",
                 success: function (data) {
                     if (data) {
+                        $('#selectads').val(data.adsName);
                         $('#Questions').val(data.questions);
-                        
                     }
                     else {
                         sweetAlert("Validation Alert!", "Something unexpected!", "warning");
@@ -88,6 +133,7 @@
 
                 var model = {
                     questionTableId: questionTableId,
+                    adsName: $.trim($("#selectads").val()),
                     questions: $.trim($("#Questions").val()),
                     updatedBy: @Context.Session.GetInt32("UserId"),
                 }

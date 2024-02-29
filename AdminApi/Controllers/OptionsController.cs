@@ -74,6 +74,7 @@ namespace AdminApi.Controllers
                                 u.OptionsId,
                                 u.QuestionId,
                                 p.Questions,
+                                p.AdsName,
                                 u.Option,
                                 u.IsDeleted
                             }).Where(x => x.IsDeleted == false).ToList();
@@ -89,17 +90,21 @@ namespace AdminApi.Controllers
             }
         }
 
-        [HttpGet]
-        public ActionResult GetOptionListFromQuestion()
+        /// <summary>
+        /// Questions Show in Audience Review
+        /// </summary>
+        [HttpGet("{AdsName}")]
+        public ActionResult GetOptionListFromQuestionbyadsname(string AdsName)
         {
             try
             {
                 var questions = (from p in _context.QuestionTable
-                                 where p.IsDeleted == false
+                                 where p.IsDeleted == false && p.AdsName == AdsName
                                  select new
                                  {
                                      p.QuestionTableId,
                                      p.Questions,
+                                     p.AdsName,
                                      p.IsDeleted
                                  }).ToList();
 
@@ -119,6 +124,7 @@ namespace AdminApi.Controllers
                 {
                     QuestionTableId = q.QuestionTableId,
                     Questions = q.Questions,
+                    AdsName = q.AdsName,
                     Options = options.Where(o => o.QuestionId == q.QuestionTableId)
                                       .Select(option => new
                                       {
@@ -152,6 +158,7 @@ namespace AdminApi.Controllers
                             {
                                 p.QuestionTableId,
                                 p.Questions,
+                                p.AdsName,
                                 u.OptionsId,
                                 u.Option,
                                 u.IsDeleted

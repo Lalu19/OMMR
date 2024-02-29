@@ -34,6 +34,7 @@ namespace AdminApi.Controllers
             {
                 QuestionTable qs = new QuestionTable();
                 qs.Questions = questionTableDTO.Questions;
+                qs.AdsName = questionTableDTO.AdsName;
                 qs.CreatedBy = questionTableDTO.CreatedBy;
                 qs.CreatedOn = System.DateTime.Now;
                 var obj = _QuestionRepo.Insert(qs);
@@ -55,6 +56,7 @@ namespace AdminApi.Controllers
                             select new {
                                 u.QuestionTableId,
                                 u.Questions,
+                                u.AdsName,
                                 u.IsDeleted
                             }).Where(x => x.IsDeleted == false).ToList();
 
@@ -92,6 +94,7 @@ namespace AdminApi.Controllers
             {
                 var objState = _context.QuestionTable.SingleOrDefault(opt => opt.QuestionTableId == updateQuestionTableDTO.QuestionTableId);
                 objState.Questions = updateQuestionTableDTO.Questions;
+                objState.AdsName = updateQuestionTableDTO.AdsName;
                 objState.UpdatedBy = updateQuestionTableDTO.UpdatedBy;
                 objState.UpdatedOn = System.DateTime.Now;
                 _context.SaveChanges();
