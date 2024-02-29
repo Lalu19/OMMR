@@ -1089,7 +1089,7 @@ namespace AdminApi.Controllers
         {
             try
             {
-                var agents = _context.AgentMappings.Where(a => a.AgentId == AgentId).ToList();
+                var agents = _context.AgentMappings.Where(a => a.AgentId == AgentId && a.IsDeleted == false).ToList();
 
 
                 if (agents.Any())
@@ -1220,7 +1220,7 @@ namespace AdminApi.Controllers
                 var agentService = new AgentRepository(_context);
 
 
-                var priAgent = _context.AgentMappings.FirstOrDefault(a => a.AgentId == AgentId && a.TheatreName == TheaterName);
+                var priAgent = _context.AgentMappings.FirstOrDefault(a => a.AgentId == AgentId && a.TheatreName == TheaterName && a.IsDeleted == false);
                 priAgent.TaskRejected = true;
                 _context.SaveChanges();
 
