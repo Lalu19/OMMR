@@ -315,6 +315,78 @@ namespace AdminApi.Controllers
             }
         }
 
+        [HttpGet]
+        public ActionResult GetSECList()
+        {
+            try
+            {
+                var list = (from u in _context.ScreenList
+
+                            select new
+                            {
+                                u.SEC,
+                                u.IsDeleted
+                            }).Where(x => x.IsDeleted == false).Distinct().ToList();
+
+                int totalRecords = list.Count();
+
+                return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+            }
+
+            catch (Exception ex)
+            {
+                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public ActionResult GetTheaterRatingList()
+        {
+            try
+            {
+                var list = (from u in _context.ScreenList
+
+                            select new
+                            {
+                                u.TheatreRating,
+                                u.IsDeleted
+                            }).Where(x => x.IsDeleted == false).Distinct().ToList();
+
+                int totalRecords = list.Count();
+
+                return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+            }
+
+            catch (Exception ex)
+            {
+                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public ActionResult GetMediaList()
+        {
+            try
+            {
+                var list = (from u in _context.ScreenList
+
+                            select new
+                            {
+                                u.Media,
+                                u.IsDeleted
+                            }).Where(x => x.IsDeleted == false).Distinct().ToList();
+
+                int totalRecords = list.Count();
+
+                return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+            }
+
+            catch (Exception ex)
+            {
+                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+            }
+        }
+
         [HttpGet("{State}")]
         public ActionResult GetCityListbystatename(string State)
         {
