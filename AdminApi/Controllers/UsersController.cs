@@ -530,17 +530,17 @@ namespace AdminApi.Controllers
 
                     if (existingUsers.Any(u => u.Mobile == model.Mobile))
                     {
-                        return Accepted(new Confirmation { Status = "duplicate", ResponseMsg = "Mobile Number is already in use" });
+                        return Accepted(new Confirmation { Status = "duplicate", ResponseMsg = "Mobile Number is already exists!!" });
                     }
 
                     if (existingUsers.Any(u => u.Email == model.Email))
                     {
-                        return Accepted(new Confirmation { Status = "duplicate", ResponseMsg = "Email is already in use" });
+                        return Accepted(new Confirmation { Status = "duplicate", ResponseMsg = "Email is already exists!!" });
                     }
 
                     if (existingUsers.Any(u => u.UserName == model.UserName))
                     {
-                        return Accepted(new Confirmation { Status = "duplicate", ResponseMsg = "Username is already in use" });
+                        return Accepted(new Confirmation { Status = "duplicate", ResponseMsg = "Username is already exists!!" });
                     }
 
                     model.DateAdded = DateTime.Now;
