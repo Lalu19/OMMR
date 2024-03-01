@@ -456,9 +456,14 @@
             function filterTableData() {
                 var selectedStates = $('#selectStates').val();
                 var selectedCities = $('#selectcity').val();
-                var selectedSec = $('#selectSec').val();
-                var selectedRating = $('#selectRating').val();
+                // var selectedSec = $('#selectSec').val();
+               // var selectedRating = $('#selectRating').val();
                 var selectedMedia = $('#selectMedia').val();
+
+
+                var selectedSec = $('#selectSec').val() ? $('#selectSec').val().map(function(sec) { return sec.replace(/[.+*?^${}()|[\]\\]/g, '\\$&'); }) : '';
+                var selectedRating = $('#selectRating').val() ? $('#selectRating').val().map(function (sec) { return sec.replace(/[.+*?^${}()|[\]\\]/g, '\\$&'); }) : '';
+
 
                 // Perform filtering based on selected values
                 table.columns(1).search(selectedStates ? selectedStates.join('|') : '', true, false, true);
