@@ -188,324 +188,523 @@
                 }
             });
         }
-
-        $("#selectStates").change(function () {
-            var selectedStates = $("#selectStates").val();
-
-            var allCities = [];
-
-            selectedStates.forEach(function (stateName) {
-                $.ajax({
-                    type: "GET",
-                    url: '@apiUrl/api/ScreenList/GetCityListbystatename/' + stateName,
-                    dataType: "json",
-                    success: function (data) {
-                        for (var i = 0; i < data['data'].length; i++) {
-                            allCities.push(data['data'][i].city);
-                        }
-
-                        var uniqueCities = Array.from(new Set(allCities));
-
-                        var options = uniqueCities.map(function (city) {
-                            return '<option value="' + city + '">' + city + '</option>';
-                        });
-
-                        $("#selectcity").html(options.join(''));
-                        $('#selectcity').multipleSelect({
-                            width: '100%'
-                        });
-                    },
-                    error: function (data) {
-                        if (data.status == 401) {
-                            window.location.replace('/Message/TokenExpire');
-                        } else if (data.status == 403) {
-                            window.location.replace('/Message/Unauthorize');
-                        }
+        // Load City dropdown
+        GetCity();
+        function GetCity() {
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/ScreenList/GetCityList",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (res) {
+                    var options = [];
+                    for (var i = 0; i < res.data.length; i++) {
+                        options.push('<option value="' + res.data[i].city + '">' + res.data[i].city + '</option>');
                     }
-                });
+                    $("#selectcity").html(options.join(''));
+                    $('#selectcity').multipleSelect({
+                        width: '100%'
+                    });
+                },
+                error: function (data) {
+                    handleAjaxError(data);
+                }
             });
-        });
-
-        $("#selectcity").change(function () {
-            var selectedCities = $("#selectcity").val();
-            var allSec = [];
-
-            selectedCities.forEach(function (city) {
-                $.ajax({
-                    type: "GET",
-                    url: '@apiUrl/api/ScreenList/GetSecListbycityname/' + city,
-                    dataType: "json",
-                    success: function (data) {
-                        for (var i = 0; i < data['data'].length; i++) {
-                            allSec.push(data['data'][i].sec);
-                        }
-
-                        var uniqueSec = Array.from(new Set(allSec));
-
-                        var options = uniqueSec.map(function (sec) {
-                            return '<option value="' + sec + '">' + sec + '</option>';
-                        });
-
-                        $("#selectSec").html(options.join(''));
-                        $('#selectSec').multipleSelect({
-                            width: '100%'
-                        });
-                    },
-                    error: function (data) {
-                        if (data.status == 401) {
-                            window.location.replace('/Message/TokenExpire');
-                        } else if (data.status == 403) {
-                            window.location.replace('/Message/Unauthorize');
-                        }
+        }
+        // Load Sec dropdown
+        GetSEC();
+        function GetSEC() {
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/ScreenList/GetSECList",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (res) {
+                    var options = [];
+                    for (var i = 0; i < res.data.length; i++) {
+                        options.push('<option value="' + res.data[i].sec + '">' + res.data[i].sec + '</option>');
                     }
-                });
+                    $("#selectSec").html(options.join(''));
+                    $('#selectSec').multipleSelect({
+                        width: '100%'
+                    });
+                },
+                error: function (data) {
+                    handleAjaxError(data);
+                }
             });
-        });
+        }
 
-        $("#selectSec").change(function () {
-            var selectedSec = $("#selectSec").val();
-            var Rating = [];
-
-            selectedSec.forEach(function (sec) {
-                $.ajax({
-                    type: "GET",
-                    url: '@apiUrl/api/ScreenList/GetTheaterRatingListbysec/' + sec,
-                    dataType: "json",
-                    success: function (data) {
-                        for (var i = 0; i < data['data'].length; i++) {
-                            Rating.push(data['data'][i].theatreRating);
-                        }
-
-                        var uniqueRating = Array.from(new Set(Rating));
-
-                        var options = uniqueRating.map(function (theatreRating) {
-                            return '<option value="' + theatreRating + '">' + theatreRating + '</option>';
-                        });
-
-                        $("#selectRating").html(options.join(''));
-                        $('#selectRating').multipleSelect({
-                            width: '100%'
-                        });
-                    },
-                    error: function (data) {
-                        if (data.status == 401) {
-                            window.location.replace('/Message/TokenExpire');
-                        } else if (data.status == 403) {
-                            window.location.replace('/Message/Unauthorize');
-                        }
+        // Load Theatre Rating dropdown
+        GetRating();
+        function GetRating() {
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/ScreenList/GetTheaterRatingList",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (res) {
+                    var options = [];
+                    for (var i = 0; i < res.data.length; i++) {
+                        options.push('<option value="' + res.data[i].theatreRating + '">' + res.data[i].theatreRating + '</option>');
                     }
-                });
+                    $("#selectRating").html(options.join(''));
+                    $('#selectRating').multipleSelect({
+                        width: '100%'
+                    });
+                },
+                error: function (data) {
+                    handleAjaxError(data);
+                }
             });
-        });
-
-        $("#selectRating").change(function () {
-            var selectedRating = $("#selectRating").val();
-            var Media = [];
-
-            selectedRating.forEach(function (theatreRating) {
-                $.ajax({
-                    type: "GET",
-                    url: '@apiUrl/api/ScreenList/GetMediaListbyTheaterRating/' + theatreRating,
-                    dataType: "json",
-                    success: function (data) {
-                        for (var i = 0; i < data['data'].length; i++) {
-                            Media.push(data['data'][i].media);
-                        }
-
-                        var uniqueMedia = Array.from(new Set(Media));
-
-                        var options = uniqueMedia.map(function (media) {
-                            return '<option value="' + media + '">' + media + '</option>';
-                        });
-
-                        $("#selectMedia").html(options.join(''));
-                        $('#selectMedia').multipleSelect({
-                            width: '100%'
-                        });
-                    },
-                    error: function (data) {
-                        if (data.status == 401) {
-                            window.location.replace('/Message/TokenExpire');
-                        } else if (data.status == 403) {
-                            window.location.replace('/Message/Unauthorize');
-                        }
+        }
+        // Load Media dropdown
+        GetMedia();
+        function GetMedia() {
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/ScreenList/GetMediaList",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (res) {
+                    var options = [];
+                    for (var i = 0; i < res.data.length; i++) {
+                        options.push('<option value="' + res.data[i].media + '">' + res.data[i].media + '</option>');
                     }
-                });
+                    $("#selectMedia").html(options.join(''));
+                    $('#selectMedia').multipleSelect({
+                        width: '100%'
+                    });
+                },
+                error: function (data) {
+                    handleAjaxError(data);
+                }
             });
-        });
+        }
+        //$("#selectStates").change(function () {
+        //    var selectedStates = $("#selectStates").val();
+
+        //    var allCities = [];
+
+        //    selectedStates.forEach(function (stateName) {
+        //        $.ajax({
+        //            type: "GET",
+        //            url: '@apiUrl/api/ScreenList/GetCityListbystatename/' + stateName,
+        //            dataType: "json",
+        //            success: function (data) {
+        //                for (var i = 0; i < data['data'].length; i++) {
+        //                    allCities.push(data['data'][i].city);
+        //                }
+
+        //                var uniqueCities = Array.from(new Set(allCities));
+
+        //                var options = uniqueCities.map(function (city) {
+        //                    return '<option value="' + city + '">' + city + '</option>';
+        //                });
+
+        //                $("#selectcity").html(options.join(''));
+        //                $('#selectcity').multipleSelect({
+        //                    width: '100%'
+        //                });
+        //            },
+        //            error: function (data) {
+        //                if (data.status == 401) {
+        //                    window.location.replace('/Message/TokenExpire');
+        //                } else if (data.status == 403) {
+        //                    window.location.replace('/Message/Unauthorize');
+        //                }
+        //            }
+        //        });
+        //    });
+        //});
+
+        //$("#selectcity").change(function () {
+        //    var selectedCities = $("#selectcity").val();
+        //    var allSec = [];
+
+        //    selectedCities.forEach(function (city) {
+        //        $.ajax({
+        //            type: "GET",
+        //            url: '@apiUrl/api/ScreenList/GetSecListbycityname/' + city,
+        //            dataType: "json",
+        //            success: function (data) {
+        //                for (var i = 0; i < data['data'].length; i++) {
+        //                    allSec.push(data['data'][i].sec);
+        //                }
+
+        //                var uniqueSec = Array.from(new Set(allSec));
+
+        //                var options = uniqueSec.map(function (sec) {
+        //                    return '<option value="' + sec + '">' + sec + '</option>';
+        //                });
+
+        //                $("#selectSec").html(options.join(''));
+        //                $('#selectSec').multipleSelect({
+        //                    width: '100%'
+        //                });
+        //            },
+        //            error: function (data) {
+        //                if (data.status == 401) {
+        //                    window.location.replace('/Message/TokenExpire');
+        //                } else if (data.status == 403) {
+        //                    window.location.replace('/Message/Unauthorize');
+        //                }
+        //            }
+        //        });
+        //    });
+        //});
+
+        //$("#selectSec").change(function () {
+        //    var selectedSec = $("#selectSec").val();
+        //    var Rating = [];
+
+        //    selectedSec.forEach(function (sec) {
+        //        $.ajax({
+        //            type: "GET",
+        //            url: '@apiUrl/api/ScreenList/GetTheaterRatingListbysec/' + sec,
+        //            dataType: "json",
+        //            success: function (data) {
+        //                for (var i = 0; i < data['data'].length; i++) {
+        //                    Rating.push(data['data'][i].theatreRating);
+        //                }
+
+        //                var uniqueRating = Array.from(new Set(Rating));
+
+        //                var options = uniqueRating.map(function (theatreRating) {
+        //                    return '<option value="' + theatreRating + '">' + theatreRating + '</option>';
+        //                });
+
+        //                $("#selectRating").html(options.join(''));
+        //                $('#selectRating').multipleSelect({
+        //                    width: '100%'
+        //                });
+        //            },
+        //            error: function (data) {
+        //                if (data.status == 401) {
+        //                    window.location.replace('/Message/TokenExpire');
+        //                } else if (data.status == 403) {
+        //                    window.location.replace('/Message/Unauthorize');
+        //                }
+        //            }
+        //        });
+        //    });
+        //});
+
+        //$("#selectRating").change(function () {
+        //    var selectedRating = $("#selectRating").val();
+        //    var Media = [];
+
+        //    selectedRating.forEach(function (theatreRating) {
+        //        $.ajax({
+        //            type: "GET",
+        //            url: '@apiUrl/api/ScreenList/GetMediaListbyTheaterRating/' + theatreRating,
+        //            dataType: "json",
+        //            success: function (data) {
+        //                for (var i = 0; i < data['data'].length; i++) {
+        //                    Media.push(data['data'][i].media);
+        //                }
+
+        //                var uniqueMedia = Array.from(new Set(Media));
+
+        //                var options = uniqueMedia.map(function (media) {
+        //                    return '<option value="' + media + '">' + media + '</option>';
+        //                });
+
+        //                $("#selectMedia").html(options.join(''));
+        //                $('#selectMedia').multipleSelect({
+        //                    width: '100%'
+        //                });
+        //            },
+        //            error: function (data) {
+        //                if (data.status == 401) {
+        //                    window.location.replace('/Message/TokenExpire');
+        //                } else if (data.status == 403) {
+        //                    window.location.replace('/Message/Unauthorize');
+        //                }
+        //            }
+        //        });
+        //    });
+        //});
 
         var table;
-
         $(document).ready(function () {
-            // Show loader when the page is loaded
-            $("#loader").show();
+            // Load dropdowns and initialize DataTable
+            GetState();
+            GetCity();
+            GetSEC();
+            GetRating();
+            GetMedia();
+            initializeDataTable();
 
-            // Hide loader after 5 seconds
-            setTimeout(function () {
-                $("#loader").hide();
-
-                // Display the data or perform any other actions
-            }, 5000);
-            table = $('#Agent_Tb').DataTable({
-                "dom": 'Bfrtip',
-               // "buttons": ['excel'],
-                "buttons": [
-                    {
-                        extend: 'excel',
-                        text: 'Export to Excel',
-                        action: function (e, dt, button, config) {
-                            var filteredData = dt.rows({ search: 'applied' }).data().toArray();
-                            console.log(filteredData); // Or perform any other action you desire
-                            var exportData = dt.buttons.exportData({
-                                modifier: {
-                                    search: 'applied'
-                                }
-                            });
-
-                            $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config, exportData);
-                            saveDataToDatabase(filteredData);
-
-                           // $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
-                        }
-                    }
-                ],
-                "searching": true,
-                "paging": true,
-                "sort": true,
-                "info": true,
-                "ajax": {
-                    "url": '@apiUrl/api/ScreenList/GetallList',
-                    "type": "GET",
-                    "dataType": "json",
-                    "headers": {
-                        "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
-                    },
-                    "error": function (data) {
-                        if (data.status == 401) {
-                            window.location.replace('/Message/TokenExpire');
-                        } else if (data.status == 403) {
-                            window.location.replace('/Message/Unauthorize');
-                        }
-                    }
-                },
-                "order": [],
-                "columns": [
-                    { "data": "region", "orderable": true, "visible": true },
-                    { "data": "state", "orderable": true, "visible": true },
-                    { "data": "city", "orderable": true, "visible": true },
-                    { "data": "district", "orderable": true, "visible": true },
-                    { "data": "theatreCode", "orderable": true, "visible": true },
-                    { "data": "theatreName", "orderable": true, "visible": true },
-                    { "data": "sec", "orderable": true, "visible": true },
-                    { "data": "screen", "orderable": true, "visible": true },
-                    { "data": "noofSeats", "orderable": true, "visible": true },
-                    { "data": "theatreRating", "orderable": true, "visible": true },
-                    { "data": "rate", "orderable": true, "visible": true },
-                    { "data": "media", "orderable": true, "visible": true },
-                ]
-            });
-            function saveDataToDatabase(data) {
-
-                data.forEach(function (item) {
-                    item.createdBy = @Context.Session.GetInt32("UserId");
-                });
-                $.ajax({
-                    type: "POST",
-                    url: '@apiUrl/api/ClientSearch/SaveDataToDatabase/SaveDataToDatabase', // Change this to the correct API endpoint for saving data
-                    contentType: "application/json",
-                    data: JSON.stringify(data),
-                    success: function (response) {
-                        console.log("Data saved to the database: " + response);
-                       
-                    },
-                    error: function (error) {
-                        console.error("Error saving data to the database: " + error);
-                    }
-                });
-            }
-
-            //$('#Agent_Tb').on('init.dt', function () {
-            //    $('#loader').hide();
-            //});
-
-            $("#selectStates").change(function () {
-                var selectedStates = $(this).val();
-                var selectedCities = $("#selectcity").val();
-                var selectedSec = $("#selectSec").val();
-                var selectedRating = $("#selectRating").val();
-                var selectedMedia = $("#selectMedia").val();
-                filterTableData(selectedStates, selectedCities, selectedSec, selectedRating, selectedMedia);
+            // Trigger filtering when any dropdown selection changes
+            $('#selectStates, #selectcity, #selectSec, #selectRating, #selectMedia').change(function () {
+                filterTableData();
             });
 
-            $("#selectcity").change(function () {
-                var selectedStates = $("#selectStates").val();
-                var selectedCities = $(this).val();
-                var selectedSec = $("#selectSec").val();
-                var selectedRating = $("#selectRating").val();
-                var selectedMedia = $("#selectMedia").val();
-                filterTableData(selectedStates, selectedCities, selectedSec, selectedRating, selectedMedia);
-            });
+            function filterTableData() {
+                var selectedStates = $('#selectStates').val();
+                var selectedCities = $('#selectcity').val();
+                var selectedSec = $('#selectSec').val();
+                var selectedRating = $('#selectRating').val();
+                var selectedMedia = $('#selectMedia').val();
 
-            $("#selectSec").change(function () {
-                var selectedStates = $("#selectStates").val();
-                var selectedCities = $("#selectcity").val();
-                var selectedSec = $(this).val();
-                var selectedRating = $("#selectRating").val();
-                var selectedMedia = $("#selectMedia").val();
-                filterTableData(selectedStates, selectedCities, selectedSec, selectedRating, selectedMedia);
-            });
+                // Perform filtering based on selected values
+                table.columns(1).search(selectedStates ? selectedStates.join('|') : '', true, false, true);
+                table.columns(2).search(selectedCities ? selectedCities.join('|') : '', true, false, true);
+                table.columns(6).search(selectedSec ? selectedSec.join('|') : '', true, false, true);
 
-            $("#selectRating").change(function () {
-                var selectedStates = $("#selectStates").val();
-                var selectedCities = $("#selectcity").val();
-                var selectedSec = $("#selectSec").val();
-                var selectedRating = $(this).val();
-                var selectedMedia = $("#selectMedia").val();
-                filterTableData(selectedStates, selectedCities, selectedSec, selectedRating, selectedMedia);
-            });
-
-            $("#selectMedia").change(function () {
-                var selectedStates = $("#selectStates").val();
-                var selectedCities = $("#selectcity").val();
-                var selectedSec = $("#selectSec").val();
-                var selectedRating = $("#selectRating").val();
-                var selectedMedia = $(this).val();
-                filterTableData(selectedStates, selectedCities, selectedSec, selectedRating, selectedMedia);
-            });
-
-            var initialStates = $("#selectStates").val();
-            var initialCities = $("#selectcity").val();
-            var initialSec = $("#selectSec").val();
-            var initialRating = $("#selectRating").val();
-            var initialMedia = $("#selectMedia").val();
-            filterTableData(initialStates, initialCities, initialSec, initialRating, initialMedia);
-
-            function filterTableData(selectedStates, selectedCities, selectedSec, selectedRating, selectedMedia) {
-                var escapeRegExp = function (string) {
-                    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                };
-
-                var stateFilter = selectedStates.map(escapeRegExp).join('|');
-                var cityFilter = selectedCities.map(escapeRegExp).join('|');
-                var secFilter = selectedSec.map(escapeRegExp).join('|');
-                //var ratingFilter = selectedRating.map(escapeRegExp).join('|');
-                var ratingFilter = selectedRating.map(function (rating) {
-
-                    return rating.length === 1 ? `^${escapeRegExp(rating)}$` : escapeRegExp(rating);
-
-                }).join('|');
-                var mediaFilter = selectedMedia.map(escapeRegExp).join('|');
-
-                table.columns(1).search(stateFilter, true, false, true);
-                table.columns(2).search(cityFilter, true, false, true);
-                table.columns(6).search(secFilter, true, false, true);
+                // Filter by exact match for single-character ratings and pattern match for others
+                var ratingFilter = selectedRating ? selectedRating.map(function (rating) {
+                    return rating.length === 1 ? '^' + rating + '$' : '^' + rating + '$';
+                }).join('|') : '';
                 table.columns(9).search(ratingFilter, true, false, true);
-                table.columns(11).search(mediaFilter, true, false, true);
 
+                table.columns(11).search(selectedMedia ? selectedMedia.join('|') : '', true, false, true);
+
+                // Redraw the table with applied filters
                 table.draw();
             }
 
-          
+            function initializeDataTable() {
+                table = $('#Agent_Tb').DataTable({
+                    "dom": 'Bfrtip',
+                    // "buttons": ['excel'],
+                    "buttons": [
+                        {
+                            extend: 'excel',
+                            text: 'Export to Excel',
+                            action: function (e, dt, button, config) {
+                                var filteredData = dt.rows({ search: 'applied' }).data().toArray();
+                                console.log(filteredData); // Or perform any other action you desire
+                                var exportData = dt.buttons.exportData({
+                                    modifier: {
+                                        search: 'applied'
+                                    }
+                                });
+
+                                $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config, exportData);
+                                saveDataToDatabase(filteredData);
+
+                                // $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+                            }
+                        }
+                    ],
+                    "searching": true,
+                    "paging": true,
+                    "sort": true,
+                    "info": true,
+                    "ajax": {
+                        "url": '@apiUrl/api/ScreenList/GetallList',
+                        "type": "GET",
+                        "dataType": "json",
+                        "headers": {
+                            "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                        },
+                        "error": function (data) {
+                            if (data.status == 401) {
+                                window.location.replace('/Message/TokenExpire');
+                            } else if (data.status == 403) {
+                                window.location.replace('/Message/Unauthorize');
+                            }
+                        }
+                    },
+                    "order": [],
+                    "columns": [
+                        { "data": "region", "orderable": true, "visible": true },
+                        { "data": "state", "orderable": true, "visible": true },
+                        { "data": "city", "orderable": true, "visible": true },
+                        { "data": "district", "orderable": true, "visible": true },
+                        { "data": "theatreCode", "orderable": true, "visible": true },
+                        { "data": "theatreName", "orderable": true, "visible": true },
+                        { "data": "sec", "orderable": true, "visible": true },
+                        { "data": "screen", "orderable": true, "visible": true },
+                        { "data": "noofSeats", "orderable": true, "visible": true },
+                        { "data": "theatreRating", "orderable": true, "visible": true },
+                        { "data": "rate", "orderable": true, "visible": true },
+                        { "data": "media", "orderable": true, "visible": true },
+                    ]
+                });
+            }
         });
+
+        //$(document).ready(function () {
+        //    // Show loader when the page is loaded
+        //    $("#loader").show();
+
+        //    // Hide loader after 5 seconds
+        //    setTimeout(function () {
+        //        $("#loader").hide();
+
+        //        // Display the data or perform any other actions
+        //    }, 5000);
+        //    table = $('#Agent_Tb').DataTable({
+        //        "dom": 'Bfrtip',
+        //       // "buttons": ['excel'],
+        //        "buttons": [
+        //            {
+        //                extend: 'excel',
+        //                text: 'Export to Excel',
+        //                action: function (e, dt, button, config) {
+        //                    var filteredData = dt.rows({ search: 'applied' }).data().toArray();
+        //                    console.log(filteredData); // Or perform any other action you desire
+        //                    var exportData = dt.buttons.exportData({
+        //                        modifier: {
+        //                            search: 'applied'
+        //                        }
+        //                    });
+
+        //                    $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config, exportData);
+        //                    saveDataToDatabase(filteredData);
+
+        //                   // $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+        //                }
+        //            }
+        //        ],
+        //        "searching": true,
+        //        "paging": true,
+        //        "sort": true,
+        //        "info": true,
+        //        "ajax": {
+        //            "url": '@apiUrl/api/ScreenList/GetallList',
+        //            "type": "GET",
+        //            "dataType": "json",
+        //            "headers": {
+        //                "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+        //            },
+        //            "error": function (data) {
+        //                if (data.status == 401) {
+        //                    window.location.replace('/Message/TokenExpire');
+        //                } else if (data.status == 403) {
+        //                    window.location.replace('/Message/Unauthorize');
+        //                }
+        //            }
+        //        },
+        //        "order": [],
+        //        "columns": [
+        //            { "data": "region", "orderable": true, "visible": true },
+        //            { "data": "state", "orderable": true, "visible": true },
+        //            { "data": "city", "orderable": true, "visible": true },
+        //            { "data": "district", "orderable": true, "visible": true },
+        //            { "data": "theatreCode", "orderable": true, "visible": true },
+        //            { "data": "theatreName", "orderable": true, "visible": true },
+        //            { "data": "sec", "orderable": true, "visible": true },
+        //            { "data": "screen", "orderable": true, "visible": true },
+        //            { "data": "noofSeats", "orderable": true, "visible": true },
+        //            { "data": "theatreRating", "orderable": true, "visible": true },
+        //            { "data": "rate", "orderable": true, "visible": true },
+        //            { "data": "media", "orderable": true, "visible": true },
+        //        ]
+        //    });
+        //    function saveDataToDatabase(data) {
+
+        //        data.forEach(function (item) {
+        //            item.createdBy = @Context.Session.GetInt32("UserId");
+        //        });
+        //        $.ajax({
+        //            type: "POST",
+        //            url: '@apiUrl/api/ClientSearch/SaveDataToDatabase/SaveDataToDatabase', // Change this to the correct API endpoint for saving data
+        //            contentType: "application/json",
+        //            data: JSON.stringify(data),
+        //            success: function (response) {
+        //                console.log("Data saved to the database: " + response);
+                       
+        //            },
+        //            error: function (error) {
+        //                console.error("Error saving data to the database: " + error);
+        //            }
+        //        });
+        //    }
+
+        //    //$("#selectStates").change(function () {
+        //    //    var selectedStates = $(this).val();
+        //    //    var selectedCities = $("#selectcity").val();
+        //    //    var selectedSec = $("#selectSec").val();
+        //    //    var selectedRating = $("#selectRating").val();
+        //    //    var selectedMedia = $("#selectMedia").val();
+        //    //    filterTableData(selectedStates, selectedCities, selectedSec, selectedRating, selectedMedia);
+        //    //});
+
+        //    //$("#selectcity").change(function () {
+        //    //    var selectedStates = $("#selectStates").val();
+        //    //    var selectedCities = $(this).val();
+        //    //    var selectedSec = $("#selectSec").val();
+        //    //    var selectedRating = $("#selectRating").val();
+        //    //    var selectedMedia = $("#selectMedia").val();
+        //    //    filterTableData(selectedStates, selectedCities, selectedSec, selectedRating, selectedMedia);
+        //    //});
+
+        //    //$("#selectSec").change(function () {
+        //    //    var selectedStates = $("#selectStates").val();
+        //    //    var selectedCities = $("#selectcity").val();
+        //    //    var selectedSec = $(this).val();
+        //    //    var selectedRating = $("#selectRating").val();
+        //    //    var selectedMedia = $("#selectMedia").val();
+        //    //    filterTableData(selectedStates, selectedCities, selectedSec, selectedRating, selectedMedia);
+        //    //});
+
+        //    //$("#selectRating").change(function () {
+        //    //    var selectedStates = $("#selectStates").val();
+        //    //    var selectedCities = $("#selectcity").val();
+        //    //    var selectedSec = $("#selectSec").val();
+        //    //    var selectedRating = $(this).val();
+        //    //    var selectedMedia = $("#selectMedia").val();
+        //    //    filterTableData(selectedStates, selectedCities, selectedSec, selectedRating, selectedMedia);
+        //    //});
+
+        //    //$("#selectMedia").change(function () {
+        //    //    var selectedStates = $("#selectStates").val();
+        //    //    var selectedCities = $("#selectcity").val();
+        //    //    var selectedSec = $("#selectSec").val();
+        //    //    var selectedRating = $("#selectRating").val();
+        //    //    var selectedMedia = $(this).val();
+        //    //    filterTableData(selectedStates, selectedCities, selectedSec, selectedRating, selectedMedia);
+        //    //});
+
+        //    var initialStates = $("#selectStates").val();
+        //    var initialCities = $("#selectcity").val();
+        //    var initialSec = $("#selectSec").val();
+        //    var initialRating = $("#selectRating").val();
+        //    var initialMedia = $("#selectMedia").val();
+        //    filterTableData(initialStates, initialCities, initialSec, initialRating, initialMedia);
+
+            //function filterTableData(selectedStates, selectedCities, selectedSec, selectedRating, selectedMedia) {
+            //    var escapeRegExp = function (string) {
+            //        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            //    };
+
+            //    var stateFilter = selectedStates.map(escapeRegExp).join('|');
+            //    var cityFilter = selectedCities.map(escapeRegExp).join('|');
+            //    var secFilter = selectedSec.map(escapeRegExp).join('|');
+            //    //var ratingFilter = selectedRating.map(escapeRegExp).join('|');
+            //    var ratingFilter = selectedRating.map(function (rating) {
+
+            //        return rating.length === 1 ? `^${escapeRegExp(rating)}$` : escapeRegExp(rating);
+
+            //    }).join('|');
+            //    var mediaFilter = selectedMedia.map(escapeRegExp).join('|');
+
+            //    table.columns(1).search(stateFilter, true, false, true);
+            //    table.columns(2).search(cityFilter, true, false, true);
+            //    table.columns(6).search(secFilter, true, false, true);
+            //    table.columns(9).search(ratingFilter, true, false, true);
+            //    table.columns(11).search(mediaFilter, true, false, true);
+
+            //    table.draw();
+            //}
+
+          
+        //});
     </script>
 }
