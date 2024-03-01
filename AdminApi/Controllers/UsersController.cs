@@ -496,6 +496,29 @@ namespace AdminApi.Controllers
         ///
         ////[Authorize(Roles="Admin,User")]
 
+        //[HttpPost]
+        //public ActionResult CreateUser(Users model)
+        //{
+        //    try
+        //    {
+        //        if (ModelState.IsValid)
+        //        {
+        //            model.DateAdded = DateTime.Now;
+        //            model.IsActive = true;
+        //            model.IsPasswordChange = false;
+
+        //            var obj = _userRepo.Insert(model);
+        //            return Ok(obj);
+        //        }
+
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = "Invalid Model State" });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+        //    }
+        //}
+
         [HttpPost]
         public ActionResult CreateUser(Users model)
         {
@@ -503,6 +526,23 @@ namespace AdminApi.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    var existingUsers = _userRepo.SelectAll();
+
+                    if (existingUsers.Any(u => u.Mobile == model.Mobile))
+                    {
+                        return Accepted(new Confirmation { Status = "duplicate", ResponseMsg = "Mobile Number is already in use" });
+                    }
+
+                    if (existingUsers.Any(u => u.Email == model.Email))
+                    {
+                        return Accepted(new Confirmation { Status = "duplicate", ResponseMsg = "Email is already in use" });
+                    }
+
+                    if (existingUsers.Any(u => u.UserName == model.UserName))
+                    {
+                        return Accepted(new Confirmation { Status = "duplicate", ResponseMsg = "Username is already in use" });
+                    }
+
                     model.DateAdded = DateTime.Now;
                     model.IsActive = true;
                     model.IsPasswordChange = false;
@@ -518,6 +558,7 @@ namespace AdminApi.Controllers
                 return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
         }
+
 
         //[HttpPost]
         //public ActionResult CreateUser(Users model)
