@@ -153,7 +153,7 @@ namespace AdminApi.Controllers
                 var list = (from u in _context.AdScreenFeedbackForm
                             join s in _context.States on u.StateId equals s.StateId
                             join p in _context.Agents on u.AgentId equals p.AgentId
-                            join q in _context.AdScreen on u.AdScreenId equals q.AdScreenId
+                            join q in _context.AdScreenMapping on u.AdScreenId equals q.AdScreenId
 
                             select new
                             {
@@ -335,13 +335,13 @@ namespace AdminApi.Controllers
                             join s in _context.States on u.StateId equals s.StateId
                             join p in _context.Agents on u.AgentId equals p.AgentId
                             join q in _context.StateUser on u.StateId equals q.StateId
-                            join c in _context.AdScreen on u.AdScreenId equals c.AdScreenId
+                            join c in _context.AdScreenMapping on u.AdScreenId equals c.AdScreenId
                             //join l in _context.ScreenList on c.TheatreName equals l.TheatreName
 
                             select new
                             {
                                 u.AdScreenFeedbackFormId,
-                               // u.AdScreenId,
+                                c.AdScreenId,
                                 u.AgentId,
                                 p.AgentName,
                                 s.StateId,
@@ -379,7 +379,7 @@ namespace AdminApi.Controllers
                                 u.CreatedBy,
                                 u.CreatedOn,
                                 u.IsDeleted
-                            }).Where(x => x.IsDeleted == false && x.UserId == UserId).ToList();
+                            }).Where(x => x.IsDeleted == false && x.UserId == UserId).Distinct().ToList();
 
                 int totalRecords = list.Count();
 

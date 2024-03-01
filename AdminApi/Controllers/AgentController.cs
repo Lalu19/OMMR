@@ -978,8 +978,8 @@ namespace AdminApi.Controllers
                 }
 
                 //BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromHours(24));
-                BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromMinutes(2));
-                //BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromMinutes(10));
+               // BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromMinutes(2));
+                BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromMinutes(10));
 
 
                 var response = new

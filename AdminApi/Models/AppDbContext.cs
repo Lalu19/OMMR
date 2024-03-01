@@ -35,6 +35,7 @@ namespace AdminApi.Models
         public virtual DbSet<ScreenList> ScreenList { get; set; }
         public virtual DbSet<HallPass> HallPass { get; set; }
         public virtual DbSet<AdScreen> AdScreen { get; set; }
+        public virtual DbSet<AdScreenMapping> AdScreenMapping { get; set; }
         public virtual DbSet<AdScreenFeedbackForm> AdScreenFeedbackForm { get; set; }
         public virtual DbSet<StateUser> StateUser { get; set; }
         //public virtual DbSet<TheatreLocation> TheatreLocation { get; set; }
@@ -117,6 +118,18 @@ namespace AdminApi.Models
             .HasDefaultValueSql("getdate()");
 
             modelBuilder.Entity<AdScreen>()
+             .Property(s => s.IsDeleted)
+             .HasDefaultValue(false)
+             .ValueGeneratedNever();
+            //Website pages end
+
+
+            //Website pages start
+            modelBuilder.Entity<AdScreenMapping>()
+            .Property(s => s.CreatedOn)
+            .HasDefaultValueSql("getdate()");
+
+            modelBuilder.Entity<AdScreenMapping>()
              .Property(s => s.IsDeleted)
              .HasDefaultValue(false)
              .ValueGeneratedNever();

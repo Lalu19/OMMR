@@ -115,6 +115,65 @@ namespace AdminApi.Controllers
 
         /////Delete the previous data code
 
+        //[HttpPost]
+        //public IActionResult AdScreenCreate(IFormFile file)
+        //{
+        //    try
+        //    {
+        //        if (file == null || file.Length == 0)
+        //        {
+        //            return BadRequest(new { status = "error", responseMsg = "No file uploaded" });
+        //        }
+
+        //        using (var package = new ExcelPackage(file.OpenReadStream()))
+        //        {
+        //            var worksheet = package.Workbook.Worksheets[0];
+
+        //            // Delete all records from the AdScreen table
+        //            _context.Database.ExecuteSqlRaw("DELETE FROM AdScreen");
+
+        //            //// Reset the identity column seed for AdScreenId
+        //            //_context.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('AdScreen', RESEED, 0)");
+
+        //            for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+        //            {
+        //                var excelData = new AdScreen
+        //                {
+        //                    State = worksheet.Cells[row, 1].Value?.ToString(),
+        //                    City = worksheet.Cells[row, 2].Value?.ToString(),
+        //                    TheatreName = worksheet.Cells[row, 3].Value?.ToString(),
+        //                    //Latitude = worksheet.Cells[row, 4].Value?.ToString(),
+        //                    //Longitude = worksheet.Cells[row, 5].Value?.ToString(),
+        //                    Screen = worksheet.Cells[row, 4].Value?.ToString(),
+        //                    AdsName = worksheet.Cells[row, 5].Value?.ToString(),
+        //                    AdsLanguage = worksheet.Cells[row, 6].Value?.ToString(),
+        //                    AdsSequence = worksheet.Cells[row, 7].Value?.ToString(),
+        //                    AdsDuration = worksheet.Cells[row, 8].Value?.ToString(),
+        //                    AdsPlaytime = worksheet.Cells[row, 9].Value?.ToString(),
+        //                    AdsYoutubeLink = worksheet.Cells[row, 10].Value?.ToString(),
+        //                };
+
+        //                // Create a new record
+        //                var stateEntity = _context.States.FirstOrDefault(s => s.StateName == excelData.State);
+        //                if (stateEntity != null)
+        //                {
+        //                    excelData.StateId = stateEntity.StateId;
+        //                }
+
+        //                _context.AdScreen.Add(excelData);
+        //            }
+
+        //            _context.SaveChanges();
+        //        }
+
+        //        return Ok(new { status = "success", responseMsg = "Data saved successfully" });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+        //    }
+        //}
+
         [HttpPost]
         public IActionResult AdScreenCreate(IFormFile file)
         {
@@ -132,9 +191,6 @@ namespace AdminApi.Controllers
                     // Delete all records from the AdScreen table
                     _context.Database.ExecuteSqlRaw("DELETE FROM AdScreen");
 
-                    //// Reset the identity column seed for AdScreenId
-                    //_context.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('AdScreen', RESEED, 0)");
-
                     for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
                     {
                         var excelData = new AdScreen
@@ -142,8 +198,6 @@ namespace AdminApi.Controllers
                             State = worksheet.Cells[row, 1].Value?.ToString(),
                             City = worksheet.Cells[row, 2].Value?.ToString(),
                             TheatreName = worksheet.Cells[row, 3].Value?.ToString(),
-                            //Latitude = worksheet.Cells[row, 4].Value?.ToString(),
-                            //Longitude = worksheet.Cells[row, 5].Value?.ToString(),
                             Screen = worksheet.Cells[row, 4].Value?.ToString(),
                             AdsName = worksheet.Cells[row, 5].Value?.ToString(),
                             AdsLanguage = worksheet.Cells[row, 6].Value?.ToString(),
@@ -161,6 +215,29 @@ namespace AdminApi.Controllers
                         }
 
                         _context.AdScreen.Add(excelData);
+
+                        // Save the changes to get the AdScreenId
+                        _context.SaveChanges();
+
+                        // Create corresponding AdScreenMapping entry
+                        var adScreenMapping = new AdScreenMapping
+                        {
+                            AdScreenId = excelData.AdScreenId, // Use the newly generated AdScreenId
+                            StateId = excelData.StateId,
+                            State = excelData.State,
+                            City = excelData.City, 
+                            TheatreName = excelData.TheatreName, 
+                            Screen = excelData.Screen, 
+                            AdsName = excelData.AdsName, 
+                            AdsLanguage = excelData.AdsLanguage, 
+                            AdsSequence = excelData.AdsSequence, 
+                            AdsDuration = excelData.AdsDuration, 
+                            AdsPlaytime = excelData.AdsPlaytime, 
+                            AdsYoutubeLink = excelData.AdsYoutubeLink, 
+                                                              
+                        };
+
+                        _context.AdScreenMapping.Add(adScreenMapping);
                     }
 
                     _context.SaveChanges();
@@ -173,6 +250,8 @@ namespace AdminApi.Controllers
                 return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
         }
+
+
 
         [HttpGet]
         public ActionResult GetallList()
@@ -1422,7 +1501,7 @@ namespace AdminApi.Controllers
                 // Split the comma-separated string into an array of ads names
                 var adsNameArray = adsNames.Split(',');
 
-                var list = (from s in _context.AdScreen
+                var list = (from s in _context.AdScreenMapping
                             join u in _context.AdScreenFeedbackForm on s.AdScreenId equals u.AdScreenId
                             join p in _context.Agents on u.AgentId equals p.AgentId
                             join q in _context.States on s.StateId equals q.StateId
