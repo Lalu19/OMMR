@@ -82,6 +82,15 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
+                                <label class="form-label">Media Name &nbsp;<span style="color: red;"><b>*</b></span></label>
+                                <div class="input-box">
+                                    <select class="form-control" id="selectmedia">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
                                 <label class="form-label">Hall Pass Upload &nbsp;<span style="color: red;"><b>*</b></span></label>
                                 <input type="file" class="form-control" id="profilephoto" required>
                             </div>
@@ -145,7 +154,40 @@
             });
         }
 
-     
+        GetMedias()
+        function GetMedias(Id) {
+            var opt = '';
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/AdScreen/GetMediaList",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (res) {
+                    console.log(res)
+                    var options = [];
+                    options.push('<option value="">Please Select </option>');
+                    for (var i = 0; i < res.data.length; i++) {
+                        //if (Id == res.data[i].stateId) {
+                        //    opt = 'selected'
+                        //} else {
+                        //    opt = '';
+                        //}
+                        options.push('<option value="' + res.data[i].media + '" ' + opt + '>' + res.data[i].media + '</option>');
+                    }
+                    $("#selectmedia").html(options.join(''));
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
 
     </script>
 
@@ -169,6 +211,7 @@
                     //statename: $.trim($("#selectState").val()),
                     //theatreName: selectedAreasString,
                     adsName: $.trim($("#selectads").val()),
+                    media: $.trim($("#selectmedia").val()),
                     hallPassImg: imgPath,
                     createdBy: @Context.Session.GetInt32("UserId"),
                 }

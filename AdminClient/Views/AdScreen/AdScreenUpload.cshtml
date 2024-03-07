@@ -128,7 +128,7 @@
                 var wb = XLSX.utils.book_new();
 
                 // Define the worksheet
-                var ws = XLSX.utils.aoa_to_sheet([["State", "City", "Theatre Name", "Screen", "AdsName", "AdsLanguage", "AdsSequence", "AdsDuration", "AdsPlaytime", "AdsYoutubeLink"]]);
+                var ws = XLSX.utils.aoa_to_sheet([["State", "City", "TheatreName", "Screen", "AdsName", "AdsLanguage", "AdsSequence", "AdsDuration", "AdsPlaytime", "AdsYoutubeLink","Media"]]);
 
                 // Add the worksheet to the workbook
                 XLSX.utils.book_append_sheet(wb, ws, "Template");

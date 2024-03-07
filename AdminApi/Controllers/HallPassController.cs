@@ -32,13 +32,14 @@ namespace AdminApi.Controllers
         [HttpPost]
         public IActionResult HallPassCreate(HallPassDTO hallPassDTO)
         {
-            var objcheck = _context.HallPass.SingleOrDefault(opt => opt.AdsName == hallPassDTO.AdsName && opt.IsDeleted == false);
+            var objcheck = _context.HallPass.SingleOrDefault(opt => opt.AdsName == hallPassDTO.AdsName && opt.Media == hallPassDTO.Media && opt.IsDeleted == false);
             try
             {
                 if (objcheck == null)
                 {
                     HallPass hp = new HallPass();
                     hp.AdsName = hallPassDTO.AdsName;
+                    hp.Media = hallPassDTO.Media;
                     hp.HallPassImg = hallPassDTO.HallPassImg;
                     hp.CreatedBy = hallPassDTO.CreatedBy;
                     hp.CreatedOn = System.DateTime.Now;
@@ -112,6 +113,7 @@ namespace AdminApi.Controllers
                             {
                                 u.HallPassId,
                                 u.AdsName,
+                                u.Media,
                                 u.HallPassImg,
                                 u.CreatedBy,
                                 u.IsDeleted
@@ -149,6 +151,7 @@ namespace AdminApi.Controllers
             {
                 var objAgent = _context.HallPass.SingleOrDefault(opt => opt.HallPassId == hallPassUpdateDTO.HallPassId);
                 objAgent.AdsName = hallPassUpdateDTO.AdsName;
+                objAgent.Media = hallPassUpdateDTO.Media;
                 objAgent.HallPassImg = hallPassUpdateDTO.HallPassImg;
                 objAgent.UpdatedBy = hallPassUpdateDTO.UpdatedBy;
                 objAgent.UpdatedOn = System.DateTime.Now;

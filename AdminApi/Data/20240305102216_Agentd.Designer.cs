@@ -4,14 +4,16 @@ using AdminApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AdminApi.Data
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240305102216_Agentd")]
+    partial class Agentd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,9 +60,6 @@ namespace AdminApi.Data
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
-
-                    b.Property<string>("Media")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Screen")
                         .HasColumnType("nvarchar(max)");
@@ -605,9 +604,6 @@ namespace AdminApi.Data
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<string>("Media")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int?>("UpdatedBy")
                         .HasColumnType("int");
 
@@ -1017,7 +1013,7 @@ namespace AdminApi.Data
                         {
                             MenuID = 1,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 685, DateTimeKind.Local).AddTicks(6105),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 488, DateTimeKind.Local).AddTicks(3021),
                             IconClass = "fas fa-home",
                             IsActive = true,
                             IsMigrationData = true,
@@ -1031,7 +1027,7 @@ namespace AdminApi.Data
                         {
                             MenuID = 2,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 685, DateTimeKind.Local).AddTicks(6448),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 488, DateTimeKind.Local).AddTicks(3352),
                             IconClass = "fas fa-ellipsis-v",
                             IsActive = true,
                             IsMigrationData = true,
@@ -1045,7 +1041,7 @@ namespace AdminApi.Data
                         {
                             MenuID = 3,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 685, DateTimeKind.Local).AddTicks(6451),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 488, DateTimeKind.Local).AddTicks(3355),
                             IconClass = "",
                             IsActive = true,
                             IsMigrationData = true,
@@ -1059,7 +1055,7 @@ namespace AdminApi.Data
                         {
                             MenuID = 4,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 685, DateTimeKind.Local).AddTicks(6453),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 488, DateTimeKind.Local).AddTicks(3358),
                             IconClass = "",
                             IsActive = true,
                             IsMigrationData = true,
@@ -1073,7 +1069,7 @@ namespace AdminApi.Data
                         {
                             MenuID = 5,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 685, DateTimeKind.Local).AddTicks(6455),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 488, DateTimeKind.Local).AddTicks(3361),
                             IconClass = "fas fa-user",
                             IsActive = true,
                             IsMigrationData = true,
@@ -1087,7 +1083,7 @@ namespace AdminApi.Data
                         {
                             MenuID = 6,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 685, DateTimeKind.Local).AddTicks(6457),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 488, DateTimeKind.Local).AddTicks(3363),
                             IconClass = "",
                             IsActive = true,
                             IsMigrationData = true,
@@ -1101,7 +1097,7 @@ namespace AdminApi.Data
                         {
                             MenuID = 7,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 685, DateTimeKind.Local).AddTicks(6458),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 488, DateTimeKind.Local).AddTicks(3365),
                             IconClass = "",
                             IsActive = true,
                             IsMigrationData = true,
@@ -1115,7 +1111,7 @@ namespace AdminApi.Data
                         {
                             MenuID = 8,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 685, DateTimeKind.Local).AddTicks(6460),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 488, DateTimeKind.Local).AddTicks(3367),
                             IconClass = "",
                             IsActive = true,
                             IsMigrationData = true,
@@ -1129,7 +1125,7 @@ namespace AdminApi.Data
                         {
                             MenuID = 9,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 685, DateTimeKind.Local).AddTicks(6462),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 488, DateTimeKind.Local).AddTicks(3369),
                             IconClass = "fas fa-wrench",
                             IsActive = true,
                             IsMigrationData = true,
@@ -1143,7 +1139,7 @@ namespace AdminApi.Data
                         {
                             MenuID = 10,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 685, DateTimeKind.Local).AddTicks(6463),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 488, DateTimeKind.Local).AddTicks(3370),
                             IconClass = "",
                             IsActive = true,
                             IsMigrationData = true,
@@ -1195,7 +1191,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupID = 1,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 681, DateTimeKind.Local).AddTicks(8855),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 484, DateTimeKind.Local).AddTicks(7779),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupName = "Super Admin Group"
@@ -1204,7 +1200,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupID = 2,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 682, DateTimeKind.Local).AddTicks(8410),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 485, DateTimeKind.Local).AddTicks(5661),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupName = "User Group"
@@ -1246,7 +1242,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupWiseMenuMappingId = 1,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 686, DateTimeKind.Local).AddTicks(2399),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 488, DateTimeKind.Local).AddTicks(9479),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 1,
@@ -1256,7 +1252,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupWiseMenuMappingId = 2,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 686, DateTimeKind.Local).AddTicks(2701),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 488, DateTimeKind.Local).AddTicks(9889),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 1,
@@ -1266,7 +1262,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupWiseMenuMappingId = 3,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 686, DateTimeKind.Local).AddTicks(2703),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 488, DateTimeKind.Local).AddTicks(9892),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 1,
@@ -1276,7 +1272,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupWiseMenuMappingId = 4,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 686, DateTimeKind.Local).AddTicks(2705),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 488, DateTimeKind.Local).AddTicks(9894),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 1,
@@ -1286,7 +1282,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupWiseMenuMappingId = 5,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 686, DateTimeKind.Local).AddTicks(2706),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 488, DateTimeKind.Local).AddTicks(9895),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 1,
@@ -1296,7 +1292,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupWiseMenuMappingId = 6,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 686, DateTimeKind.Local).AddTicks(2708),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 488, DateTimeKind.Local).AddTicks(9897),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 1,
@@ -1306,7 +1302,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupWiseMenuMappingId = 7,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 686, DateTimeKind.Local).AddTicks(2709),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 488, DateTimeKind.Local).AddTicks(9898),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 1,
@@ -1316,7 +1312,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupWiseMenuMappingId = 8,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 686, DateTimeKind.Local).AddTicks(2711),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 488, DateTimeKind.Local).AddTicks(9900),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 2,
@@ -1326,7 +1322,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupWiseMenuMappingId = 9,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 686, DateTimeKind.Local).AddTicks(2712),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 488, DateTimeKind.Local).AddTicks(9901),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 2,
@@ -1336,7 +1332,7 @@ namespace AdminApi.Data
                         {
                             MenuGroupWiseMenuMappingId = 10,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 686, DateTimeKind.Local).AddTicks(2714),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 488, DateTimeKind.Local).AddTicks(9902),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 2,
@@ -1418,7 +1414,7 @@ namespace AdminApi.Data
                         {
                             UserRoleId = 1,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 683, DateTimeKind.Local).AddTicks(9947),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 486, DateTimeKind.Local).AddTicks(8486),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 1,
@@ -1428,7 +1424,7 @@ namespace AdminApi.Data
                         {
                             UserRoleId = 2,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 684, DateTimeKind.Local).AddTicks(295),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 486, DateTimeKind.Local).AddTicks(8794),
                             IsActive = true,
                             IsMigrationData = true,
                             MenuGroupId = 2,
@@ -1531,7 +1527,7 @@ namespace AdminApi.Data
                         {
                             UserId = 1,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 684, DateTimeKind.Local).AddTicks(8083),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 487, DateTimeKind.Local).AddTicks(4434),
                             DeleteRequested = false,
                             FullName = "Appman",
                             IsActive = true,
@@ -1546,7 +1542,7 @@ namespace AdminApi.Data
                         {
                             UserId = 2,
                             AddedBy = 1,
-                            DateAdded = new DateTime(2024, 3, 7, 18, 32, 38, 684, DateTimeKind.Local).AddTicks(8534),
+                            DateAdded = new DateTime(2024, 3, 5, 15, 52, 16, 487, DateTimeKind.Local).AddTicks(4916),
                             DeleteRequested = false,
                             FullName = "Helen Smith",
                             IsActive = true,

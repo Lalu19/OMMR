@@ -205,6 +205,7 @@ namespace AdminApi.Controllers
                             AdsDuration = worksheet.Cells[row, 8].Value?.ToString(),
                             AdsPlaytime = worksheet.Cells[row, 9].Value?.ToString(),
                             AdsYoutubeLink = worksheet.Cells[row, 10].Value?.ToString(),
+                            Media = worksheet.Cells[row, 11].Value?.ToString(),
                         };
 
                         // Create a new record
@@ -273,6 +274,7 @@ namespace AdminApi.Controllers
                                 u.AdsSequence,
                                 u.AdsDuration,
                                 u.AdsPlaytime,
+                                u.Media,
                                 u.IsDeleted
                             }).Where(x => x.IsDeleted == false).ToList();
 
@@ -772,6 +774,30 @@ namespace AdminApi.Controllers
                                 u.AdsName,
                                 u.AdsYoutubeLink,
                                 u.AdsLanguage,
+                                u.IsDeleted
+                            }).Where(x => x.IsDeleted == false).Distinct().ToList();
+
+                int totalRecords = list.Count();
+
+                return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+            }
+
+            catch (Exception ex)
+            {
+                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public ActionResult GetMediaList()
+        {
+            try
+            {
+                var list = (from u in _context.AdScreen
+
+                            select new
+                            {
+                                u.Media,
                                 u.IsDeleted
                             }).Where(x => x.IsDeleted == false).Distinct().ToList();
 
@@ -1391,8 +1417,8 @@ namespace AdminApi.Controllers
             }
         }
 
-        [HttpGet("{adsName}")]
-        public ActionResult GetHallpassByAdsname(string adsName)
+        [HttpGet("{adsName}/{media}")]
+        public ActionResult GetHallpassByAdsname(string adsName, string media)
         {
             try
             {
@@ -1402,9 +1428,10 @@ namespace AdminApi.Controllers
                             select new
                             {
                                 u.AdsName,
+                                a.Media,
                                 a.HallPassImg,
                                 u.IsDeleted
-                            }).Where(x => x.IsDeleted == false && x.AdsName == adsName).Distinct().ToList();
+                            }).Where(x => x.IsDeleted == false && x.AdsName == adsName && x.Media == media).ToList();
 
                 int totalRecords = list.Count();
 

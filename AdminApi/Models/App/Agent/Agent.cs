@@ -6,7 +6,7 @@ namespace AdminApi.Models.App.Agent
     {
         public int AgentId { get; set; }
         public int StateId { get; set; }
-        //public string Statename { get; set; }
+        public string Statename { get; set; }
         public string Cityname { get; set; }
         public string TheatreName { get; set; }
         public string AgentName { get; set; }

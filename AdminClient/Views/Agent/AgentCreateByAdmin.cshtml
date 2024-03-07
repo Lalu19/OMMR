@@ -1,4 +1,262 @@
-﻿@using Microsoft.Extensions.Configuration;
+﻿@*@using Microsoft.Extensions.Configuration;
+@using Microsoft.AspNetCore.Http
+@inject IConfiguration Configuration;
+
+@{
+    ViewBag.Title = "Agent Upload";
+    string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
+}
+
+<style>
+    #preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #fff;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+</style>
+
+<!-- PAGE-HEADER -->
+<div class="page-header">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#"><i class="fe fe-file-text mr-1"></i>Agent Console</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Agent Create </li>
+    </ol>
+    <div class="ml-auto">
+        <a href="~/Agent/AgentListByAdmin" class="btn btn-primary btn-icon btn-sm text-white mr-2">
+            <span>
+                <i class="fe fe-plus"></i>
+            </span> View
+        </a>
+    </div>
+</div>
+<!-- PAGE-HEADER END -->
+
+<div id="preloader" class="d-none">
+    <div class="spinner"></div>
+</div>
+
+<div class="row">
+    <div class="col-md">
+        <div class="card overflow-hidden">
+            <div class="card-header">
+                <h3 class="card-title">Agent</h3>
+            </div>
+            <div class="card-body">
+                <form action="#" role="form" class="validate" id="formPost" enctype="multipart/form-data">
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Download Excel Template</label>
+                                <button type="button" id="downloadTemplate" class="btn btn-primary btn-icon btn-sm text-white">
+                                    <span>
+                                        <i class="fe fe-download"></i>
+                                    </span> Download Template
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Upload Agent list &nbsp;<span style="color: red;"><b>*</b></span></label>
+                                <input type="file" class="form-control" id="file" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" id="btncreate" class="btn btn-radius btn-success">Create</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+
+            $("#downloadTemplate").click(function () {
+                // Create a workbook
+                var wb = XLSX.utils.book_new();
+
+                // Define the worksheet
+                var ws = XLSX.utils.aoa_to_sheet([["State Name", "City Name", "Theatre Name", "Agent Name", "Agent Role", "Agent Phone No", "Email Id", "Address", "Agent UserId", "PassWord"]]);
+
+                // Add the worksheet to the workbook
+                XLSX.utils.book_append_sheet(wb, ws, "Template");
+
+                // Generate an array buffer from the workbook
+                var buf = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+
+                // Convert the array buffer to a Blob
+                var blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+
+                // Create a Blob URL
+                var blobUrl = URL.createObjectURL(blob);
+
+                // Create a hidden anchor element
+                var a = document.createElement("a");
+                a.style.display = "none";
+                document.body.appendChild(a);
+
+                // Set the anchor's attributes
+                a.href = blobUrl;
+                a.download = "template.xlsx";
+
+                // Programmatically click the anchor to trigger the download
+                a.click();
+
+                // Clean up: remove the anchor and revoke the Blob URL
+                document.body.removeChild(a);
+                URL.revokeObjectURL(blobUrl);
+            });
+
+
+            $("#btncreate").click(function (e) {
+                e.preventDefault();
+
+                // Show preloader
+                var preloader = $("#preloader");
+                preloader.removeClass("d-none");
+
+                var formData = new FormData();
+                formData.append("file", $("#file")[0].files[0]);
+
+                $.ajax({
+                    type: "POST",
+                    url: "@apiUrl/api/Agent/UploadAgents",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        "Authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                    },
+                    success: function (data, statusText, xhr) {
+                        if (xhr.status === 200) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Agent List",
+                                text: "Successfully Uploaded!",
+                            }).then(function () {
+                                location.reload(); // Refresh the page
+                            });
+
+                            //preloader.addClass("d-none");
+                        } else if (data.status === "Duplicate") {
+                            Swal.fire({
+                                icon: "warning",
+                                title: "Validation Alert!",
+                                text: data.responseMsg,
+                            }).then(function () {
+                                location.reload(); // Refresh the page
+                            });
+                        } else if (data.status === "error") {
+                            Swal.fire({
+                                icon: "warning",
+                                title: "Validation Alert!",
+                                text: data.responseMsg,
+                            }).then(function () {
+                                location.reload(); // Refresh the page
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: "warning",
+                                title: "Validation Alert!",
+                                text: "Something unexpected!",
+                            }).then(function () {
+                                location.reload(); // Refresh the page
+                            });
+                        }
+                        preloader.addClass("d-none");
+                    },
+
+                    //success: function (data, statusText, xhr) {
+                    //    if (xhr.status === 200) {
+                    //        console.log(data);
+                    //        sweetAlert({
+                    //            html: true,
+                    //            title: "Upload Screen List",
+                    //            text: "Successfully Created!",
+                    //            type: "success"
+                    //        });
+                    //    } else if (data.status === "error") {
+                    //        sweetAlert("Validation Alert!", data.responseMsg, "warning");
+                    //    } else {
+                    //        sweetAlert("Validation Alert!", "Something unexpected!", "warning");
+                    //    }
+                    //},
+                    error: function (xhr, textStatus, errorThrown) {
+                        if (xhr.status == 401) {
+                            window.location.replace('/Message/TokenExpire');
+                        } else if (xhr.status == 403) {
+                            window.location.replace('/Message/Unauthorize');
+                        } else if (xhr.status == 400) {
+                            sweetAlert("Validation Alert!", "Please check input data!", "warning");
+                        } else {
+                            sweetAlert("Error", "An error occurred: " + errorThrown, "error");
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
+
+}
+
+
+*@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@using Microsoft.Extensions.Configuration;
 @using Microsoft.AspNetCore.Http
 @inject IConfiguration Configuration;
 

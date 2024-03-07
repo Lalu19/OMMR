@@ -18,6 +18,7 @@ namespace AdminApi.Models.App
         public string AdsDuration { get; set; }
         public string AdsPlaytime { get; set; }
         public string AdsYoutubeLink { get; set; }
+        public string Media { get; set; }
         public int CreatedBy { get; set; }
         public DateTime? CreatedOn { get; set; }       
         public int? UpdatedBy { get; set; }

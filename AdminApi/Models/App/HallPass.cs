@@ -6,6 +6,7 @@ namespace AdminApi.Models.App
     {
         public int HallPassId { get; set; }
         public string AdsName { get; set; }
+        public string Media { get; set; }
         public string HallPassImg { get; set; }
         public int CreatedBy { get; set; }
         public DateTime? CreatedOn { get; set; }

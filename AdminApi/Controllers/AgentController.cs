@@ -25,6 +25,10 @@ using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using OfficeOpenXml.ConditionalFormatting.Contracts;
 using Org.BouncyCastle.Asn1.Mozilla;
+using OfficeOpenXml;
+using System.IO;
+using AdminApi.Models.App;
+using Microsoft.EntityFrameworkCore;
 
 namespace AdminApi.Controllers
 {
@@ -169,6 +173,129 @@ namespace AdminApi.Controllers
 
         //}
 
+        //[HttpPost]
+        //public IActionResult UploadAgents(IFormFile file)
+        //{
+        //    try
+        //    {
+        //        if (file == null || file.Length == 0)
+        //        {
+        //            return BadRequest(new { status = "error", responseMsg = "No file uploaded" });
+        //        }
+
+        //        using (var package = new ExcelPackage(file.OpenReadStream()))
+        //        {
+        //            var worksheet = package.Workbook.Worksheets[0];
+
+        //            for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+        //            {
+        //                var excelData = new Agent
+        //                {
+        //                    Statename = worksheet.Cells[row, 1].Value.ToString(),
+        //                    Cityname = worksheet.Cells[row, 2].Value.ToString(),
+        //                    TheatreName = worksheet.Cells[row, 3].Value.ToString(),
+        //                    AgentName = worksheet.Cells[row, 4].Value.ToString(),
+        //                    Agentrole = worksheet.Cells[row, 5].Value.ToString(),
+        //                    AgentPhoneNumber = worksheet.Cells[row, 6].Value.ToString(),
+        //                    EmailId = worksheet.Cells[row, 7].Value.ToString(),
+        //                    Address = worksheet.Cells[row, 8].Value.ToString(),
+        //                    AgentuserId = worksheet.Cells[row, 9].Value.ToString(),
+        //                    PassWord = worksheet.Cells[row, 10].Value.ToString(),
+        //                    CreatedOn = System.DateTime.Now
+        //                };
+                      
+        //                // Check duplicacy
+        //                var existingAgentByPhoneNumber = _context.Agents.FirstOrDefault(opt => opt.AgentPhoneNumber == excelData.AgentPhoneNumber && opt.IsDeleted == false);
+        //                var existingAgentByUserId = _context.Agents.FirstOrDefault(opt => opt.AgentuserId == excelData.AgentuserId && opt.IsDeleted == false);
+        //                var existingAgentByEmail = _context.Agents.FirstOrDefault(opt => opt.EmailId == excelData.EmailId && opt.IsDeleted == false);
+
+        //                if (existingAgentByPhoneNumber != null)
+        //                {
+        //                    return Accepted(new Confirmation { Status = "Duplicate", ResponseMsg = "An agent with the same phone number already exists!" });
+        //                }
+
+        //                if (existingAgentByUserId != null)
+        //                {
+        //                    return Accepted(new Confirmation { Status = "Duplicate", ResponseMsg = "An agent with the same user ID already exists!" });
+        //                }
+
+        //                if (existingAgentByEmail != null)
+        //                {
+        //                    return Accepted(new Confirmation { Status = "Duplicate", ResponseMsg = "An agent with the same Emailid already exists!" });
+        //                }
+
+        //                var existingAgents = _context.Agents.Where(opt => opt.IsDeleted == false).ToList();
+
+        //                foreach (var agent in existingAgents)
+        //                {
+        //                    var theaterNames = agent.TheatreName.Split(',').Select(x => x.Trim()).ToList();
+        //                    var newTheaterNames = excelData.TheatreName.Split(',').Select(x => x.Trim()).ToList();
+
+        //                    foreach (var newTheaterName in newTheaterNames)
+        //                    {
+        //                        foreach (var theaterName in theaterNames)
+        //                        {
+        //                            if (theaterName.Equals(newTheaterName, StringComparison.OrdinalIgnoreCase))
+        //                            {
+        //                                if (agent.Agentrole.Equals("Primary", StringComparison.OrdinalIgnoreCase) && excelData.Agentrole.Equals("Primary", StringComparison.OrdinalIgnoreCase))
+        //                                {
+        //                                    return Accepted(new Confirmation { Status = "Duplicate", ResponseMsg = "A 'Primary' agent with the same TheatreName already exists!" });
+        //                                }
+        //                                else if (agent.Agentrole.Equals("Backup", StringComparison.OrdinalIgnoreCase) && excelData.Agentrole.Equals("Backup", StringComparison.OrdinalIgnoreCase))
+        //                                {
+        //                                    return Accepted(new Confirmation { Status = "Duplicate", ResponseMsg = "A 'Backup' agent with the same TheatreName already exists!" });
+        //                                }
+        //                            }
+        //                        }
+        //                    }
+        //                }
+
+        //                // Create a new record
+        //                var stateEntity = _context.States.FirstOrDefault(s => s.StateName == excelData.Statename);
+        //                if (stateEntity != null)
+        //                {
+        //                    excelData.StateId = stateEntity.StateId;
+        //                }
+
+        //                _context.Agents.Add(excelData);
+
+        //                // Save the changes to get the AgentId
+        //                _context.SaveChanges();
+
+        //                // Create AgentMapping entries
+        //                foreach (var theaterName in excelData.TheatreName.Split(',').Select(x => x.Trim()))
+        //                {
+        //                    AgentMapping agentMapping = new AgentMapping
+        //                    {
+        //                        AgentId = excelData.AgentId,
+        //                        StateId = excelData.StateId,
+        //                        AgentName = excelData.AgentName,
+        //                        Agentrole = excelData.Agentrole,
+        //                        AgentPhoneNumber = excelData.AgentPhoneNumber,
+        //                        EmailId = excelData.EmailId,
+        //                        TheatreName = theaterName,
+        //                        TaskAccepted = false,
+        //                        TaskRejected = false,
+        //                        NotificationSent = false,
+        //                        IsTimeExpired = false, // or set based on your requirement
+        //                        CreatedOn = System.DateTime.Now
+        //                    };
+        //                    _context.AgentMappings.Add(agentMapping);
+        //                }
+        //            }
+
+        //            _context.SaveChanges();
+        //        }
+
+        //        return Ok(new { status = "success", responseMsg = "Data saved successfully" });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+        //    }
+        //}
+
+
         [HttpPost]
         public IActionResult AgentCreate(AgentCreateDTO AgentCreateDTO)
         {
@@ -251,9 +378,9 @@ namespace AdminApi.Controllers
                             AgentPhoneNumber = AgentCreateDTO.AgentPhoneNumber,
                             EmailId = AgentCreateDTO.EmailId,
                             TheatreName = theaterName,
-                            TaskAccepted = false, 
-                            TaskRejected = false, 
-                            NotificationSent = false, 
+                            TaskAccepted = false,
+                            TaskRejected = false,
+                            NotificationSent = false,
                             IsTimeExpired = false, // or set based on your requirement
                             CreatedBy = AgentCreateDTO.CreatedBy,
                             CreatedOn = System.DateTime.Now
@@ -264,20 +391,20 @@ namespace AdminApi.Controllers
                     // _context.SaveChanges();
                     foreach (var theaterName in AgentCreateDTO.TheatreName.Split(',').Select(x => x.Trim()))
                     {
-                      AgentReport agentReport = new AgentReport
-                      {
-                          AgentId = insertedAgent.AgentId,
-                          StateId = AgentCreateDTO.StateId,
-                          AgentName = AgentCreateDTO.AgentName,
-                          Agentrole = AgentCreateDTO.Agentrole,
-                          AgentPhoneNumber = AgentCreateDTO.AgentPhoneNumber,
-                          EmailId = AgentCreateDTO.EmailId,
-                          TheatreName = theaterName,
-                          TaskAccepted = false,
-                          TaskRejected = false,
-                          NotificationSent = false,
-                          CreatedOn = DateTime.Now
-                      };
+                        AgentReport agentReport = new AgentReport
+                        {
+                            AgentId = insertedAgent.AgentId,
+                            StateId = AgentCreateDTO.StateId,
+                            AgentName = AgentCreateDTO.AgentName,
+                            Agentrole = AgentCreateDTO.Agentrole,
+                            AgentPhoneNumber = AgentCreateDTO.AgentPhoneNumber,
+                            EmailId = AgentCreateDTO.EmailId,
+                            TheatreName = theaterName,
+                            TaskAccepted = false,
+                            TaskRejected = false,
+                            NotificationSent = false,
+                            CreatedOn = DateTime.Now
+                        };
                         _context.AgentReports.Add(agentReport);
                     }
 
@@ -298,71 +425,6 @@ namespace AdminApi.Controllers
                 return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
         }
-
-        //[HttpPost]
-        //public IActionResult AgentCreate(AgentCreateDTO AgentCreateDTO)
-        //{
-        //    var objcheck = _context.Agents.SingleOrDefault(opt => opt.AgentuserId == AgentCreateDTO.AgentuserId && opt.IsDeleted == false);
-        //    //Not Create Duplicate Theatre name for Primary and backup agent
-        //    var existingPrimaryAgent = _context.Agents
-        //.SingleOrDefault(opt => opt.TheatreName == AgentCreateDTO.TheatreName
-        //    && opt.Agentrole == "Primary"
-        //    && opt.IsDeleted == false);
-
-        //    var existingBackupAgent = _context.Agents
-        //        .SingleOrDefault(opt => opt.TheatreName == AgentCreateDTO.TheatreName
-        //            && opt.Agentrole == "Backup"
-        //            && opt.IsDeleted == false);
-
-        //    if (AgentCreateDTO.Agentrole == "Primary" && existingPrimaryAgent != null)
-        //    {
-
-        //        return Accepted(new Confirmation { Status = "AlreadyExist", ResponseMsg = "A 'Primary' agent with the same TheatreName is already exists!" });
-        //    }
-        //    else if (AgentCreateDTO.Agentrole == "Backup" && existingBackupAgent != null)
-        //    {
-
-        //        return Accepted(new Confirmation { Status = "AlreadyExist", ResponseMsg = "A 'Backup' agent with the same TheatreName is already exists!" });
-        //    }
-
-
-        //    try
-        //    {
-        //        if (objcheck == null)
-        //        {
-        //            Agent Agent = new Agent();
-        //            Agent.AgentName = AgentCreateDTO.AgentName;
-        //            Agent.Agentrole = AgentCreateDTO.Agentrole;
-        //            Agent.Agentrole = AgentCreateDTO.Agentrole;
-        //            Agent.StateId = AgentCreateDTO.StateId;
-        //           // Agent.Statename = AgentCreateDTO.Statename;
-        //            Agent.Cityname = AgentCreateDTO.Cityname;
-        //            Agent.TheatreName = AgentCreateDTO.TheatreName;
-        //            Agent.AgentPhoneNumber = AgentCreateDTO.AgentPhoneNumber;
-        //            Agent.Address = AgentCreateDTO.Address;
-        //            Agent.EmailId = AgentCreateDTO.EmailId;
-        //            Agent.ProfilePhoto = AgentCreateDTO.ProfilePhoto;
-        //            Agent.AgentuserId = AgentCreateDTO.AgentuserId;
-        //            //Agent.PassWord = EncryptPassword(AgentCreateDTO.PassWord);
-        //            Agent.PassWord = AgentCreateDTO.PassWord;
-        //            Agent.CreatedBy = AgentCreateDTO.CreatedBy;
-        //            Agent.CreatedOn = System.DateTime.Now;
-        //            var obj = _AgentRepo.Insert(Agent);
-        //            return Ok(obj);
-        //        }
-        //        else if (objcheck != null)
-        //        {
-        //            return Accepted(new Confirmation { Status = "Duplicate", ResponseMsg = "Duplicate User Id..!" });
-        //        }
-        //        return Accepted(new Confirmation { Status = "Error", ResponseMsg = "Something unexpected!" });
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
-        //    }
-
-        //}
 
         [HttpGet("{userId}")]
         public ActionResult AgentPassListbyUserId(int userId)

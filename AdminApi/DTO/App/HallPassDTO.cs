@@ -3,6 +3,7 @@
     public class HallPassDTO
     {
         public string AdsName { get; set; }
+        public string Media { get; set; }
         public string HallPassImg { get; set; }
         public int CreatedBy { get; set; }
     }
@@ -10,6 +11,7 @@
     {
         public int HallPassId { get; set; }
         public string AdsName { get; set; }
+        public string Media { get; set; }
         public string HallPassImg { get; set; }
         public int? UpdatedBy { get; set; }
     }
