@@ -528,17 +528,17 @@ namespace AdminApi.Controllers
                 {
                     var existingUsers = _userRepo.SelectAll();
 
-                    if (existingUsers.Any(u => u.Mobile == model.Mobile))
+                    if (existingUsers.Any(u => u.IsActive && u.Mobile == model.Mobile))
                     {
                         return Accepted(new Confirmation { Status = "duplicate", ResponseMsg = "Mobile Number is already exists!!" });
                     }
 
-                    if (existingUsers.Any(u => u.Email == model.Email))
+                    if (existingUsers.Any(u => u.IsActive && u.Email == model.Email))
                     {
                         return Accepted(new Confirmation { Status = "duplicate", ResponseMsg = "Email is already exists!!" });
                     }
 
-                    if (existingUsers.Any(u => u.UserName == model.UserName))
+                    if (existingUsers.Any(u => u.IsActive && u.UserName == model.UserName))
                     {
                         return Accepted(new Confirmation { Status = "duplicate", ResponseMsg = "Username is already exists!!" });
                     }
@@ -558,6 +558,7 @@ namespace AdminApi.Controllers
                 return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
         }
+
 
 
         //[HttpPost]
