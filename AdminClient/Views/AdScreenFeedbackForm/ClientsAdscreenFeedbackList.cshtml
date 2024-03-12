@@ -11,20 +11,30 @@
 
 
 <style>
-    /* Style for the rounded container with background color */
+   /* #progress-bar-container {
+        width: 100%;
+        background-color: #ccc; 
+        border-radius: 20px; 
+        overflow: hidden;
+    }*/
+
     #progress-bar-container {
         width: 100%;
-        background-color: #ccc; /* Background color for the rounded container */
-        border-radius: 20px; /* Adjust this value to control the roundness */
-        overflow: hidden; /* Clip the progress bar inside the container */
+        background-color: red; 
+        border-radius: 20px; 
+        overflow: hidden;
     }
 
-
-    /* Style for the progress bar itself */
-    #progress-bar-container {
+   /* #progress-bar-container {
         border-radius: 15px;
-        background-color:#21c44c; /* Change this to the desired progress bar color */
-        height: 100%; /* Make the progress bar fill the entire height of the container */
+        background-color:#21c44c;
+        height: 100%;
+    }*/
+
+    #progress-bar {
+        border-radius: 9px;
+        background-color: #4CAF50; 
+        height: 100%;
     }
 
 
@@ -293,9 +303,51 @@
         //}
 
 
+        //async function totalFeedback() {
+        //    $.ajax({
+        //        "url": '@apiUrl/api/AdScreen/GetClientAdsFeedbackListbyAdsNames?adsNames=' + ads,
+        //        type: "GET",
+        //        success: function (data) {
+        //            console.log(data);
+        //            var x = '';
+
+        //            if (data && data.totalFeedbackCount !== undefined) {
+        //                var totalFeedbackCount = data.totalFeedbackCount;
+        //                x = x + '<span>' + totalFeedbackCount + '</span>';
+        //                $('#progresss').html(x);
+
+        //                // Calculate percentage of feedback
+        //                var percentage = (totalFeedbackCount / 100) * 100;
+        //                var remainingPercentage = 150 - percentage;
+
+        //                // Update the progress bar color and width
+        //                $('#progress-bar').css('width', percentage + '%');
+        //                $('#progress-bar').attr('aria-valuenow', percentage);
+
+        //                // Create the red portion for remaining progress
+        //                var redPortion = '<div class="bg-danger" style="width:' + remainingPercentage + '%; height:100%; position:absolute; top:0; left:' + percentage + '%;"></div>';
+        //                $('#progress-bar').append(redPortion);
+
+        //                // Add text indicating the remaining percentage in white color
+        //                var remainingText = '<span class="remaining-text" style="position:absolute; top:50%; transform: translateY(-50%); color: white; right:5px;">' + Math.floor(remainingPercentage) + '</span>';
+        //                $('#progress-bar').append(remainingText);
+
+        //                // Update tooltip content with the number of records
+        //                $('#progresss').attr('data-original-title', totalFeedbackCount + " Records");
+        //            } else {
+        //                console.log("Invalid data returned from the API");
+        //                // Handle the case where data is not valid (optional)
+        //            }
+        //        },
+        //        error: function (err) {
+        //            console.log(err);
+        //        }
+        //    });
+        //}
+
         async function totalFeedback() {
             $.ajax({
-                "url": '@apiUrl/api/AdScreen/GetClientAdsFeedbackListbyAdsNames?adsNames=' + ads,
+                url: '@apiUrl/api/AdScreen/GetClientAdsFeedbackListbyAdsNames?adsNames=' + ads,
                 type: "GET",
                 success: function (data) {
                     console.log(data);
@@ -303,24 +355,19 @@
 
                     if (data && data.totalFeedbackCount !== undefined) {
                         var totalFeedbackCount = data.totalFeedbackCount;
-                        x = x + '<span>' + totalFeedbackCount + '</span>';
+                        var remainingFeedback = 500 - totalFeedbackCount; // Calculate remaining feedback
+                        x = x + '<span>' + totalFeedbackCount + '</span>' + ' (' + remainingFeedback + ' remaining)';
                         $('#progresss').html(x);
 
-                        // Calculate percentage of feedback
-                        var percentage = (totalFeedbackCount / 100) * 100;
-                        var remainingPercentage = 150 - percentage;
-
-                        // Update the progress bar color and width
-                        $('#progress-bar').css('width', percentage + '%');
-                        $('#progress-bar').attr('aria-valuenow', percentage);
-
-                        // Create the red portion for remaining progress
-                        var redPortion = '<div class="bg-danger" style="width:' + remainingPercentage + '%; height:100%; position:absolute; top:0; left:' + percentage + '%;"></div>';
-                        $('#progress-bar').append(redPortion);
-
-                        // Add text indicating the remaining percentage in white color
-                        var remainingText = '<span class="remaining-text" style="position:absolute; top:50%; transform: translateY(-50%); color: white; right:5px;">' + Math.floor(remainingPercentage) + '</span>';
-                        $('#progress-bar').append(remainingText);
+                        // Update the progress bar only if totalFeedbackCount is greater than 0
+                        if (totalFeedbackCount > 0) {
+                            var percentage = (totalFeedbackCount / 5);
+                            $('#progress-bar').css('width', percentage + '%');
+                            $('#progress-bar').attr('aria-valuenow', percentage);
+                        } else {
+                            // Handle the case where totalFeedbackCount is 0 or less (optional)
+                            $('#progress-bar').css('width', '0%');
+                        }
 
                         // Update tooltip content with the number of records
                         $('#progresss').attr('data-original-title', totalFeedbackCount + " Records");
@@ -334,7 +381,6 @@
                 }
             });
         }
-
 
        //async function totalFeedback() {
                         //    $.ajax({

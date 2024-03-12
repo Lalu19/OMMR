@@ -1254,6 +1254,7 @@ namespace AdminApi.Controllers
                         AdsSequence = group.Select(u => u.AdsSequence).ToArray(),
                         AdsDuration = group.Select(u => u.AdsDuration).ToArray(),
                         AdsLanguage = group.Select(u => u.AdsLanguage).ToArray(),
+                        Media = group.Select(u => u.Media).ToArray(),
                         IsDeleted = group.Select(u => u.IsDeleted).FirstOrDefault(),
                     })
                     .ToList();
@@ -1353,6 +1354,7 @@ namespace AdminApi.Controllers
                                 u.AdsSequence,
                                 u.AdsDuration,
                                 u.AdsLanguage,
+                                u.Media,
                                 u.IsDeleted
                             }).Distinct().ToList();
 
