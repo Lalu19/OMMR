@@ -1248,7 +1248,6 @@ namespace AdminApi.Controllers
                         Screen = group.Key.Screen,
                         AdsPlaytime = group.Key.AdsPlaytime,
                         AdsNames = group.Select(u => u.AdsName).ToArray(),
-                        /* AdsPlaytime = group.Select(u => u.AdsPlaytime).FirstOrDefault(),*/
                         AdScreenId = group.Select(u => u.AdScreenId).ToArray(),
                         AdsYoutubeLink = group.Select(u => u.AdsYoutubeLink).ToArray(),
                         AdsSequence = group.Select(u => u.AdsSequence).ToArray(),
@@ -1260,6 +1259,7 @@ namespace AdminApi.Controllers
                     .ToList();
 
                 int totalRecords = groupedAds.Count();
+
                 // Update AgentMapping table
                 var agentMappingsToUpdate = _context.AgentMappings
                     .Where(mapping => mapping.StateId == Stateid && mapping.AgentId == AgentId && mapping.TheatreName == TheaterName)
@@ -1270,6 +1270,18 @@ namespace AdminApi.Controllers
                     mapping.TaskAccepted = true; // Set TaskAccepted to true
                 }
 
+                // Update AgentReports table
+                var agentReportsToUpdate = _context.AgentReports
+                    .Where(report => report.StateId == Stateid && report.AgentId == AgentId && report.TheatreName == TheaterName)
+                    .OrderByDescending(report => report.NotifiedOn) // Order by Timestamp to get the latest entry
+                    .FirstOrDefault(); // Get the latest entry
+
+                if (agentReportsToUpdate != null)
+                {
+                    agentReportsToUpdate.TaskAccepted = true; // Set TaskAccepted to true
+                    agentReportsToUpdate.TaskAcceptedTime = DateTime.Now;
+                }
+
                 _context.SaveChanges();
                 return Ok(new { data = groupedAds, recordsTotal = totalRecords, recordsFiltered = totalRecords });
             }
@@ -1278,8 +1290,6 @@ namespace AdminApi.Controllers
                 return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
             }
         }
-
-
 
 
         [HttpGet("{TheaterName}/{Stateid}")]

@@ -13,7 +13,9 @@ namespace AdminApi.Models.App.Agent
         public string AgentPhoneNumber { get; set; }
         public string EmailId { get; set; }
         public bool TaskAccepted { get; set; }
+        public DateTime? TaskAcceptedTime { get; set; }
         public bool TaskRejected { get; set; }
+        public DateTime? TaskRejectedTime { get; set; }
         public bool NotificationSent { get; set; }
         public DateTime? NotifiedOn { get; set; }
         public bool IsTimeExpired { get; set; }

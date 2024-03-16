@@ -36,8 +36,8 @@ namespace AdminApi.Services
 
                         var now = DateTime.Now;
                        // var twentyFourHoursAgo = now.AddMinutes(-4);
-                         var twentyFourHoursAgo = now.AddMinutes(-59);
-                        // var twentyFourHoursAgo = now.AddHours(-25);
+                        // var twentyFourHoursAgo = now.AddMinutes(-59);
+                         var twentyFourHoursAgo = now.AddHours(-72);
 
 
                         var agentsToReset = context.Agents

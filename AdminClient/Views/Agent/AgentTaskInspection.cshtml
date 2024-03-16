@@ -7,12 +7,12 @@
     string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
 }
 
-@*
+
 <div class="row">
     <div class="col-md">
         <div class="card overflow-hidden">
             <div class="card-header">
-                <h3 class="card-title">Agent Task Inspection for Admin Report</h3>
+                <h3 class="card-title">Agent Task Inspection for State User Report</h3>
             </div>
             <div class="card-body">
                 <form action="#" role="form" class="validate" id="formPost">
@@ -40,7 +40,7 @@
             </div>
         </div>
     </div>
-</div>*@
+</div>
 <div class="row">
     <div class="col-md-12 col-lg-12">
         <div class="card">
@@ -52,8 +52,12 @@
                     <table id="Agent_Tb" class="table table-striped table-bordered nowrap dataTable no-footer dtr-inline" style="width:100%">
                         <thead>
                             <tr>
+                                <th>Notification Sent</th>
+                                <th>Notifified On</th>
                                 <th>Task Accepted</th>
+                                <th>Task Accepted Time</th>
                                 <th>Task Rejected</th>
+                                <th>Task Rejected Time</th>
                                 <th>State Name</th>
                                 <th>Theatre Name</th>
                                 <th>Agent Name</th>
@@ -71,10 +75,10 @@
 
 @section scripts{
     <script>
-        //$(document).ready(function () {
-        //    $("#btnSearch").click(function () {
-        //        var fromDate = $("#FromDate").val();
-        //        var toDate = $("#ToDate").val();
+        $(document).ready(function () {
+            $("#btnSearch").click(function () {
+                var fromDate = $("#FromDate").val();
+                var toDate = $("#ToDate").val();
               
                 loadAgent()
                 async function loadAgent() {
@@ -89,8 +93,8 @@
                 "sort": true,
                 "info": true,
                 "ajax": {
-                       "url": '@apiUrl/api/Agent/AgentTaskInspectionbyUserId/' + @Context.Session.GetInt32("UserId"),
-                     //"url": '@apiUrl/api/Agent/AgentTaskInspectionbyUserId/' + fromDate + '/' + toDate + '/' + @Context.Session.GetInt32("UserId"),
+                      // "url": '@apiUrl/api/Agent/AgentTaskInspectionbyUserId/' + @Context.Session.GetInt32("UserId"),
+                     "url": '@apiUrl/api/Agent/AgentTaskInspectionbyUserId/' + fromDate + '/' + toDate + '/' + @Context.Session.GetInt32("UserId"),
                     "type": "GET",
                     "dataType": "json",
                     "headers": {
@@ -105,42 +109,153 @@
                     }
                 },
                 "order": [],
-                "columns": [
-                    {
-                        "data": "taskAccepted",
-                        "render": function (data, type, row) {
-                            if (row.taskAccepted === true) {
-                                return '<p><lable style="color: #064ef9;"">Yes</lable></br>';
-                            } else if (row.taskAccepted === false) {
-                                return '<p><lable style="color: #f90669;">No</lable></br>';
-                            } else {
-                                return '';
-                            }
-                        }
-                    },
-                    {
-                        "data": "taskRejected",
-                        "render": function (data, type, row) {
-                            if (row.taskRejected === true) {
-                                return '<p><lable style="color: #064ef9;"">Yes</lable></br>';
-                            } else if (row.taskRejected === false) {
-                                return '<p><lable style="color: #f90669;">No</lable></br>';
-                            } else {
-                                return '';
-                            }
-                        }
-                    },
-                    { "data": "stateName", "orderable": true, "visible": true },
-                    { "data": "theatreName", "orderable": true, "visible": true },
-                    { "data": "agentName", "orderable": true, "visible": true },
-                    { "data": "agentrole", "orderable": true, "visible": true },
-                    { "data": "agentPhoneNumber", "orderable": true, "visible": true },
-                    { "data": "emailId", "orderable": true, "visible": true },
-                ]
+                        "columns": [
+                            {
+                                "data": "notificationSent",
+                                "render": function (data, type, row) {
+                                    if (row.notificationSent === true) {
+                                        return '<p><lable style="color: #064ef9;"">Yes</lable></br>';
+                                    } else if (row.notificationSent === false) {
+                                        return '<p><lable style="color: #f90669;">No</lable></br>';
+                                    } else {
+                                        return '';
+                                    }
+                                }
+                            },
+                            {
+                                "data": "notifiedOn",
+                                "render": function (data) {
+                                    if (data === null) return "";
+                                    var date = new Date(data);
+                                    var day = date.getDate();
+                                    var month = date.getMonth() + 1;
+                                    var year = date.getFullYear();
+                                    var hour = date.getHours();
+                                    var amOrPm = hour >= 12 ? "PM" : "AM";
+
+                                    // Convert 24-hour format to 12-hour format
+                                    if (hour > 12) {
+                                        hour = hour - 12;
+                                    } else if (hour === 0) {
+                                        hour = 12;
+                                    }
+
+                                    return (
+                                        (day < 10 ? "0" + day : day) +
+                                        "/" +
+                                        (month < 10 ? "0" + month : month) +
+                                        "/" +
+                                        year.toString().substring(2) +
+                                        "&nbsp;&nbsp;" +
+                                        (hour < 10 ? "0" + hour : hour) +
+                                        ":" +
+                                        (date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()) +
+                                        " " +
+                                        amOrPm
+                                    );
+                                }
+                            },
+                            {
+                                "data": "taskAccepted",
+                                "render": function (data, type, row) {
+                                    if (row.taskAccepted === true) {
+                                        return '<p><lable style="color: #064ef9;"">Yes</lable></br>';
+                                    } else if (row.taskAccepted === false) {
+                                        return '<p><lable style="color: #f90669;">No</lable></br>';
+                                    } else {
+                                        return '';
+                                    }
+                                }
+                            },
+                            {
+                                "data": "taskAcceptedTime",
+                                "render": function (data) {
+                                    if (data === null) return "";
+                                    var date = new Date(data);
+                                    var day = date.getDate();
+                                    var month = date.getMonth() + 1;
+                                    var year = date.getFullYear();
+                                    var hour = date.getHours();
+                                    var amOrPm = hour >= 12 ? "PM" : "AM";
+
+                                    // Convert 24-hour format to 12-hour format
+                                    if (hour > 12) {
+                                        hour = hour - 12;
+                                    } else if (hour === 0) {
+                                        hour = 12;
+                                    }
+
+                                    return (
+                                        (day < 10 ? "0" + day : day) +
+                                        "/" +
+                                        (month < 10 ? "0" + month : month) +
+                                        "/" +
+                                        year.toString().substring(2) +
+                                        "&nbsp;&nbsp;" +
+                                        (hour < 10 ? "0" + hour : hour) +
+                                        ":" +
+                                        (date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()) +
+                                        " " +
+                                        amOrPm
+                                    );
+                                }
+                            },
+                            {
+                                "data": "taskRejected",
+                                "render": function (data, type, row) {
+                                    if (row.taskRejected === true) {
+                                        return '<p><lable style="color: #064ef9;"">Yes</lable></br>';
+                                    } else if (row.taskRejected === false) {
+                                        return '<p><lable style="color: #f90669;">No</lable></br>';
+                                    } else {
+                                        return '';
+                                    }
+                                }
+                            },
+                            {
+                                "data": "taskRejectedTime",
+                                "render": function (data) {
+                                    if (data === null) return "";
+                                    var date = new Date(data);
+                                    var day = date.getDate();
+                                    var month = date.getMonth() + 1;
+                                    var year = date.getFullYear();
+                                    var hour = date.getHours();
+                                    var amOrPm = hour >= 12 ? "PM" : "AM";
+
+                                    // Convert 24-hour format to 12-hour format
+                                    if (hour > 12) {
+                                        hour = hour - 12;
+                                    } else if (hour === 0) {
+                                        hour = 12;
+                                    }
+
+                                    return (
+                                        (day < 10 ? "0" + day : day) +
+                                        "/" +
+                                        (month < 10 ? "0" + month : month) +
+                                        "/" +
+                                        year.toString().substring(2) +
+                                        "&nbsp;&nbsp;" +
+                                        (hour < 10 ? "0" + hour : hour) +
+                                        ":" +
+                                        (date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()) +
+                                        " " +
+                                        amOrPm
+                                    );
+                                }
+                            },
+                            { "data": "stateName", "orderable": true, "visible": true },
+                            { "data": "theatreName", "orderable": true, "visible": true },
+                            { "data": "agentName", "orderable": true, "visible": true },
+                            { "data": "agentrole", "orderable": true, "visible": true },
+                            { "data": "agentPhoneNumber", "orderable": true, "visible": true },
+                            { "data": "emailId", "orderable": true, "visible": true },
+                        ]
             });
         }
 
-        //    });
-        //});
+            });
+        });
     </script>
 }
