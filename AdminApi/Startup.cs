@@ -42,9 +42,9 @@ namespace AdminApi
         {
             //For Hallpass and Client expiry
 
-            services.AddHostedService<HallPassCleanUpService>();
-            services.AddHostedService<ClientCleanUpService>();
-            services.AddHostedService<ResetAgentsService>();
+            //services.AddHostedService<HallPassCleanUpService>();
+            //services.AddHostedService<ClientCleanUpService>();
+            //services.AddHostedService<ResetAgentsService>();
 
 
             //services.AddHostedService<Adscreen30DaysCleanUp>();

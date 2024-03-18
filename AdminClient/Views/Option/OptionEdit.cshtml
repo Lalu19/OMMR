@@ -32,6 +32,15 @@
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
+                                <label class="form-label">Ads Name &nbsp;<span style="color: red;"><b>*</b></span></label>
+                                <div class="input-box">
+                                    <select class="form-control" id="selectads">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
                                 <label class="form-label">Choose Question</label>
                                 <div class="input-box">
                                     <select class="form-control" id="selectQs">
@@ -93,6 +102,40 @@
                 }
             });
         }
+        GetAds()
+        function GetAds() {
+            var opt = '';
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/AdScreen/GetAdvertiseList",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (res) {
+                    console.log(res)
+                    var options = [];
+                    options.push('<option value="">Please Select </option>');
+                    for (var i = 0; i < res.data.length; i++) {
+                        //if (Id == res.data[i].questionTableId) {
+                        //    opt = 'selected'
+                        //} else {
+                        //    opt = '';
+                        //}
+                        options.push('<option value="' + res.data[i].adsName + '" ' + opt + '>' + res.data[i].adsName + '</option>');
+                    }
+                    $("#selectads").html(options.join(''));
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
     </script>
     <script>
         var optionsId = @ViewBag.optionsId
@@ -108,6 +151,8 @@
                 dataType: "json",
                 success: function (data) {
                     if (data) {
+                        //GetAds(data.adsName);
+                        $('#selectads').val(data.adsName);
                         GetQuestion(data.questionId);
                         $('#createoption').val(data.option);
                     }
@@ -131,6 +176,7 @@
 
                 var model = {
                     optionsId: optionsId,
+                    "adsName": $.trim($("#selectads").val()),
                     "questionId": parseInt($("#selectQs").val()),
                     "option": $.trim($("#createoption").val()),
                     updatedBy: @Context.Session.GetInt32("UserId"),

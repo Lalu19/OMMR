@@ -124,8 +124,31 @@ namespace AdminApi.Controllers
             }
         }
 
+        [HttpGet("{adsName}")]
+        public ActionResult GetQsListFromAdsname(string adsName)
+        {
+            try
+            {
+                var list = (from u in _context.QuestionTable
 
+                            select new
+                            {
+                                u.AdsName,
+                                u.Questions,
+                                u.QuestionTableId,
+                                u.IsDeleted
+                            }).Where(x => x.IsDeleted == false && x.AdsName == adsName).Distinct().ToList();
 
+                int totalRecords = list.Count();
 
+                return Ok(new { data = list, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+            }
+
+            catch (Exception ex)
+            {
+                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+            }
+        }
+      
     }
 }

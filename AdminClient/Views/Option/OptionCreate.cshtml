@@ -72,7 +72,15 @@
             <div class="card-body">
                 <form action="#" name="myForm" role="form" class="validate" id="formPost">
                     <div class="row">
-
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Ads Name &nbsp;<span style="color: red;"><b>*</b></span></label>
+                                <div class="input-box">
+                                    <select class="form-control" id="selectads">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label class="form-label">Choose Question</label>
@@ -100,6 +108,7 @@
                         <table id="Optnn" class="table table-bordered table-hover mb-0">
                             <thead>
                                 <tr>
+                                    <th>Advertise</th>
                                     <th>Question</th>
                                     <th>Options</th>
                                     <th>Action</th>
@@ -156,13 +165,15 @@
                         var $irow = $(this),
                             rowObj = {};
 
+                        var Ads = $irow.find("td:eq(0)").text();
                         // Retrieve the data-value attributes
-                        var Question = parseInt($irow.find("td:eq(0)").data("value"));
+                        var Question = parseInt($irow.find("td:eq(1)").data("value"));
 
                         // Fix: Access the text content of the td element for Options
-                        var Options = $irow.find("td:eq(1)").text();
+                        var Options = $irow.find("td:eq(2)").text();
 
                         var a = {
+                            "adsName": Ads,
                             "questionId": Question,
                             "option": Options
                         };
@@ -173,6 +184,7 @@
                     var preloader = $("#preloader");
                     preloader.removeClass("d-none");
                     var model = {
+                        "adsName": $.trim($("#selectads").val()),
                         "questionId": parseInt($("#selectQs").val()),
                         "option": $.trim($("#createoption").val()),
                         optionsTableDTOs: OptionDetails,
@@ -241,12 +253,47 @@
             });
         });
 
-        GetQuestion()
-        function GetQuestion(Id) {
+        //GetQuestion()
+        //function GetQuestion(Id) {
+        //    var opt = '';
+        //    $.ajax({
+        //        type: "GET",
+        //        url: "@apiUrl/api/QuestionTable/GetQuestionList",
+        //        contentType: "application/json; charset=utf-8",
+        //        headers: {
+        //            "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+        //        },
+        //        dataType: "json",
+        //        success: function (res) {
+        //            console.log(res)
+        //            var options = [];
+        //            options.push('<option value="">Please Select </option>');
+        //            for (var i = 0; i < res.data.length; i++) {
+        //                if (Id == res.data[i].questionTableId) {
+        //                    opt = 'selected'
+        //                } else {
+        //                    opt = '';
+        //                }
+        //                options.push('<option value="' + res.data[i].questionTableId + '" ' + opt + '>' + res.data[i].questions + '</option>');
+        //            }
+        //            $("#selectQs").html(options.join(''));
+        //        },
+        //        error: function (data) {
+        //            if (data.status == 401) {
+        //                window.location.replace('/Message/TokenExpire');
+        //            } else if (data.status == 403) {
+        //                window.location.replace('/Message/Unauthorize');
+        //            }
+        //        }
+        //    });
+        //}
+
+        GetAds()
+        function GetAds(Id) {
             var opt = '';
             $.ajax({
                 type: "GET",
-                url: "@apiUrl/api/QuestionTable/GetQuestionList",
+                url: "@apiUrl/api/AdScreen/GetAdvertiseList",
                 contentType: "application/json; charset=utf-8",
                 headers: {
                     "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
@@ -257,14 +304,14 @@
                     var options = [];
                     options.push('<option value="">Please Select </option>');
                     for (var i = 0; i < res.data.length; i++) {
-                        if (Id == res.data[i].questionTableId) {
-                            opt = 'selected'
-                        } else {
-                            opt = '';
-                        }
-                        options.push('<option value="' + res.data[i].questionTableId + '" ' + opt + '>' + res.data[i].questions + '</option>');
+                        //if (Id == res.data[i].stateId) {
+                        //    opt = 'selected'
+                        //} else {
+                        //    opt = '';
+                        //}
+                        options.push('<option value="' + res.data[i].adsName + '" ' + opt + '>' + res.data[i].adsName + '</option>');
                     }
-                    $("#selectQs").html(options.join(''));
+                    $("#selectads").html(options.join(''));
                 },
                 error: function (data) {
                     if (data.status == 401) {
@@ -276,15 +323,48 @@
             });
         }
 
-    
+
+        $("#selectads").change(function () {
+            var vquestion = $("#selectads").val()
+            var opt = '';
+            $.ajax({
+                type: "GET",
+                url: '@apiUrl/api/QuestionTable/GetQsListFromAdsname/' + vquestion,
+                dataType: "json",
+                success: function (data) {
+                    var options = [];
+                    options.push('<option>Select Qs</option>');
+                    for (var i = 0; i < data['data'].length; i++) {
+                        //if (Id == res.data[i].questionTableId) {
+                        //    opt = 'selected'
+                        //} else {
+                        //    opt = '';
+                        //}
+                        options.push('<option value="' + data['data'][i].questionTableId + '" ' + opt + '>' + data['data'][i].questions + '</option>');
+                    }
+                    $("#selectQs").html(options.join(''));
+
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        });
+
+
         $(function () {
 
             $("#Add_Optn").click(function (e) {
+                var Ads = $('#selectads').val();
                 var Qsn = $('#selectQs').val();
                 var QsnText = $('#selectQs option:selected').text();
                 var Optn = $('#createoption').val();
 
-                var row = "<tr><td data-value='" + Qsn + "'>" + QsnText + "</td><td data-value='" + Optn + "'>" + Optn + "</td><td><button class='delRowBtn'><i class='ion-trash-b' style='color: red;'></i></button></td></tr>";
+                var row = "<tr><td>" + Ads + "</td><td data-value='" + Qsn + "'>" + QsnText + "</td><td data-value='" + Optn + "'>" + Optn + "</td><td><button class='delRowBtn'><i class='ion-trash-b' style='color: red;'></i></button></td></tr>";
 
                 $('#Option_tb').append(row);
 
@@ -296,10 +376,10 @@
                 $('#createoption').val('');
             });
 
-
             $(document).on("click", ".delRowBtn", function () {
                 $(this).closest("tr").remove();
             });
+
         });
 
     </script>

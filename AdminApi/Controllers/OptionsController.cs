@@ -47,6 +47,7 @@ namespace AdminApi.Controllers
 
                     Options opt = new Options();
                     opt.QuestionId = optionsTableMasterDTO.OptionsTableDTOs[i].QuestionId;
+                    opt.AdsName = optionsTableMasterDTO.OptionsTableDTOs[i].AdsName;
                     opt.Option = optionsTableMasterDTO.OptionsTableDTOs[i].Option;
                     opt.CreatedBy = optionsTableMasterDTO.OptionsTableDTOs[i].CreatedBy;
                     opt.CreatedOn = System.DateTime.Now;
@@ -74,7 +75,7 @@ namespace AdminApi.Controllers
                                 u.OptionsId,
                                 u.QuestionId,
                                 p.Questions,
-                                p.AdsName,
+                                u.AdsName,
                                 u.Option,
                                 u.IsDeleted
                             }).Where(x => x.IsDeleted == false).ToList();
@@ -196,6 +197,7 @@ namespace AdminApi.Controllers
             {
                 var objState = _context.Options.SingleOrDefault(opt => opt.OptionsId == optionsTableUpdateDTO.OptionsId);
                 objState.QuestionId = optionsTableUpdateDTO.QuestionId;
+                objState.AdsName = optionsTableUpdateDTO.AdsName;
                 objState.Option = optionsTableUpdateDTO.Option;
                 objState.UpdatedBy = optionsTableUpdateDTO.UpdatedBy;
                 objState.UpdatedOn = System.DateTime.Now;
