@@ -39,7 +39,9 @@
                                 <th>Email</th>
                                 <th>Address</th>
                                 <th>Advertise Name</th>
+                                <th>Total Verification Count</th>
                                 <th>User Name</th>
+                                <th>Password</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -102,7 +104,6 @@
                                         <input type="text" class="form-control" id="Address" autocomplete="off" placeholder="Address Name" required />
                                     </div>
                                 </div>
-
                             </div>
 
                             <div class="row" @*style="display:none"*@>
@@ -141,11 +142,15 @@
                             <select class="form-control" id="selectArea"></select>
                             </div>
                             </div>
-
                             </div>*@
                             <div class="row">
                                 <div class="col-lg-6">
-
+                                    <div class="form-group">
+                                        <label class="control-label">Total Verification Count&nbsp;<span style="color: red;"><b>*</b></span></label>
+                                        <input type="number" class="form-control" id="totalnumberr" autocomplete="off" placeholder="Total Verification Count" required />
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
                                     <div class="form-group">
                                         <label class="control-label">Profile picture&nbsp;<span style="color: red;"><b>*</b></span></label>
                                         <div class="custom-file mt-0">
@@ -154,6 +159,9 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
+                               
                                 @* <div class="col-lg-6">
                                 <div class="form-group">
                                 <label class="control-label">Hospital Name&nbsp;<span style="color: red;"><b>*</b></span></label>
@@ -287,6 +295,7 @@
                         //areaId: parseInt($("#selectArea").val()),
                         address: $.trim($("#Address").val()),
                         advertiseName: selectedAreasString,
+                        totalVerificationCount: parseFloat($("#totalnumberr").val()),
                         addedBy: @Context.Session.GetInt32("UserId"),
                     }
                     //console.log(model);
@@ -371,7 +380,9 @@
                         //cityId: parseInt($("#selectCity").val()),
                         //areaId: parseInt($("#selectArea").val()),
                         address: $.trim($("#Address").val()),
+                        totalVerificationCount: parseFloat($("#totalnumberr").val()),
                         advertiseName: selectedAreasString,
+                       
                         lastUpdatedBy: @Context.Session.GetInt32("UserId"),
                     }
                     //console.log(model);
@@ -442,6 +453,7 @@
                         //GetHospitalName(data.hospitalMasterid);
                         GetHospitalName(data.stateId);
                         GetAdvertise(data.advertiseName);
+                        $('#totalnumberr').val(data.totalVerificationCount);
                         //CityList(data.cityId);
                         //AreaList(data.areaId);
                         $('#Address').val(data.address);
@@ -513,8 +525,10 @@
                     { "data": "address", "orderable": true },
 
                     { "data": "advertiseName", "orderable": true },
+                    { "data": "totalVerificationCount", "orderable": true },
 
                     { "data": "userName", "orderable": true },
+                    { "data": "password", "orderable": true },
                     {
                         "orderable": false,
                         "class": "action_button",
@@ -599,8 +613,9 @@
             });
         }
 
-        GetAdvertise()
-        function GetAdvertise() {
+        //For Create
+        GetAdvertises()
+        function GetAdvertises() {
             var opt = '';
             $.ajax({
                 type: "GET",
@@ -636,6 +651,43 @@
                 }
             });
         }
+
+        //For Edit
+        function GetAdvertise(selectedAds) {
+            var opt = '';
+            $.ajax({
+                type: "GET",
+                url: "@apiUrl/api/AdScreen/GetAdvertiseList",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                },
+                dataType: "json",
+                success: function (res) {
+                    var options = [];
+                    options.push('<option value="">Please Select</option>');
+                    for (var i = 0; i < res.data.length; i++) {
+                        var adsName = res.data[i].adsName;
+                        var selected = (selectedAds && selectedAds.includes(adsName)) ? 'selected' : '';
+                        options.push('<option value="' + adsName + '" ' + selected + '>' + adsName + '</option>');
+                    }
+                    $("#adver").html(options.join(''));
+
+                    $('#adver').multipleSelect({
+                        width: '100%'
+                    });
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        window.location.replace('/Message/TokenExpire');
+                    } else if (data.status == 403) {
+                        window.location.replace('/Message/Unauthorize');
+                    }
+                }
+            });
+        }
+
+
 
         function showAddBtn() {
             roleList('');

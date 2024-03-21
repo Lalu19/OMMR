@@ -62,11 +62,11 @@ namespace AdminApi.Controllers
                 equals r.UserRoleId 
                 where u.IsActive.Equals(true) && u.UserName.Equals(username) && u.Password.Equals(password)
                 //select new {u.UserId,r.UserRoleId,r.RoleName,u.FullName,u.Mobile,u.Email,u.ImagePath,u.HospitalMasterid}).FirstOrDefault();                                              
-                select new {u.UserId,r.UserRoleId,r.RoleName,u.FullName,u.Mobile,u.Email,u.ImagePath,u.StateId,u.StateName,u.Address,u.AdvertiseName}).FirstOrDefault();                                              
+                select new {u.UserId,r.UserRoleId,r.RoleName,u.FullName,u.Mobile,u.Email,u.ImagePath,u.StateId,u.StateName,u.Address,u.AdvertiseName,u.TotalVerificationCount }).FirstOrDefault();                                              
                 if(user!=null)
                 {                   
                     UserInfo userInfo=new UserInfo/*{UserId=user.UserId,UserRoleId=user.UserRoleId,RoleName=user.RoleName,FullName=user.FullName,Mobile=user.Mobile,Email=user.Email,ImagePath=user.ImagePath,HospitalMasterid=user.HospitalMasterid};*/
-                    { UserId = user.UserId,UserRoleId = user.UserRoleId,RoleName = user.RoleName,FullName = user.FullName,Mobile = user.Mobile,Email = user.Email,ImagePath = user.ImagePath,StateId = user.StateId,StateName=user.StateName,Address=user.Address,AdvertiseName=user.AdvertiseName};
+                    { UserId = user.UserId,UserRoleId = user.UserRoleId,RoleName = user.RoleName,FullName = user.FullName,Mobile = user.Mobile,Email = user.Email,ImagePath = user.ImagePath,StateId = user.StateId,StateName=user.StateName,Address=user.Address,AdvertiseName=user.AdvertiseName, TotalVerificationCount = user.TotalVerificationCount };
                     var tokenString=GenerateJwtToken(userInfo);
                     return Ok(new Response{token=tokenString,Obj=userInfo});                                    
                 }
@@ -416,6 +416,7 @@ namespace AdminApi.Controllers
                     u.StateId,
                     p.StateName,
                     u.AdvertiseName,
+                    u.TotalVerificationCount,
                     //u.CityId,
                     //c.CityName,
                     //u.AreaId,
@@ -438,6 +439,7 @@ namespace AdminApi.Controllers
                     StateId = s.StateId,
                     StateName = s.StateName,
                     AdvertiseName = s.AdvertiseName,
+                    TotalVerificationCount = s.TotalVerificationCount,
                     // CityId = s.CityId,
                     //CityName = s.CityName,
                     // AreaId = s.AreaId,
@@ -630,6 +632,7 @@ namespace AdminApi.Controllers
                 objUser.StateId = model.StateId;
                 objUser.StateName = model.StateName;
                 objUser.AdvertiseName = model.AdvertiseName;
+                objUser.TotalVerificationCount = model.TotalVerificationCount;
                 //objUser.CityId = model.CityId;
                 //objUser.AreaId = model.AreaId;
                 objUser.Address = model.Address;

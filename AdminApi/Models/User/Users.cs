@@ -50,8 +50,8 @@ namespace AdminApi.Models.User
         //public int? AreaId { get; set; }
         public string Address { get; set; }
         public string AdvertiseName { get; set; }
-
-		public bool DeleteRequested { get; set; }
+        public double TotalVerificationCount { get; set; }
+        public bool DeleteRequested { get; set; }
 		public string SuperAdminDeletionResponse { get; set; }
 
 	}

@@ -832,6 +832,7 @@ namespace AdminApi.Controllers
                                 u.Email,
                                 u.DateOfBirth,
                                 u.UserName,
+                                u.Password,
                                 u.ImagePath,
                                 //u.StateId,
                                 //p.StateName,
@@ -849,6 +850,7 @@ namespace AdminApi.Controllers
                     Email = s.Email,
                     DateOfBirth = s.DateOfBirth,
                     UserName = s.UserName,
+                    Password = s.Password,
                     ImagePath = s.ImagePath,
                     //StateId = s.StateId,
                     //StateName = s.StateName,
@@ -883,6 +885,7 @@ namespace AdminApi.Controllers
                                 u.Email,
                                 u.DateOfBirth,
                                 u.UserName,
+                                u.Password,
                                 u.ImagePath,
                                 u.Address
                             });
@@ -897,6 +900,7 @@ namespace AdminApi.Controllers
                     Email = s.Email,
                     DateOfBirth = s.DateOfBirth,
                     UserName = s.UserName,
+                    Password = s.Password,
                     ImagePath = s.ImagePath,
                     Address = s.Address
                 });
@@ -929,6 +933,7 @@ namespace AdminApi.Controllers
                                 u.Email,
                                 u.DateOfBirth,
                                 u.UserName,
+                                u.Password,
                                 u.ImagePath,
                                 u.Address,
                                 u.DeleteRequested,
@@ -946,6 +951,7 @@ namespace AdminApi.Controllers
                     Email = s.Email,
                     DateOfBirth = s.DateOfBirth,
                     UserName = s.UserName,
+                    Password = s.Password,
                     ImagePath = s.ImagePath,
                     Address = s.Address,
                     DeleteRequested = s.DeleteRequested,
@@ -981,9 +987,11 @@ namespace AdminApi.Controllers
                                 u.Email,
                                 u.DateOfBirth,
                                 u.UserName,
+                                u.Password,
                                 u.ImagePath,
                                 u.Address,
                                 u.AdvertiseName,
+                                u.TotalVerificationCount,
                                 u.IsActive
                             }).Where(x=> x.IsActive == true);
 
@@ -997,9 +1005,11 @@ namespace AdminApi.Controllers
                     Email = s.Email,
                     DateOfBirth = s.DateOfBirth,
                     UserName = s.UserName,
+                    Password = s.Password,
                     ImagePath = s.ImagePath,
                     Address = s.Address,
-                    AdvertiseName = s.AdvertiseName
+                    AdvertiseName = s.AdvertiseName,
+                    TotalVerificationCount = s.TotalVerificationCount
                 });
 
                 int totalRecords = userInfoList.Count();

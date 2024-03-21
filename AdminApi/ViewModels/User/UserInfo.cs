@@ -20,12 +20,14 @@ namespace AdminApi.ViewModels.User
         public int StateId { get; set; }
         public string StateName { get; set; }
         public string AdvertiseName { get; set; }
+        public double TotalVerificationCount { get; set; }
+
         //public int? CityId { get; set; }
         //public string? CityName { get; set; }
         //public int? AreaId { get; set; }
         //public string? AreaName { get; set; }
-        public string Address { get; set; }
 
+        public string Address { get; set; }
         public bool DeleteRequested { get; set; }
         public string SuperAdminDeletionResponse { get; set; }
     }
