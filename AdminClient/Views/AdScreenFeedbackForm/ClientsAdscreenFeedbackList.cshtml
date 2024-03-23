@@ -118,7 +118,10 @@
         // Move the declaration of ads outside of the GetAds function
         var ads = "";
 
-        GetAds()
+        var totalVerificationCount = 0; // Variable to hold total verification count
+
+        GetAds();
+
         function GetAds() {
             $.ajax({
                 type: "GET",
@@ -130,12 +133,10 @@
                 dataType: "json",
                 success: function (data) {
                     if (data && data.data && data.data.length > 0) {
-                        // Loop through the array of advertisements
                         ads = data.data.map(item => item.advertiseName).join(',');
+                        totalVerificationCount = data.data[0].totalVerificationCount; // Set totalVerificationCount
 
-                        console.log('Ads:', ads); // Log the value of ads
-
-
+                        console.log('Ads:', ads);
                         loadAds();
                         totalFeedback();
                     } else {
@@ -152,6 +153,7 @@
             });
         }
 
+     
         loadAds()
         async function loadAds() {
             try {
@@ -233,7 +235,7 @@
             }
         }
 
-        totalFeedback()
+       
         //async function totalFeedback() {
         //    $.ajax({
         //        "url": '@apiUrl/api/AdScreen/GetClientAdsFeedbackListbyAdsNames?adsNames=' + ads,
@@ -355,32 +357,35 @@
 
                     if (data && data.totalFeedbackCount !== undefined) {
                         var totalFeedbackCount = data.totalFeedbackCount;
-                        var remainingFeedback = 500 - totalFeedbackCount; // Calculate remaining feedback
-                        x = x + '<span>' + totalFeedbackCount + '</span>' + ' (' + remainingFeedback + ' remaining)';
+                        var remainingFeedback = totalVerificationCount - totalFeedbackCount; // Calculate remaining feedback
+
+                        // Styling for totalFeedbackCount and remainingFeedback
+                        var totalFeedbackColor = 'white';
+                        var remainingFeedbackColor = remainingFeedback > 0 ? 'green' : 'red';
+
+                        x = '<span style="color:' + totalFeedbackColor + '">' + totalFeedbackCount + '</span> (' + remainingFeedback + ' remaining)';
                         $('#progresss').html(x);
 
-                        // Update the progress bar only if totalFeedbackCount is greater than 0
                         if (totalFeedbackCount > 0) {
-                            var percentage = (totalFeedbackCount / 5);
+                            var percentage = (totalFeedbackCount / totalVerificationCount) * 100;
                             $('#progress-bar').css('width', percentage + '%');
                             $('#progress-bar').attr('aria-valuenow', percentage);
                         } else {
-                            // Handle the case where totalFeedbackCount is 0 or less (optional)
                             $('#progress-bar').css('width', '0%');
                         }
 
-                        // Update tooltip content with the number of records
                         $('#progresss').attr('data-original-title', totalFeedbackCount + " Records");
                     } else {
                         console.log("Invalid data returned from the API");
-                        // Handle the case where data is not valid (optional)
                     }
+
                 },
                 error: function (err) {
                     console.log(err);
                 }
             });
         }
+
 
        //async function totalFeedback() {
                         //    $.ajax({

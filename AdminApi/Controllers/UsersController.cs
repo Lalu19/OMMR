@@ -835,13 +835,14 @@ namespace AdminApi.Controllers
                         .Select(name => new
                         {
                             UserId = user.UserId,
-                            AdvertiseName = name.Trim()
+                            AdvertiseName = name.Trim(),
+                            TotalVerificationCount = user.TotalVerificationCount
                         })
                         .ToList();
 
                     int totalRecords = ads.Count;
 
-                    return Ok(new { data = ads, recordsTotal = totalRecords, recordsFiltered = totalRecords });
+                    return Ok(new { data = ads, recordsTotal = totalRecords, recordsFiltered = totalRecords, totalVerificationCount = user.TotalVerificationCount });
                 }
                 else
                 {
