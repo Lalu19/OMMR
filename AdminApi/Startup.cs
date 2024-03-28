@@ -40,11 +40,11 @@ namespace AdminApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //For Hallpass and Client expiry
+            ////For Hallpass and Client expiry
 
-            //services.AddHostedService<HallPassCleanUpService>();
-            //services.AddHostedService<ClientCleanUpService>();
-            //services.AddHostedService<ResetAgentsService>();
+            services.AddHostedService<HallPassCleanUpService>();
+            services.AddHostedService<ClientCleanUpService>();
+            services.AddHostedService<ResetAgentsService>();
 
 
             //services.AddHostedService<Adscreen30DaysCleanUp>();
@@ -53,12 +53,12 @@ namespace AdminApi
 
             //services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=103.145.37.246,10230;Database=OMMR;User Id=sa;Password=Software@2016;TrustServerCertificate=True;")));
 
-            // services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=.\SQLEXPRESS;Database=OMMR;user id=sa;Password=Software@2016;TrustServerCertificate=True;")));
+             services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=.\SQLEXPRESS;Database=OMMR;user id=sa;Password=Software@2016;TrustServerCertificate=True;")));
             services.AddHangfireServer();
 
             // services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=192.168.29.55,10230;Database=OMMR;User Id=sa;Password=Appman@250319;TrustServerCertificate=True;")));
 
-            services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=192.168.29.55,10230;Database=OMMR_Local;User Id=sa;Password=Appman@250319;TrustServerCertificate=True;")));
+           // services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=192.168.29.55,10230;Database=OMMR_Local;User Id=sa;Password=Appman@250319;TrustServerCertificate=True;")));
 
 
 

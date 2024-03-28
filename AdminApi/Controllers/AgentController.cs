@@ -1039,8 +1039,8 @@ namespace AdminApi.Controllers
                     }
                 }
 
-                 // BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromMinutes(30));
-                 BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromMinutes(2));
+                  BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromMinutes(30));
+                // BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromMinutes(2));
                 // BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromMinutes(10));
 
 
