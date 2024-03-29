@@ -49,16 +49,11 @@ namespace AdminApi
 
             //services.AddHostedService<Adscreen30DaysCleanUp>();
 
-            // services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=DESKTOP-8AP7SAV\SQLEXPRESS;Database=OMMR;Trusted_Connection=True;")));
-
-            //services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=103.145.37.246,10230;Database=OMMR;User Id=sa;Password=Software@2016;TrustServerCertificate=True;")));
-
-             services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=.\SQLEXPRESS;Database=OMMR;user id=sa;Password=Software@2016;TrustServerCertificate=True;")));
+            services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=.\SQLEXPRESS;Database=OMMR_Local;user id=sa;Password=Software@2016;TrustServerCertificate=True;")));
+            //services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=.\SQLEXPRESS;Database=OMMR;user id=sa;Password=Software@2016;TrustServerCertificate=True;")));
             services.AddHangfireServer();
 
-            // services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=192.168.29.55,10230;Database=OMMR;User Id=sa;Password=Appman@250319;TrustServerCertificate=True;")));
-
-           // services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=192.168.29.55,10230;Database=OMMR_Local;User Id=sa;Password=Appman@250319;TrustServerCertificate=True;")));
+            //services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=192.168.29.55,10230;Database=OMMR_Local;User Id=sa;Password=Appman@250319;TrustServerCertificate=True;")));
 
 
 
@@ -89,7 +84,7 @@ namespace AdminApi
             {
                 options.AddPolicy(name: AllowSpecificOrigins, builder =>
                 {
-                    builder.WithOrigins("http://localhost:53580", "https://ommr.in")
+                    builder.WithOrigins("http://localhost:53580", "https://ommr.in", "https://demo1.appman.in")
                     .AllowAnyHeader()
                     .AllowAnyMethod();
                 });

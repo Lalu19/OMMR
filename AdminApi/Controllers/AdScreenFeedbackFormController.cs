@@ -10,6 +10,7 @@ using AdminApi.DTO.App;
 using AdminApi.Models.App;
 using AdminApi.Models.User;
 using System.Collections.Generic;
+using AdminApi.Models.App.Agent;
 
 namespace AdminApi.Controllers
 {
@@ -596,7 +597,7 @@ namespace AdminApi.Controllers
         //    {
         //        var list = (from u in _context.AdScreenFeedbackForm
         //                    join a in _context.Agents on u.AgentId equals a.AgentId
-                           
+
 
         //                    select new
         //                    {
@@ -619,6 +620,10 @@ namespace AdminApi.Controllers
         //    }
         //}
 
+        /// <summary>
+        /// Visited Theatre list report
+        /// </summary>
+
         [HttpGet("{fromDate}/{toDate}/{agentId}")]
         public ActionResult GetTheatreListByAgent(DateTime fromDate, DateTime toDate, int agentId)
         {
@@ -626,7 +631,7 @@ namespace AdminApi.Controllers
             {
                 var list = (from u in _context.AdScreenFeedbackForm
                             join m in _context.Agents on u.AgentId equals m.AgentId
-                            join n in _context.AdScreen on u.AdScreenId equals n.AdScreenId
+                            join n in _context.AdScreenMapping on u.AdScreenId equals n.AdScreenId
 
                             where u.IsDeleted == false && u.CreatedOn.Date >= fromDate.Date && u.CreatedOn.Date <= toDate.Date
                             select new

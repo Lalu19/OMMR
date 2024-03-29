@@ -175,31 +175,7 @@ namespace AdminApi.Controllers
                 return StatusCode(500, new { status = "error", responseMsg = "An error occurred" });
             }
         }
-        //[HttpPost]
-        //public IActionResult ToggleActivation(int screenListId, bool isActive)
-        //{
-        //    try
-        //    {
-        //        var screen = _context.ScreenList.FirstOrDefault(s => s.ScreenListId == screenListId);
-        //        if (screen != null)
-        //        {
-        //            screen.IsActive = isActive;
-        //            _context.SaveChanges();
-        //            return Ok(new { status = "success", responseMsg = "Screen activation status updated" });
-        //        }
-        //        else
-        //        {
-        //            return NotFound(new { status = "error", responseMsg = "Screen not found" });
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Handle exceptions as needed
-        //        return StatusCode(500, new { status = "error", responseMsg = "An error occurred" });
-        //    }
-        //}
-
-
+      
         [HttpGet]
         public ActionResult GetallList()
         {
@@ -652,6 +628,10 @@ namespace AdminApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Longitude Latitude by Thaetrename
+        /// </summary>
+        /// 
         [HttpGet("{TheaterName}/{Stateid}")]
         public ActionResult GetLocationbyTheaterName(string TheaterName, int Stateid)
         {

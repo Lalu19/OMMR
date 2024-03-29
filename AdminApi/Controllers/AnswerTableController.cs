@@ -282,6 +282,10 @@ namespace AdminApi.Controllers
             }
         }
 
+
+        /// <summary>
+        /// Delete multiple Answers simoultaneously
+        /// </summary>
         [HttpPost]
         public IActionResult DeleteSelectedAnswers([FromBody] int[] idsToDelete, int deletedBy)
         {

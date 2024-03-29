@@ -1689,6 +1689,10 @@ namespace AdminApi.Controllers
         //    }
         //}
 
+
+        /// <summary>
+        /// AgentTaskInspection for Admin
+        /// </summary>
         [HttpGet("{fromDate}/{toDate}")]
         public ActionResult AgentTaskInspection(DateTime fromDate, DateTime toDate)
         {
@@ -1771,6 +1775,10 @@ namespace AdminApi.Controllers
         //    }
         //}
 
+
+        /// <summary>
+        /// AgentTaskInspection for Stateuser
+        /// </summary>
         [HttpGet("{fromDate}/{toDate}/{UserId}")]
         public ActionResult AgentTaskInspectionbyUserId(DateTime fromDate, DateTime toDate, int UserId)
         {
@@ -1838,6 +1846,9 @@ namespace AdminApi.Controllers
             return Ok("Your Password is sent to your registered email");
         }
 
+        /// <summary>
+        /// Refresh all booleans value in agentmapping table
+        /// </summary>
         [HttpPost]
         public IActionResult RefreshBooleans()
         {

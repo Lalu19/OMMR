@@ -63,11 +63,11 @@ namespace AdminApi.Controllers
         //    {
         //        for (int i = 0; i < stateUserMasterDTO.StateUserDTOs.Count; i++)
         //        {
-        //            StateUser bed = new StateUser();
-        //            bed.UserId = stateUserMasterDTO.StateUserDTOs[i].UserId;
-        //            bed.StateId = stateUserMasterDTO.StateUserDTOs[i].StateId;
-        //            bed.CreatedBy = stateUserMasterDTO.StateUserDTOs[i].CreatedBy;
-        //            _StateUserRepo.Insert(bed);
+        //            StateUser statee = new StateUser();
+        //            statee.UserId = stateUserMasterDTO.StateUserDTOs[i].UserId;
+        //            statee.StateId = stateUserMasterDTO.StateUserDTOs[i].StateId;
+        //            statee.CreatedBy = stateUserMasterDTO.StateUserDTOs[i].CreatedBy;
+        //            _StateUserRepo.Insert(statee);
 
         //        }
 
@@ -93,11 +93,11 @@ namespace AdminApi.Controllers
                         return Accepted(new Confirmation { Status = "Duplicate", ResponseMsg = "Duplicate State Name..!" });
                     }
 
-                    StateUser bed = new StateUser();
-                    bed.UserId = stateUserMasterDTO.StateUserDTOs[i].UserId;
-                    bed.StateId = stateUserMasterDTO.StateUserDTOs[i].StateId;
-                    bed.CreatedBy = stateUserMasterDTO.StateUserDTOs[i].CreatedBy;
-                    _StateUserRepo.Insert(bed);
+                    StateUser statee = new StateUser();
+                    statee.UserId = stateUserMasterDTO.StateUserDTOs[i].UserId;
+                    statee.StateId = stateUserMasterDTO.StateUserDTOs[i].StateId;
+                    statee.CreatedBy = stateUserMasterDTO.StateUserDTOs[i].CreatedBy;
+                    _StateUserRepo.Insert(statee);
                 }
 
                 return Ok(stateUserMasterDTO);

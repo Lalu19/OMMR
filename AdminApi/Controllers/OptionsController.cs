@@ -94,6 +94,7 @@ namespace AdminApi.Controllers
         /// <summary>
         /// Questions Show in Audience Review
         /// </summary>
+        /// 
         [HttpGet("{AdsName}")]
         public ActionResult GetOptionListFromQuestionbyadsname(string AdsName)
         {
