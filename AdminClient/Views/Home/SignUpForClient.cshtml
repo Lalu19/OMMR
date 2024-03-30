@@ -143,13 +143,16 @@
                                                     @* <label class="form-label" for="password">Password</label>*@
                                                     <div class="form-icon-container"><input class="form-control form-icon-input" name="password" type="password" id="password" autocomplete="off" placeholder="Password" required><span class="fas fa-key text-900 fs--1 form-icon"></span></div>
                                                 </div>
-
+                                             
                                                 <div class="row flex-between-center mb-1">
                                                     <div class="col-auto">
-                                                        <div class="form-check mb-0"><input class="form-check-input" id="basic-checkbox" type="checkbox" onclick="Toggle()"><label class="form-check-label mb-0" for="basic-checkbox">Show passward</label></div>
+                                                        <div class="form-check mb-0"><input class="form-check-input" id="basic-checkbox" type="checkbox" onclick="Toggle()"><label class="form-check-label mb-0" for="basic-checkbox">Show password</label></div>
                                                     </div>
                                                 </div>
-
+                                                <div class="mb-1 text-start">
+                                                    @*<label class="form-label" for="mobile">TotalVerificationCount</label>*@
+                                                    <div class="form-icon-container"><input class="form-control form-icon-input" name="TotalVerificationCount" type="number" id="totalVerificationCount" autocomplete="off" placeholder="Total Verification Count" required><span class="fas fa-mobile text-900 fs--1 form-icon"></span></div>
+                                                </div>
                                                 @* <div class="mb-1 text-start">
                                                 <label class="form-label" for="Advertise">Advertise Name</label>
                                                 <div class="form-control form-icon-container">
@@ -187,7 +190,7 @@
                                                     <button type="button" id="btnSave" class="btn btn-success w-100 mb-3">Sign Up</button>
                                                 </div>
 
-                                                <span class="backto-link font-default content-color text-decoration-none">Already have an Client account? <a class="text-decoration-underline theme-color" href="/Home/Login"> Signin for Client </a> </span>
+                                                <span class="backto-link font-default content-color text-decoration-none">Already have an Client account? <a class="text-decoration-underline theme-color" href="/Home/Login"> Signin </a> </span>
                                             </div>
                                         </div>
                                     </form>
@@ -304,6 +307,7 @@
                     address: $.trim($("#Address").val()),
                     userName: $.trim($("#username").val()),
                     password: $.trim($("#password").val()),
+                    totalVerificationCount: $.trim($("#totalVerificationCount").val()),
 
                     advertiseName: selectedAreasString,
 

@@ -32,7 +32,6 @@ namespace AdminApi.Services
                     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
                     var now = DateTime.Now;
-                   // var threeDaysAgo = now.AddMinutes(-5);
                     var threeDaysAgo = now.AddDays(-3);
 
                     var hallPassesToDelete = context.HallPass

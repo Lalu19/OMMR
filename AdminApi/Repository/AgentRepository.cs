@@ -43,6 +43,7 @@ namespace AdminApi.Repository
             }
         }
 
+        //For Resend Notification
         public async Task<List<object>> RunAgentProcessing2()
         {
             try
@@ -166,6 +167,7 @@ namespace AdminApi.Repository
             }
         }
 
+        //For Resend Notification
         public async Task<List<object>> ProcessAgentsFromTheaterName2(List<string> distinctTheatreNames)
         {
             try

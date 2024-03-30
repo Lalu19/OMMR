@@ -29,6 +29,10 @@ namespace AdminApi.Controllers
         }
 
 
+        /// <summary>
+        /// Approve the request of Stateuser Delete by SuperAdmin
+        /// </summary>
+       
         [HttpGet("{id}/{DeletedBy}")]
         public IActionResult DeleteStateAdmin(int id, int DeletedBy)
         {
@@ -59,6 +63,10 @@ namespace AdminApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Decline the request of Stateuser Delete by SuperAdmin
+        /// </summary>
+      
         [HttpGet("{id}/{DeletedBy}")]
         public IActionResult DeleteStateAdminReject(int id, int DeletedBy)
         {

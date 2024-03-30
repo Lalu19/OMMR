@@ -27,6 +27,9 @@ namespace AdminApi.Controllers
 
         }
 
+        /// <summary>
+        /// Approve the request of agent Delete by Admin
+        /// </summary>
 
         [HttpGet("{id}/{DeletedBy}")]
         public IActionResult DeleteAgent(int id ,int DeletedBy)
@@ -48,6 +51,10 @@ namespace AdminApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Decline the request of agent Delete by Admin
+        /// </summary>
+       
         [HttpGet("{id}/{DeletedBy}")]
         public IActionResult DeleteAgentReject(int id, int DeletedBy)
         {
