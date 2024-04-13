@@ -29,6 +29,7 @@ using OfficeOpenXml;
 using System.IO;
 using AdminApi.Models.App;
 using Microsoft.EntityFrameworkCore;
+using AdminApi.Service;
 
 namespace AdminApi.Controllers
 {
@@ -38,15 +39,18 @@ namespace AdminApi.Controllers
     {
         private readonly IConfiguration _config;
         private readonly AppDbContext _context;
+        private readonly IAdScreenService _adScreenService;
         private readonly ISqlRepository<Agent> _AgentRepo;
         public AgentController(IConfiguration config,
                                 AppDbContext context,
+                                IAdScreenService adScreenService,
                                 ISqlRepository<Agent> AgentRepo)
 
         {
             _config = config;
             _context = context;
             _AgentRepo = AgentRepo;
+            _adScreenService = adScreenService;
 
         }
 
@@ -1153,16 +1157,33 @@ namespace AdminApi.Controllers
             {
                 var agents = _context.AgentMappings.Where(a => a.AgentId == AgentId && a.IsDeleted == false).ToList();
 
-
                 if (agents.Any())
                 {
                     var theatreNames = agents
-                        .Where(z => z.TaskRejected == false && z.IsTimeExpired == false && z.NotificationSent == true && z.IsDeleted == false)
-                        .Select(a => new { AgentId, TheatreName = a.TheatreName, StateId = a.StateId, TaskAccepted = a.TaskAccepted })
-                        .ToArray();
+                                    .Where(z => !z.TaskRejected && !z.IsTimeExpired && z.NotificationSent && !z.IsDeleted)
+                                    .Select(a => new { AgentId, TheatreName = a.TheatreName, StateId = a.StateId, TaskAccepted = a.TaskAccepted })
+                                    .ToList();
+
+                    var filteredTheatreNames = new List<object>();
+
+                    foreach (var theatre in theatreNames)
+                    {
+                        var screenlist = _adScreenService.GetScreenListbyTheaterName(theatre.TheatreName, theatre.StateId, theatre.AgentId);
 
 
-                    return Ok(new { data = theatreNames, recordsTotal = theatreNames.Length, recordsFiltered = theatreNames.Length });
+                        if (screenlist != null && screenlist.Count() != 0)
+                        {
+
+                            filteredTheatreNames.Add(theatre);
+                        }
+                    }
+
+                    return Ok(new
+                    {
+                        data = filteredTheatreNames,
+                        recordsTotal = filteredTheatreNames.Count,
+                        recordsFiltered = filteredTheatreNames.Count
+                    });
                 }
                 else
                 {
@@ -1172,9 +1193,14 @@ namespace AdminApi.Controllers
             }
             catch (Exception ex)
             {
-                return Accepted(new Confirmation { Status = "error", ResponseMsg = ex.Message });
+                // Log the exception details
+                Console.WriteLine($"An error occurred: {ex}");
+
+                // Return a 500 Internal Server Error response
+                return StatusCode(500, new Confirmation { Status = "error", ResponseMsg = "An error occurred while processing your request." });
             }
         }
+
 
         //[HttpGet("{AgentId}")]
         //public IActionResult PrimaryAgentMovieTheatres(int AgentId)

@@ -45,13 +45,14 @@ namespace AdminApi
             services.AddHostedService<HallPassCleanUpService>();
             services.AddHostedService<ClientCleanUpService>();
             services.AddHostedService<ResetAgentsService>();
-
+            services.AddScoped<IAdScreenService, AdScreenService>();
+           // services.AddScoped<AdScreenService>();
 
             //services.AddHostedService<Adscreen30DaysCleanUp>();
 
-           // services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=.\SQLEXPRESS;Database=OMMR_Local;user id=sa;Password=Software@2016;TrustServerCertificate=True;")));
+            // services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=.\SQLEXPRESS;Database=OMMR_Local;user id=sa;Password=Software@2016;TrustServerCertificate=True;")));
 
-            //services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=.\SQLEXPRESS;Database=OMMR;user id=sa;Password=Software@2016;TrustServerCertificate=True;")));
+            services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=.\SQLEXPRESS;Database=OMMR;user id=sa;Password=Software@2016;TrustServerCertificate=True;")));
             services.AddHangfireServer();
 
             services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=192.168.29.55,10230;Database=OMMR_Local;User Id=sa;Password=Appman@250319;TrustServerCertificate=True;")));

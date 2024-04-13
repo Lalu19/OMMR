@@ -11,6 +11,7 @@ using Microsoft.Data.SqlClient;
 using OfficeOpenXml;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using AdminApi.Service;
 
 namespace AdminApi.Controllers
 {
@@ -20,15 +21,18 @@ namespace AdminApi.Controllers
     {
         private readonly IConfiguration _config;
         private readonly AppDbContext _context;
+       // private readonly IAdScreenService _adScreenService;
         private readonly ISqlRepository<ScreenList> _ScreenListRepo;
 
         public ScreenListController(IConfiguration config,
                                     AppDbContext context,
+                                   // IAdScreenService adScreenService,
                                     ISqlRepository<ScreenList> ScreenListRepo)
         {
             _config = config;
             _context = context;
             _ScreenListRepo = ScreenListRepo;
+           // _adScreenService = adScreenService;
         }
 
       //  [HttpPost]
@@ -606,15 +610,21 @@ namespace AdminApi.Controllers
 
                     foreach (var theaterName in theaterNames)
                     {
-                        theaters.Add(new
-                        {
-                            StateId = item.StateId,
-                            StateName = item.StateName,
-                            AgentId = item.AgentId,
-                            AgentName = item.AgentName,
-                            TheatreName = theaterName,
-                            IsDeleted = item.IsDeleted
-                        });
+                        //var screenlist = _adScreenService.GetScreenListbyTheaterName(theaterName, item.StateId, item.AgentId);
+
+                       // if (screenlist != null && screenlist.Count() != 0)
+                       // {
+
+                            theaters.Add(new
+                            {
+                                StateId = item.StateId,
+                                StateName = item.StateName,
+                                AgentId = item.AgentId,
+                                AgentName = item.AgentName,
+                                TheatreName = theaterName,
+                                IsDeleted = item.IsDeleted
+                            });
+                       // }
                     }
                 }
 
