@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using AdminApi.Models.User;
 using AdminApi.DTO.App.AgentDTO;
 using Microsoft.EntityFrameworkCore;
+using AdminApi.Service;
 
 namespace AdminApi.Controllers
 {
@@ -22,16 +23,21 @@ namespace AdminApi.Controllers
     {
         private readonly IConfiguration _config;
         private readonly AppDbContext _context;
+       // private readonly IAdScreenService _adScreenService;
         private readonly ISqlRepository<AdScreen> _AdScreenRepo;
 
         public AdScreenController(IConfiguration config,
                                     AppDbContext context,
+                                   // IAdScreenService adScreenService,
                                     ISqlRepository<AdScreen> AdScreenRepo)
         {
             _config = config;
             _context = context;
             _AdScreenRepo = AdScreenRepo;
+           // _adScreenService = adScreenService;
         }
+
+
 
         /////Delete the previous data code
 
@@ -1095,6 +1101,7 @@ namespace AdminApi.Controllers
                             }).Where(x => x.IsDeleted == false && x.AgentId == agentid).Distinct().ToList();
 
                 var theaters = new List<object>();
+                var filteredTheatreNames = new List<object>();
 
                 foreach (var item in list)
                 {
@@ -1102,18 +1109,22 @@ namespace AdminApi.Controllers
 
                     foreach (var theaterName in theaterNames)
                     {
-                        theaters.Add(new
-                        {
-                            StateId = item.StateId,
-                            StateName = item.StateName,
-                            AgentId = item.AgentId,
-                            AgentName = item.AgentName,
-                            TheatreName = theaterName,
-                            IsDeleted = item.IsDeleted
-                        });
-                    }
-                }
+                       
 
+                            theaters.Add(new
+                            {
+                                StateId = item.StateId,
+                                StateName = item.StateName,
+                                AgentId = item.AgentId,
+                                AgentName = item.AgentName,
+                                TheatreName = theaterName,
+                                IsDeleted = item.IsDeleted
+                            });
+                        
+
+                    }
+
+                }
                 int totalRecords = theaters.Count;
 
                 return Ok(new { data = theaters, recordsTotal = totalRecords, recordsFiltered = totalRecords });
