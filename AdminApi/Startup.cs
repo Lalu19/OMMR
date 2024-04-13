@@ -55,6 +55,7 @@ namespace AdminApi
             services.AddHangfireServer();
 
             services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=192.168.29.55,10230;Database=OMMR_Local;User Id=sa;Password=Appman@250319;TrustServerCertificate=True;")));
+            //services.AddHangfire(x => x.UseSqlServerStorage(string.Format(@"Data Source=115.246.161.107,10230;Database=OMMR_Local;User Id=sa;Password=Appman@250319;TrustServerCertificate=True;")));
 
 
 

@@ -47,6 +47,7 @@ namespace AdminApi.Models
         public virtual DbSet<UpcomingMovie> UpcomingMovie { get; set; }
         public virtual DbSet<UpComingMovieListforClient> UpComingMovieListforClient { get; set; }
         public virtual DbSet<AgentReport> AgentReports { get; set; }
+        public virtual DbSet<Verdict> Verdicts { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -230,6 +231,17 @@ namespace AdminApi.Models
             .HasDefaultValueSql("getdate()");
 
             modelBuilder.Entity<UpComingMovieListforClient>()
+             .Property(s => s.IsDeleted)
+             .HasDefaultValue(false)
+             .ValueGeneratedNever();
+            //Website pages end
+
+            //Website pages start
+            modelBuilder.Entity<Verdict>()
+            .Property(s => s.CreatedOn)
+            .HasDefaultValueSql("getdate()");
+
+            modelBuilder.Entity<Verdict>()
              .Property(s => s.IsDeleted)
              .HasDefaultValue(false)
              .ValueGeneratedNever();
