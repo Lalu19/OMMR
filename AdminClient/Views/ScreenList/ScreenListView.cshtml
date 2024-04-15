@@ -45,17 +45,17 @@
     }
 
     /*   .radio-container {
-                display: inline-block;
-                margin-right: 10px;
-            }
-
-                .radio-container:last-child {
-                    margin-right: 0;
+                    display: inline-block;
+                    margin-right: 10px;
                 }
 
-                .radio-container input[type="radio"] {
-                    margin-right: 5px;
-                } */
+                    .radio-container:last-child {
+                        margin-right: 0;
+                    }
+
+                    .radio-container input[type="radio"] {
+                        margin-right: 5px;
+                    } */
 
 
     /* Add some spacing around the radio button and label */
@@ -146,14 +146,14 @@
                         </div>
                     </div>
 
-                   @*<div class="col-md-2">
-                        <div class="form-group">
-                            <label for="mediaFilter">MEDIA:</label>
-                            <div class="input-box">
-                                <select multiple="multiple" class="form-control select2 w-100"  id="selectMedia" name="selectedMedia[]">
-                                </select>
-                            </div>
-                        </div>
+                    @*<div class="col-md-2">
+                    <div class="form-group">
+                    <label for="mediaFilter">MEDIA:</label>
+                    <div class="input-box">
+                    <select multiple="multiple" class="form-control select2 w-100"  id="selectMedia" name="selectedMedia[]">
+                    </select>
+                    </div>
+                    </div>
                     </div>*@
 
                 </div>
@@ -467,7 +467,7 @@
         }
 
 
-        GetMediaHouse();
+      /* GetMediaHouse();
         function GetMediaHouse() {
             $.ajax({
                 type: "GET",
@@ -511,9 +511,9 @@
                     handleAjaxError(data);
                 }
             });
-        }
+        } */
 
-        /*  var table;
+      /* var table;
          $(document).ready(function () {
              // Load dropdowns and initialize DataTable
              GetState();
@@ -630,44 +630,36 @@
              }
          }); */
 
-
-
-
-
-
-
-    /*     GetVerdictRadio();
-        function GetVerdictRadio() {
-            $.ajax({
-                type: "GET",
-                url: "@apiUrl/api/Verdict/GetVerdictList",
-                contentType: "application/json; charset=utf-8",
-                headers: {
-                    "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
-                },
-                dataType: "json",
-                success: function (res) {
-                    console.log(res)
-                    var radios = [];
-                    for (var i = 0; i < res.data.length; i++) {
-                        radios.push('<div class="radio-container">');
-                        radios.push('<input type="radio" class="btn-check" name="options-outlined" id="verdict' + i + '" autocomplete="off" value="' + res.data[i].verdictValue + '">');
-                        radios.push('<label class="btn btn-outline-success" for="verdict' + i + '">' + res.data[i].verdictName + '</label>');
-                        radios.push('</div>');
+      /* GetVerdictRadio();
+            function GetVerdictRadio() {
+                $.ajax({
+                    type: "GET",
+                    url: "@apiUrl/api/Verdict/GetVerdictList",
+                    contentType: "application/json; charset=utf-8",
+                    headers: {
+                        "authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                    },
+                    dataType: "json",
+                    success: function (res) {
+                        console.log(res)
+                        var radios = [];
+                        for (var i = 0; i < res.data.length; i++) {
+                            radios.push('<div class="radio-container">');
+                            radios.push('<input type="radio" class="btn-check" name="options-outlined" id="verdict' + i + '" autocomplete="off" value="' + res.data[i].verdictValue + '">');
+                            radios.push('<label class="btn btn-outline-success" for="verdict' + i + '">' + res.data[i].verdictName + '</label>');
+                            radios.push('</div>');
+                        }
+                        $("#verdictRadios").html(radios.join(''));
+                    },
+                    error: function (data) {
+                        if (data.status == 401) {
+                            window.location.replace('/Message/TokenExpire');
+                        } else if (data.status == 403) {
+                            window.location.replace('/Message/Unauthorize');
+                        }
                     }
-                    $("#verdictRadios").html(radios.join(''));
-                },
-                error: function (data) {
-                    if (data.status == 401) {
-                        window.location.replace('/Message/TokenExpire');
-                    } else if (data.status == 403) {
-                        window.location.replace('/Message/Unauthorize');
-                    }
-                }
-            });
-        } */
-
-
+                });
+            } */
 
 
         GetVerdictRadio();
@@ -702,10 +694,10 @@
 
                             var verdictValue = parseFloat($(this).val()) / 100;
 
-                            var projectedCPVValue = (((estimatedBudget * campaignPeriod * newAdDuration) * verdictValue)/7)/100;
+                            var projectedCPVValue = (((estimatedBudget * campaignPeriod * newAdDuration) * verdictValue) / 7) / 100;
 
                             //projectedCPVValue = projectedCPVValue.toFixed(2);
-                            var projectedCPVValue = Math.round(projectedCPVValue)
+                            //var projectedCPVValue = Math.round(projectedCPVValue)
 
                             var totalCapacityAll = parseFloat($('#totalCapacityAll').val());
 
@@ -725,14 +717,6 @@
                 }
             });
         }
-
-
-
-       
-
-
-
-
 
 
         var table;
@@ -785,8 +769,6 @@
                 totalCapacityUpdate();
             }
 
-
-
             /*function updateEstimatedBudget() {
                    // Get the filtered data
                    var filteredData = table.rows({ search: 'applied' }).data().toArray();
@@ -800,142 +782,138 @@
                    $('#estimatedBudget').val(sumOfRate);
                } */
 
+            /*function updateEstimatedBudget() {
+                 // Get all data from the table
+                 var allData = table.rows().data().toArray();
 
+                 // Initialize sumOfRate
+                 var sumOfRate = 0;
 
-           /*function updateEstimatedBudget() {
-                // Get all data from the table
-                var allData = table.rows().data().toArray();
+                 // Get selected options from Media and MediaHouse dropdowns
+                 var selectedMedia = $('#selectMedia').val();
+                 var selectedMediaHouse = $('#selectMediaHouse').val();
 
-                // Initialize sumOfRate
-                var sumOfRate = 0;
+                 // Check if Media House is selected
+                 if (selectedMediaHouse) {
+                     // Loop through each selected Media House
+                     selectedMediaHouse.forEach(function (mediaHouse) {
+                         // Filter data based on selected Media House
+                         var filteredData = allData.filter(function (row) {
+                             return row.media === mediaHouse;
+                         });
 
-                // Get selected options from Media and MediaHouse dropdowns
-                var selectedMedia = $('#selectMedia').val();
-                var selectedMediaHouse = $('#selectMediaHouse').val();
+                         // Calculate the sum of rates
+                         var totalRate = filteredData.reduce(function (acc, curr) {
+                             return acc + parseFloat(curr.rate);
+                         }, 0);
 
-                // Check if Media House is selected
-                if (selectedMediaHouse) {
-                    // Loop through each selected Media House
-                    selectedMediaHouse.forEach(function (mediaHouse) {
-                        // Filter data based on selected Media House
-                        var filteredData = allData.filter(function (row) {
-                            return row.media === mediaHouse;
-                        });
+                         // Add to the total sum
+                         sumOfRate += totalRate;
+                     });
+                 }
 
-                        // Calculate the sum of rates
-                        var totalRate = filteredData.reduce(function (acc, curr) {
-                            return acc + parseFloat(curr.rate);
-                        }, 0);
+                 // Check if Media is selected
+                 if (selectedMedia) {
+                     // Loop through each selected Media
+                     selectedMedia.forEach(function (media) {
+                         // Filter data based on selected Media
+                         var filteredData = allData.filter(function (row) {
+                             return row.media === media;
+                         });
 
-                        // Add to the total sum
-                        sumOfRate += totalRate;
-                    });
-                }
+                         // Calculate the sum of rates
+                         var totalRate = filteredData.reduce(function (acc, curr) {
+                             return acc + parseFloat(curr.rate);
+                         }, 0);
 
-                // Check if Media is selected
-                if (selectedMedia) {
-                    // Loop through each selected Media
-                    selectedMedia.forEach(function (media) {
-                        // Filter data based on selected Media
-                        var filteredData = allData.filter(function (row) {
-                            return row.media === media;
-                        });
+                         // Add to the total sum
+                         sumOfRate += totalRate;
+                     });
+                 }
 
-                        // Calculate the sum of rates
-                        var totalRate = filteredData.reduce(function (acc, curr) {
-                            return acc + parseFloat(curr.rate);
-                        }, 0);
+                 // Apply the multiplication factor based on Media selection
+                 if (selectedMedia && (selectedMedia.includes('UFO') || selectedMedia.includes('QUBE'))) {
+                     // Multiply sumOfRate by 4 if Media is UFO or QUBE
+                     sumOfRate *= 4;
+                 }
+                 if (selectedMedia && (selectedMedia.includes('PVR INOX') || selectedMedia.includes('Cinepolis'))) {
+                     // Multiply sumOfRate by 5 if Media is PVR INOX or Cinepolis
+                     sumOfRate *= 5;
+                 }
+                    else {
+                     // Multiply sumOfRate by 2
+                     sumOfRate *= 2
+                 }
 
-                        // Add to the total sum
-                        sumOfRate += totalRate;
-                    });
-                }
+                 // Display the sum in the 'ESTIMATED BUDGET' text box
+                 $('#estimatedBudget').val(sumOfRate);
+             } */
 
-                // Apply the multiplication factor based on Media selection
-                if (selectedMedia && (selectedMedia.includes('UFO') || selectedMedia.includes('QUBE'))) {
-                    // Multiply sumOfRate by 4 if Media is UFO or QUBE
-                    sumOfRate *= 4;
-                }
-                if (selectedMedia && (selectedMedia.includes('PVR INOX') || selectedMedia.includes('Cinepolis'))) {
-                    // Multiply sumOfRate by 5 if Media is PVR INOX or Cinepolis
-                    sumOfRate *= 5;
-                }
-                   else {
-                    // Multiply sumOfRate by 2
-                    sumOfRate *= 2
-                }
+            /*function updateEstimatedBudget() {
+                 // Get the filtered data from the DataTable
+                 var filteredData = table.rows({ search: 'applied' }).data().toArray();
 
-                // Display the sum in the 'ESTIMATED BUDGET' text box
-                $('#estimatedBudget').val(sumOfRate);
-            } */
+                 // Initialize sumOfRate
+                 var sumOfRate = 0;
 
+                 // Get selected options from Media and MediaHouse dropdowns
+                 var selectedMedia = $('#selectMedia').val();
+                 var selectedMediaHouse = $('#selectMediaHouse').val();
 
+                 // Check if Media House is selected
+                 if (selectedMediaHouse) {
+                     // Loop through each selected Media House
+                     selectedMediaHouse.forEach(function (mediaHouse) {
+                         // Filter data based on selected Media House
+                         var filteredMediaData = filteredData.filter(function (row) {
+                             return row.media === mediaHouse;
+                         });
 
-           /*function updateEstimatedBudget() {
-                // Get the filtered data from the DataTable
-                var filteredData = table.rows({ search: 'applied' }).data().toArray();
+                         // Calculate the sum of rates
+                         var totalRate = filteredMediaData.reduce(function (acc, curr) {
+                             return acc + parseFloat(curr.rate);
+                         }, 0);
 
-                // Initialize sumOfRate
-                var sumOfRate = 0;
+                         // Add to the total sum
+                         sumOfRate += totalRate;
+                     });
+                 }
 
-                // Get selected options from Media and MediaHouse dropdowns
-                var selectedMedia = $('#selectMedia').val();
-                var selectedMediaHouse = $('#selectMediaHouse').val();
+                 // Check if Media is selected
+                 if (selectedMedia) {
+                     // Loop through each selected Media
+                     selectedMedia.forEach(function (media) {
+                         // Filter data based on selected Media
+                         var filteredMediaData = filteredData.filter(function (row) {
+                             return row.media === media;
+                         });
 
-                // Check if Media House is selected
-                if (selectedMediaHouse) {
-                    // Loop through each selected Media House
-                    selectedMediaHouse.forEach(function (mediaHouse) {
-                        // Filter data based on selected Media House
-                        var filteredMediaData = filteredData.filter(function (row) {
-                            return row.media === mediaHouse;
-                        });
+                         // Calculate the sum of rates
+                         var totalRate = filteredMediaData.reduce(function (acc, curr) {
+                             return acc + parseFloat(curr.rate);
+                         }, 0);
 
-                        // Calculate the sum of rates
-                        var totalRate = filteredMediaData.reduce(function (acc, curr) {
-                            return acc + parseFloat(curr.rate);
-                        }, 0);
+                         // Add to the total sum
+                         sumOfRate += totalRate;
+                     });
+                 }
 
-                        // Add to the total sum
-                        sumOfRate += totalRate;
-                    });
-                }
+                 // Apply the multiplication factor based on Media selection
+                 if (selectedMedia && (selectedMedia.includes('UFO') || selectedMedia.includes('QUBE'))) {
+                     // Multiply sumOfRate by 4 if Media is UFO or QUBE
+                     sumOfRate *= 4;
+                 }
+                 if (selectedMedia && (selectedMedia.includes('PVR INOX') || selectedMedia.includes('Cinepolis'))) {
+                     // Multiply sumOfRate by 5 if Media is PVR INOX or Cinepolis
+                     sumOfRate *= 5;
+                 } else {
+                     // Multiply sumOfRate by 2
+                     sumOfRate *= 2;
+                 }
 
-                // Check if Media is selected
-                if (selectedMedia) {
-                    // Loop through each selected Media
-                    selectedMedia.forEach(function (media) {
-                        // Filter data based on selected Media
-                        var filteredMediaData = filteredData.filter(function (row) {
-                            return row.media === media;
-                        });
-
-                        // Calculate the sum of rates
-                        var totalRate = filteredMediaData.reduce(function (acc, curr) {
-                            return acc + parseFloat(curr.rate);
-                        }, 0);
-
-                        // Add to the total sum
-                        sumOfRate += totalRate;
-                    });
-                }
-
-                // Apply the multiplication factor based on Media selection
-                if (selectedMedia && (selectedMedia.includes('UFO') || selectedMedia.includes('QUBE'))) {
-                    // Multiply sumOfRate by 4 if Media is UFO or QUBE
-                    sumOfRate *= 4;
-                }
-                if (selectedMedia && (selectedMedia.includes('PVR INOX') || selectedMedia.includes('Cinepolis'))) {
-                    // Multiply sumOfRate by 5 if Media is PVR INOX or Cinepolis
-                    sumOfRate *= 5;
-                } else {
-                    // Multiply sumOfRate by 2
-                    sumOfRate *= 2;
-                }
-
-                // Display the sum in the 'ESTIMATED BUDGET' text box
-                $('#estimatedBudget').val(sumOfRate);
-            } */
+                 // Display the sum in the 'ESTIMATED BUDGET' text box
+                 $('#estimatedBudget').val(sumOfRate);
+             } */
 
 
             function updateEstimatedBudget() {
@@ -1001,7 +979,6 @@
                 $('#estimatedBudget').val(sumOfRate);
             }
 
-
             function totalCapacityUpdate() {
                 // Get the filtered data from the DataTable
                 var filteredData = table.rows({ search: 'applied' }).data().toArray();
@@ -1066,9 +1043,6 @@
                 var totalCapacityValue = totalCapacity;
             }
 
-
-
-
             function initializeDataTable() {
                 table = $('#Agent_Tb').DataTable({
                     "dom": 'Bfrtip',
@@ -1127,6 +1101,27 @@
                         { "data": "media", "orderable": true, "visible": true },
                     ]
                 });
+
+                function saveDataToDatabase(data) {
+
+                    data.forEach(function (item) {
+                        item.createdBy = @Context.Session.GetInt32("UserId");
+                    });
+                    $.ajax({
+                        type: "POST",
+                        url: '@apiUrl/api/ClientSearch/SaveDataToDatabase/SaveDataToDatabase', // Change this to the correct API endpoint for saving data
+                        contentType: "application/json",
+                        data: JSON.stringify(data),
+                        success: function (response) {
+                            console.log("Data saved to the database: " + response);
+
+                        },
+                        error: function (error) {
+                            console.error("Error saving data to the database: " + error);
+                        }
+                    });
+                }
+
 
                 // Calculate and display the initial sum of 'rate' values
                 updateEstimatedBudget();
