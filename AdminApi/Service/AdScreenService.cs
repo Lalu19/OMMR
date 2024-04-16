@@ -56,10 +56,10 @@ namespace AdminApi.Service
                     .Where(mapping => mapping.StateId == Stateid && mapping.AgentId == AgentId && mapping.TheatreName == TheaterName)
                     .ToList();
 
-                foreach (var mapping in agentMappingsToUpdate)
-                {
-                    mapping.TaskAccepted = true; // Set TaskAccepted to true
-                }
+                //foreach (var mapping in agentMappingsToUpdate)
+                //{
+                //    mapping.TaskAccepted = true; // Set TaskAccepted to true
+                //}
 
                 // Update AgentReports table
                 var agentReportsToUpdate = _context.AgentReports
@@ -67,11 +67,11 @@ namespace AdminApi.Service
                     .OrderByDescending(report => report.NotifiedOn) // Order by Timestamp to get the latest entry
                     .FirstOrDefault(); // Get the latest entry
 
-                if (agentReportsToUpdate != null)
-                {
-                    agentReportsToUpdate.TaskAccepted = true; // Set TaskAccepted to true
-                    agentReportsToUpdate.TaskAcceptedTime = DateTime.Now;
-                }
+                //if (agentReportsToUpdate != null)
+                //{
+                //    agentReportsToUpdate.TaskAccepted = true; // Set TaskAccepted to true
+                //    agentReportsToUpdate.TaskAcceptedTime = DateTime.Now;
+                //}
 
                 _context.SaveChanges();
                 return  groupedAds ;
