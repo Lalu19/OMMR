@@ -73,8 +73,10 @@
         }
             /* Style for the label when the radio button is checked */
             .radio-container input[type="radio"]:checked + label {
-                background-color: #28a745; /* Change background color */
-                color: #fff; /* Change text color */
+                background-color:grey; 
+                color: #fff;
+
+              
 
 </style>
 
@@ -267,7 +269,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.4/dist/xlsx.full.min.js"></script>
-
 
 @section scripts {
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.4/dist/xlsx.full.min.js"></script> <!-- Include the xlsx library script reference -->
@@ -677,14 +678,26 @@
                     var radios = [];
                     for (var i = 0; i < res.data.length; i++) {
                         radios.push('<div class="radio-container">');
+
                         radios.push('<input type="radio" class="btn-check" name="options-outlined" id="verdict' + i + '" autocomplete="off" value="' + res.data[i].verdictValue + '">');
-                        radios.push('<label class="btn btn-outline-success" for="verdict' + i + '">' + res.data[i].verdictName + '</label>');
+
+                      /*radios.push('<label class="btn btn-outline-secondary" for="verdict' + i + '">' + res.data[i].verdictName + '</label>'); */
+
+                        radios.push('<label class="btn btn-outline-' + res.data[i].colorCode + '" for="verdict' + i + '">' + res.data[i].verdictName + '</label>');
+
                         radios.push('</div>');
                     }
                     $("#verdictRadios").html(radios.join(''));
 
                     // Bind event listener to the newly created radio buttons
                     $('input[name="options-outlined"]').change(function () {
+
+                        // Reset background color of all labels
+                        $('label.btn').removeClass('active');
+
+                        // Set background color of clicked label
+                        $(this).siblings('label').addClass('active');
+
                         if ($(this).is(':checked')) {
                             var estimatedBudget = parseFloat($('#estimatedBudget').val());
                             var campaignPeriod = parseFloat($('#campaignPeriod').val());

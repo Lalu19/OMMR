@@ -3,14 +3,14 @@
 @inject IConfiguration Configuration;
 
 @{
-    ViewBag.Title = "Verdict";
+    ViewBag.Title = "Projected Admits";
     string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
 }
 <!-- PAGE-HEADER -->
 <div class="page-header">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="#"><i class="fe fe-file-text mr-1"></i>Admin Consol</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Verdict Edit</li>
+        <li class="breadcrumb-item active" aria-current="page">Projected Admits Edit</li>
     </ol>
     <div class="ml-auto">
         <a href="~/Verdict/VerdictList" class="btn btn-primary btn-icon btn-sm text-white mr-2">
@@ -32,15 +32,22 @@
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label class="form-label">Verdict Name &nbsp;<span style="color: red;"><b>*</b></span></label>
-                                <input type="text" class="form-control" id="VerdictName" placeholder="Enter Verdict Name" required>
+                                <label class="form-label">Projected Admits Name &nbsp;<span style="color: red;"><b>*</b></span></label>
+                                <input type="text" class="form-control" id="VerdictName" placeholder="Projected Admits Name" required>
                             </div>
                         </div>
 
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label class="form-label">Verdict Percentage &nbsp;<span style="color: red;"><b>*</b></span></label>
-                                <input type="number" class="form-control" id="VerdictValue" placeholder="Enter Verdict Percentage " required>
+                                <label class="form-label">Projected Admits Percentage &nbsp;<span style="color: red;"><b>*</b></span></label>
+                                <input type="number" class="form-control" id="VerdictValue" placeholder="Projected Admits Percentage " required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Bootstrap Button Color Class &nbsp;<span style="color: red;"><b>*</b></span></label>
+                                <input type="text" class="form-control" id="ColorCode" placeholder="ootstrap Button Color Class" required>
                             </div>
                         </div>
 
@@ -76,6 +83,7 @@
                     if (data) {
                         $('#VerdictName').val(data.verdictName);
                         $('#VerdictValue').val(data.verdictValue);
+                        $('#ColorCode').val(data.colorCode);
 
                     }
                     else {
@@ -101,6 +109,7 @@
                     verdictId: verdictId,
                     verdictName: $.trim($("#VerdictName").val()),
                     verdictValue: $.trim($("#VerdictValue").val()),
+                    colorCode: $.trim($("#ColorCode").val()),
                     updatedBy: @Context.Session.GetInt32("UserId"),
                 }
                 console.log(model)
@@ -137,7 +146,7 @@
                         if (xhr.status === 200) {
                             Swal.fire({
                                 icon: "success",
-                                title: "Verdict Update",
+                                title: "Projected Admits Update",
                                 text: "Successfully Updated!",
                             }).then(function () {
                                 location.reload(); // Refresh the page
@@ -147,7 +156,7 @@
                         } else if (data.status === "Duplicate") {
                             Swal.fire({
                                 icon: "warning",
-                                title: "Verdict Already Exists!",
+                                title: "Projected Admits Already Exists!",
                                 text: data.responseMsg,
                             }).then(function () {
                                 location.reload(); // Refresh the page

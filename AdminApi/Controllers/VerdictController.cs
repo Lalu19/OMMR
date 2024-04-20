@@ -38,6 +38,7 @@ namespace AdminApi.Controllers
                     Verdict vd = new Verdict();
                     vd.VerdictName = verdictDTO.VerdictName;
                     vd.VerdictValue = verdictDTO.VerdictValue;
+                    vd.ColorCode = verdictDTO.ColorCode;
                     vd.CreatedBy = verdictDTO.CreatedBy;
                     vd.CreatedOn = System.DateTime.Now;
                     var obj = _VerdictRepo.Insert(vd);
@@ -68,6 +69,7 @@ namespace AdminApi.Controllers
                                 u.VerdictId,
                                 u.VerdictName,
                                 u.VerdictValue,
+                                u.ColorCode,
                                 u.IsDeleted
                             }).Where(x => x.IsDeleted == false).ToList();
 
@@ -99,6 +101,7 @@ namespace AdminApi.Controllers
 
                 objVerdict.VerdictName = updateVerdictDTO.VerdictName;
                 objVerdict.VerdictValue = updateVerdictDTO.VerdictValue;
+                objVerdict.ColorCode = updateVerdictDTO.ColorCode;
 
                 objVerdict.UpdatedBy = updateVerdictDTO.UpdatedBy;
                 objVerdict.UpdatedOn = System.DateTime.Now;
