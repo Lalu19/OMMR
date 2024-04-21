@@ -103,9 +103,9 @@
                         </button>
                         <br />
                         <br />
-                        <button type="button" id="ClearAllNotification" class="btn btn-info btn-icon btn-lg text-white btndesign clearbutton">
+                       @* <button type="button" id="ClearAllNotification" class="btn btn-info btn-icon btn-lg text-white btndesign clearbutton">
                             ClearAll
-                        </button>
+                        </button>*@
                     </div>
 
                     <div class="row">
@@ -390,47 +390,47 @@
             });
 
 
-            $("#ClearAllNotification").click(function () {
-                // Show preloader
-                var preloader = $("#preloader");
-                preloader.removeClass("d-none");
+            //$("#ClearAllNotification").click(function () {
+            //    // Show preloader
+            //    var preloader = $("#preloader");
+            //    preloader.removeClass("d-none");
 
-                $.ajax({
-                    type: "POST",
-                    url: "@apiUrl/api/Agent/RefreshBooleans",
-                    contentType: "application/json",
-                    //headers: {
-                    //    "Authorization": "Bearer @Context.Session.GetString("TokenTxt")"
-                    //},
-                    success: function (data, statusText, xhr) {
-                        if (xhr.status === 200) {
-                            Swal.fire({
-                                icon: "success",
-                                title: "All Notification Clear Primary Agents",
-                                text: "Successfully Cleared!",
-                            }).then(function () {
-                                location.reload(); // Refresh the page or perform other actions
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: "warning",
-                                title: "Clear Alert!",
-                                text: "Something unexpected happened!",
-                            });
-                        }
-                        preloader.addClass("d-none");
-                    },
-                    error: function (xhr, textStatus, errorThrown) {
-                        // Handle errors in the API call for notification
-                        Swal.fire({
-                            icon: "warning",
-                            title: "Clear Alert!",
-                            text: "Error in the API call for notification: " + errorThrown,
-                        });
-                        preloader.addClass("d-none");
-                    }
-                });
-            });
+            //    $.ajax({
+            //        type: "POST",
+            //        url: "@apiUrl/api/Agent/RefreshBooleans",
+            //        contentType: "application/json",
+            //        //headers: {
+            //        //    "Authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+            //        //},
+            //        success: function (data, statusText, xhr) {
+            //            if (xhr.status === 200) {
+            //                Swal.fire({
+            //                    icon: "success",
+            //                    title: "All Notification Clear Primary Agents",
+            //                    text: "Successfully Cleared!",
+            //                }).then(function () {
+            //                    location.reload(); // Refresh the page or perform other actions
+            //                });
+            //            } else {
+            //                Swal.fire({
+            //                    icon: "warning",
+            //                    title: "Clear Alert!",
+            //                    text: "Something unexpected happened!",
+            //                });
+            //            }
+            //            preloader.addClass("d-none");
+            //        },
+            //        error: function (xhr, textStatus, errorThrown) {
+            //            // Handle errors in the API call for notification
+            //            Swal.fire({
+            //                icon: "warning",
+            //                title: "Clear Alert!",
+            //                text: "Error in the API call for notification: " + errorThrown,
+            //            });
+            //            preloader.addClass("d-none");
+            //        }
+            //    });
+            //});
         });
     </script>
 
