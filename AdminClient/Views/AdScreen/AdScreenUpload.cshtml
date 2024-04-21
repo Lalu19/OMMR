@@ -42,8 +42,13 @@
 </style>
 
 <style>
-    .btndesign{
-        border-radius:10px;
+    .btndesign {
+        border-radius: 10px;
+    }
+
+    button#ClearAllNotification {
+        background-color: rebeccapurple;
+        border-color: rebeccapurple;
     }
 </style>
 
@@ -96,6 +101,11 @@
                                 <i class="fa fa-bell"></i>
                             </span> Initiate Notification
                         </button>
+                        <br />
+                        <br />
+                        <button type="button" id="ClearAllNotification" class="btn btn-info btn-icon btn-lg text-white btndesign clearbutton">
+                            ClearAll
+                        </button>
                     </div>
 
                     <div class="row">
@@ -128,7 +138,7 @@
                 var wb = XLSX.utils.book_new();
 
                 // Define the worksheet
-                var ws = XLSX.utils.aoa_to_sheet([["State", "City", "TheatreName", "Screen", "AdsName", "AdsLanguage", "AdsSequence", "AdsDuration", "AdsPlaytime", "AdsYoutubeLink","Media"]]);
+                var ws = XLSX.utils.aoa_to_sheet([["State", "City", "TheatreName", "Screen", "AdsName", "AdsLanguage", "AdsSequence", "AdsDuration", "AdsPlaytime", "AdsYoutubeLink", "Media"]]);
 
                 // Add the worksheet to the workbook
                 XLSX.utils.book_append_sheet(wb, ws, "Template");
@@ -216,7 +226,7 @@
                         }
                         preloader.addClass("d-none");
                     },
-                  
+
                     error: function (xhr, textStatus, errorThrown) {
                         if (xhr.status == 401) {
                             window.location.replace('/Message/TokenExpire');
@@ -353,6 +363,9 @@
                                 title: "Notification sent to Primary Agents",
                                 text: "Successfully initiated!",
                             }).then(function () {
+                                setTimeout(function () {
+                                    $("#ClearAllNotification").hide();
+                                }, 30 * 60 * 1000);
                                 location.reload(); // Refresh the page or perform other actions
                             });
                         } else {
@@ -376,6 +389,48 @@
                 });
             });
 
+
+            $("#ClearAllNotification").click(function () {
+                // Show preloader
+                var preloader = $("#preloader");
+                preloader.removeClass("d-none");
+
+                $.ajax({
+                    type: "POST",
+                    url: "@apiUrl/api/Agent/RefreshBooleans",
+                    contentType: "application/json",
+                    //headers: {
+                    //    "Authorization": "Bearer @Context.Session.GetString("TokenTxt")"
+                    //},
+                    success: function (data, statusText, xhr) {
+                        if (xhr.status === 200) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "All Notification Clear Primary Agents",
+                                text: "Successfully Cleared!",
+                            }).then(function () {
+                                location.reload(); // Refresh the page or perform other actions
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: "warning",
+                                title: "Clear Alert!",
+                                text: "Something unexpected happened!",
+                            });
+                        }
+                        preloader.addClass("d-none");
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        // Handle errors in the API call for notification
+                        Swal.fire({
+                            icon: "warning",
+                            title: "Clear Alert!",
+                            text: "Error in the API call for notification: " + errorThrown,
+                        });
+                        preloader.addClass("d-none");
+                    }
+                });
+            });
         });
     </script>
 

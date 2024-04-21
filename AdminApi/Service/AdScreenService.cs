@@ -49,12 +49,12 @@ namespace AdminApi.Service
                     })
                     .ToList();
 
-                int totalRecords = groupedAds.Count();
+               // int totalRecords = groupedAds.Count();
 
                 // Update AgentMapping table
-                var agentMappingsToUpdate = _context.AgentMappings
-                    .Where(mapping => mapping.StateId == Stateid && mapping.AgentId == AgentId && mapping.TheatreName == TheaterName)
-                    .ToList();
+               // var agentMappingsToUpdate = _context.AgentMappings
+                   // .Where(mapping => mapping.StateId == Stateid && mapping.AgentId == AgentId && mapping.TheatreName == TheaterName)
+                   // .ToList();
 
                 //foreach (var mapping in agentMappingsToUpdate)
                 //{
@@ -62,10 +62,10 @@ namespace AdminApi.Service
                 //}
 
                 // Update AgentReports table
-                var agentReportsToUpdate = _context.AgentReports
-                    .Where(report => report.StateId == Stateid && report.AgentId == AgentId && report.TheatreName == TheaterName)
-                    .OrderByDescending(report => report.NotifiedOn) // Order by Timestamp to get the latest entry
-                    .FirstOrDefault(); // Get the latest entry
+              //  var agentReportsToUpdate = _context.AgentReports
+              //  .Where(report => report.StateId == Stateid && report.AgentId == AgentId && report.TheatreName == TheaterName)
+               // .OrderByDescending(report => report.NotifiedOn) // Order by Timestamp to get the latest entry
+               // .FirstOrDefault(); // Get the latest entry
 
                 //if (agentReportsToUpdate != null)
                 //{
@@ -73,7 +73,7 @@ namespace AdminApi.Service
                 //    agentReportsToUpdate.TaskAcceptedTime = DateTime.Now;
                 //}
 
-                _context.SaveChanges();
+                //_context.SaveChanges();
                 return  groupedAds ;
             }
             catch (Exception ex)

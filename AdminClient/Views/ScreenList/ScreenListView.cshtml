@@ -76,7 +76,7 @@
                 background-color:grey; 
                 color: #fff;
 
-              
+            } 
 
 </style>
 
@@ -683,7 +683,7 @@
 
                       /*radios.push('<label class="btn btn-outline-secondary" for="verdict' + i + '">' + res.data[i].verdictName + '</label>'); */
 
-                        radios.push('<label class="btn btn-outline-' + res.data[i].colorCode + '" for="verdict' + i + '">' + res.data[i].verdictName + '</label>');
+                        radios.push('<label class="btn" for="verdict' + i + '"  style="background-color: ' + res.data[i].colorCode + ' ; color:' + res.data[i].colorCode + ';border-color:' + res.data[i].colorCode + ';background-color: transparent; background-image: none;">' + res.data[i].verdictName + '</label>');
 
                         radios.push('</div>');
                     }
@@ -691,12 +691,21 @@
 
                     // Bind event listener to the newly created radio buttons
                     $('input[name="options-outlined"]').change(function () {
-
+                         var index = $('input[name="options-outlined"]').index(this);
                         // Reset background color of all labels
-                        $('label.btn').removeClass('active');
+                        $('label.btn').removeClass('active').css({
+                            'background-color': 'transparent',
+                            'color': res.data[index].colorCode,
+                            'border-color':res.data[index].colorCode,
+                            'background-image': 'none'
 
-                        // Set background color of clicked label
-                        $(this).siblings('label').addClass('active');
+                        });
+                        // Set background color of clicked label and remove other inline styles
+                        $('label.btn:eq(' + index + ')').addClass('active').css({
+                            'background-color': res.data[index].colorCode,
+                            'color': '#fff'
+                        });
+
 
                         if ($(this).is(':checked')) {
                             var estimatedBudget = parseFloat($('#estimatedBudget').val());

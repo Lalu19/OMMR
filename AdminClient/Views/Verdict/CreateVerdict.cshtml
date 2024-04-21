@@ -6,7 +6,13 @@
     ViewBag.Title = "Projected Admits";
     string apiUrl = Configuration.GetValue<string>("WebAPIBaseUrl");
 }
-
+<style>
+    input#ColorCode {
+        padding: 0 0 0 0;
+        height: 37px;
+        width: 45%;
+    }
+</style>
 <!-- PAGE-HEADER -->
 <div class="page-header">
     <ol class="breadcrumb">
@@ -46,10 +52,10 @@
                                 <input type="number" class="form-control" id="VerdictValue" placeholder="Projected Admits Percentage " required>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="form-group">
-                                <label class="form-label">Bootstrap Button Color Class &nbsp;<span style="color: red;"><b>*</b></span></label>
-                                <input type="text" class="form-control" id="ColorCode" placeholder="Bootstrap Button Color Class" required>
+                                <label class="form-label"> Color &nbsp;<span style="color: red;"><b>*</b></span></label>
+                                <input type="color" class="form-control" id="ColorCode"  required>
                             </div>
                         </div>
 

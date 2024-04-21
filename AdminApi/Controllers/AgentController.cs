@@ -1020,6 +1020,8 @@ namespace AdminApi.Controllers
 
                 foreach (var result in resultList)
                 {
+                    
+
                     if (result.GetType().GetProperty("Status") != null && result.GetType().GetProperty("ResponseMsg") != null)
                     {
                         errorMessages.Add(result);
@@ -1040,10 +1042,24 @@ namespace AdminApi.Controllers
 
                         await SendNotifications(fcmToken, $"{theatre} Assigned", "Hello");
                         await agentService.SendEmail("ommr.ibl@gmail.com", mailTo, subject, body);
+
+                        
                     }
+                   
+
+                }
+                var agentmaapping = _context.AgentMappings.Where(x => x.IsDeleted == false && x.IsTimeExpired == true).ToList();
+                if (agentmaapping.Any())
+                {
+                    foreach (var agent in agentmaapping)
+                    {
+                        agent.IsTimeExpired = false; 
+                    }
+
+                    await _context.SaveChangesAsync();
                 }
 
-                  BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromMinutes(30));
+                BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromMinutes(30));
                 // BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromMinutes(2));
                 // BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromMinutes(10));
 
@@ -1051,8 +1067,8 @@ namespace AdminApi.Controllers
                 var response = new
                 {
                     Data = data,
-                    //ErrorMessages = errorMessages
                 };
+                _context.SaveChanges();
                 return Ok(response);
             }
             catch (Exception ex)
@@ -1539,7 +1555,7 @@ namespace AdminApi.Controllers
 
                 //BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromHours(24));
                 //BackgroundJob.Schedule(() => PrimaryAgentNoResponseBackupAgentAssign(), TimeSpan.FromMinutes(2));
-                BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromMinutes(2));
+                BackgroundJob.Schedule(() => PrimaryAgentNoResponse(), TimeSpan.FromMinutes(30));
 
 
                 var response = new
